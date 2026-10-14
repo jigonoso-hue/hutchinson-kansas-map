@@ -836,6 +836,7 @@ if(location.hash==='#test')window.__hm={places,computeRoute,analyse,store,E};
 readColors();updateTraffic();renderLandmarks();renderPins();syncFields();resize();recompute(true);
 const lmHash=/^#lm(\d+)$/.exec(location.hash);
 if(lmHash&&byId('lm'+lmHash[1]))select(byId('lm'+lmHash[1]),true);
+window.addEventListener('hashchange',()=>{const h=/^#lm(\d+)$/.exec(location.hash);if(h&&byId('lm'+h[1]))select(byId('lm'+h[1]),true);});
 if(location.hash!=='#test'&&location.hash!=='#notime'&&!lmHash)openTime();
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>draw());
 })();
