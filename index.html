@@ -25,6 +25,9 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:6px 24px 14px;flex-wrap:wrap;min-height:84px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-top:-34px}
 .brand img{width:64px;height:64px;flex:none;object-fit:contain}
+.brand img.fullmark{width:auto;height:92px;margin:-10px 0 -4px}
+.brand .tag{font:700 15px/1.1 Inter;color:var(--blue);letter-spacing:.06em}
+.brand .tag2{font:600 12px/1.2 Inter;color:var(--blue);margin-top:5px;letter-spacing:.04em}
 .brand b{display:block;font:700 28px/1 Inter,sans-serif;color:var(--blue);letter-spacing:-.5px}
 .brand span{display:block;font:600 12.5px/1.2 Inter,sans-serif;color:var(--blue);letter-spacing:.02em;margin-top:5px}
 .nav{display:flex;gap:30px;align-items:center;font-weight:600;font-size:16px;letter-spacing:.03em;text-transform:uppercase}
@@ -140,8 +143,9 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   .head{padding:6px 16px 10px;gap:6px}
   .brand{margin-top:0;gap:10px}
   .brand img{width:48px;height:48px}
-  .brand b{font-size:20px;letter-spacing:-.3px}
-  .brand span{font-size:10.5px}
+  .brand img.fullmark{width:auto;height:64px;margin:0}
+  .brand .tag{font-size:13px}
+  .brand .tag2{font-size:10.5px}
   .nav{width:100%;justify-content:space-between;gap:8px;font-size:13px;border-top:1px solid var(--line);margin-top:4px}
   .nav a{display:inline-flex;align-items:center;min-height:44px}
   .hero{min-height:0;display:block}
@@ -185,8 +189,8 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   </nav>
   <div class="head">
     <a class="brand" href="index.html" aria-label="Hutchinson High School home">
-      <img src="assets/logo-h.png" alt="" width="64" height="64">
-      <div><b>Hutchinson High School</b><span>HOME OF THE SALTHAWKS | CLASS OF 2005</span></div>
+      <img class="fullmark" src="assets/logo-full.png" alt="Hutchinson High School logo">
+      <div><span class="tag">HOME OF THE SALTHAWKS</span><span class="tag2">CLASS OF 2005</span></div>
     </a>
     <div class="nav"><a class="menu" href="#main"><i></i>Menu</a><a href="#cliques">Crowds</a><a href="#documents">Documents</a></div>
   </div>
@@ -212,7 +216,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
     <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Town map</a>
     <a href="#landmarks"><svg viewBox="0 0 48 48"><path d="M24 42s-12-11-12-20a12 12 0 0124 0c0 9-12 20-12 20z"/><circle cx="24" cy="22" r="4.5"/></svg>Around town</a>
     <a href="map.html#lm2"><svg viewBox="0 0 48 48"><path d="M8 38V20l16-10 16 10v18"/><path d="M8 38h32M16 38V26h16v12"/></svg>Friday night</a>
-    <a href="map.html#lm14"><svg viewBox="0 0 48 48"><path d="M6 14h26v20H6zM32 22h8l4 6v6H32z"/><circle cx="14" cy="36" r="3.5"/><circle cx="38" cy="36" r="3.5"/></svg>Kwik Shops</a>
+    <a href="pdfs/Hutchinson_Clique_Leaders_Player_Guide.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M24 6l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/></svg>Clique leaders</a>
   </nav>
 
   <section class="band" id="news">
@@ -258,7 +262,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
   <section class="wrap cliques" id="cliques" aria-labelledby="ch">
     <h2 class="sec" id="ch">Find your crowd</h2>
-    <p class="lead">Every hallway at Hutchinson High belongs to somebody. Choose one crowd, spend six standing points, and make it count. Every +1 standing with a crowd is a -1 with its enemy.</p>
+    <p class="lead">Every hallway at Hutchinson High belongs to somebody. Choose one crowd, spend six standing points, and make it count. Every +1 standing with a crowd is a -1 with its enemy. <a href="pdfs/Hutchinson_Clique_Leaders_Player_Guide.pdf" target="_blank" rel="noopener">Meet the leaders of each crowd (PDF)</a>.</p>
     <div class="cgrid" id="cgrid"></div>
   </section>
 
@@ -291,6 +295,7 @@ const DOCS=[
   {title:"Welcome Letter to the Senior Class",file:"pdfs/Hutchinson_Class_of_2005.pdf",desc:"A September 2004 letter from Principal Dale Hargrove to the Class of 2005."},
   {title:"Student Register, Class of 2005",file:"pdfs/Hutchinson_Student_Register.pdf",desc:"The registrar's form: clique, family, friends and rivals, and standing."},
   {title:"Find Your Crowd: Clique Brochure",file:"pdfs/Hutchinson_Clique_Brochure.pdf",desc:"A guide to the cliques of Hutchinson High, with perks, baggage and enemies."},
+  {title:"Who Runs the Halls: Clique Leaders Guide",file:"pdfs/Hutchinson_Clique_Leaders_Player_Guide.pdf",desc:"Who leads each crowd: names, hangouts, wants, how to earn their trust, and the whispers."},
 ];
 const LANDMARKS=["Hutchinson High School","Gowans Stadium","Hutchinson Community College","Cosmosphere","Downtown and the Fox Theatre","Kansas State Fairgrounds","Hutchinson Regional Airport","Carey Park and Hutchinson Zoo","Strataca Salt Mine","Prairie Dunes","Sand Hills State Park","Dillon Nature Center","Hutchinson Public Library","Dillons Distribution Center"];
 const $=id=>document.getElementById(id);
