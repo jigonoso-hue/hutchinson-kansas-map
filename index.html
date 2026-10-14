@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hutchinson Maps | Fall 2004</title>
+<title>Hutchinson High School | Class of 2005</title>
 <link rel="icon" type="image/png" href="assets/logo-h.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap">
@@ -94,6 +94,16 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .prin cite{display:block;font:600 15px Inter;color:var(--blue);font-style:normal;margin-bottom:18px}
 .prin .btn{background:var(--blue);color:#fff}
 @media (max-width:700px){.prin{grid-template-columns:1fr;text-align:center}.prin img{max-width:220px;margin:0 auto}}
+.lead{margin:-8px 0 22px;max-width:46em}
+.cliques{padding-top:50px}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.cc{background:#fff;border:1px solid var(--line);border-top:4px solid var(--blue);border-radius:3px;padding:18px;display:flex;flex-direction:column;gap:8px;font-size:14.5px}
+.cc h3{margin:0;font:900 22px/1.1 "Playfair Display",Georgia,serif;color:var(--navy)}
+.cc em{color:var(--blue);font-weight:600;font-style:normal}
+.cc .sk{font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8a6500}
+.cc p{margin:0}
+.cc b{color:var(--navy)}
+.cc .en{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);font-weight:600;color:#a02335}
 /* viewer */
 .viewer{position:fixed;inset:0;background:rgba(10,20,40,.7);z-index:50;display:flex;align-items:center;justify-content:center;padding:18px}
 .viewer[hidden]{display:none}
@@ -133,38 +143,38 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
 <header class="top">
   <nav class="util" aria-label="Quick links">
-    <a href="map.html">Interactive Map</a><a href="#documents">Documents</a><a href="#landmarks">Landmarks</a><a href="map.html#notime">Route Planner</a>
+    <a href="map.html">Town Map</a><a href="#documents">Student Documents</a><a href="#cliques">The Crowds</a><a href="#landmarks">Around Town</a>
   </nav>
   <div class="head">
-    <a class="brand" href="index.html" aria-label="Hutchinson Maps home">
+    <a class="brand" href="index.html" aria-label="Hutchinson High School home">
       <img src="assets/logo-h.png" alt="" width="64" height="64">
-      <div><b>Hutchinson Maps</b><span>ROADS | RIVERS | SHORTCUTS | LANDMARKS</span></div>
+      <div><b>Hutchinson High School</b><span>HOME OF THE SALTHAWKS | CLASS OF 2005</span></div>
     </a>
-    <div class="nav"><a class="menu" href="#main"><i></i>Menu</a><a href="#landmarks">Places</a><a href="#documents">Documents</a></div>
+    <div class="nav"><a class="menu" href="#main"><i></i>Menu</a><a href="#cliques">Crowds</a><a href="#documents">Documents</a></div>
   </div>
 </header>
 
 <main id="main">
   <section class="hero" aria-label="Welcome">
     <div class="hero-in">
-      <small>Fall 2004</small>
-      <h1>Find your way around Hutchinson.</h1>
-      <p>Plan a route by walking, running, biking or driving. Learn about every landmark in town, from the high school to the salt mine. Traffic follows the clock, so check the time before you go.</p>
-      <a class="btn" href="map.html">Open the map</a><a class="btn ghost" href="#documents">Browse documents</a>
+      <small>Class of 2005</small>
+      <h1>Welcome back, Salthawks.</h1>
+      <p>Senior year starts now. Pick your crowd, spend your standing, and find your way around town. Built on salt, standing strong.</p>
+      <a class="btn" href="#documents">Student documents</a><a class="btn ghost" href="map.html">Town map</a>
     </div>
     <div class="mascots"><img src="assets/mascot-big.png" alt="Salthawk mascot"><img class="lil" src="assets/mascot-little.png" alt="Little Salthawk"></div>
     <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </section>
 
   <nav class="quick" aria-label="Quick links">
-    <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Interactive map</a>
-    <a href="#landmarks"><svg viewBox="0 0 48 48"><path d="M24 42s-12-11-12-20a12 12 0 0124 0c0 9-12 20-12 20z"/><circle cx="24" cy="22" r="4.5"/></svg>Landmarks</a>
-    <a href="map.html#notime"><svg viewBox="0 0 48 48"><circle cx="12" cy="36" r="4"/><circle cx="36" cy="12" r="4"/><path d="M16 36h14a6 6 0 000-12H18a6 6 0 010-12h14"/></svg>Route planner</a>
-    <a href="#documents"><svg viewBox="0 0 48 48"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14"/></svg>Documents</a>
+    <a href="#documents" data-doc="0"><svg viewBox="0 0 48 48"><path d="M8 14l16 12 16-12"/><rect x="6" y="10" width="36" height="28" rx="2"/></svg>Welcome letter</a>
+    <a href="#documents" data-doc="1"><svg viewBox="0 0 48 48"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14"/></svg>Student register</a>
+    <a href="#documents" data-doc="2"><svg viewBox="0 0 48 48"><path d="M6 10h16v28H6zM26 10h16v28H26z"/><path d="M12 18h6M12 24h6M32 18h6M32 24h6"/></svg>Clique brochure</a>
+    <a href="#cliques"><svg viewBox="0 0 48 48"><circle cx="16" cy="16" r="6"/><circle cx="34" cy="18" r="5"/><path d="M4 40c0-9 6-14 12-14s12 5 12 14M28 40c0-7 4-11 9-11s8 4 8 11"/></svg>The crowds</a>
+    <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Town map</a>
+    <a href="#landmarks"><svg viewBox="0 0 48 48"><path d="M24 42s-12-11-12-20a12 12 0 0124 0c0 9-12 20-12 20z"/><circle cx="24" cy="22" r="4.5"/></svg>Around town</a>
     <a href="map.html#lm2"><svg viewBox="0 0 48 48"><path d="M8 38V20l16-10 16 10v18"/><path d="M8 38h32M16 38V26h16v12"/></svg>Friday night</a>
-    <a href="#news"><svg viewBox="0 0 48 48"><rect x="8" y="10" width="32" height="28" rx="2"/><path d="M8 18h32M14 26h20M14 32h12"/></svg>News</a>
     <a href="map.html#lm14"><svg viewBox="0 0 48 48"><path d="M6 14h26v20H6zM32 22h8l4 6v6H32z"/><circle cx="14" cy="36" r="3.5"/><circle cx="38" cy="36" r="3.5"/></svg>Kwik Shops</a>
-    <a href="map.html#lm3"><svg viewBox="0 0 48 48"><path d="M4 18l20-8 20 8-20 8z"/><path d="M12 22v10c4 4 20 4 24 0V22M44 18v12"/></svg>College</a>
   </nav>
 
   <section class="band" id="news">
@@ -172,24 +182,24 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <div>
         <h2 class="sec">News</h2>
         <div class="cards">
-          <a class="card" href="map.html#lm2"><div class="pic">Friday night lights<img src="assets/mascot.png" alt=""></div><h3>Game day slows every road near Gowans Stadium</h3><p>Set the day to Friday night in the map and watch traffic around the stadium crawl from the evening onward.</p></a>
-          <a class="card" href="map.html#lm4"><div class="pic" style="background:#fff;color:var(--navy)">The Cosmosphere<img src="assets/logo-h.png" alt="" style="height:80%;bottom:10%"></div><h3>Rocket nerds meet at 1100 N Plum</h3><p>A Smithsonian-affiliated space museum with an Apollo 13 capsule. See the route from school on foot.</p></a>
+          <a class="card" href="map.html#lm2"><div class="pic">Homecoming<img src="assets/mascot.png" alt=""></div><h3>Do not miss Homecoming</h3><p>The band is warming up and Student Council has big plans for the gym. Come early, stay late, and help stack chairs when it is over.</p></a>
+          <a class="card" href="map.html#lm4"><div class="pic" style="background:#fff;color:var(--navy)">The Cosmosphere<img src="assets/logo-h.png" alt="" style="height:80%;bottom:10%"></div><h3>Senior trip to the Cosmosphere</h3><p>Real rockets and capsules at 1100 N Plum. Check the town map for the walk, or catch a ride.</p></a>
         </div>
         <h2 class="sec" style="font-size:22px;margin-top:38px">More headlines</h2>
         <div class="heads" style="margin-top:0">
-          <a href="map.html#lm9"><span class="t">Salt</span>Strataca: a working mine 650 feet below town</a>
-          <a href="map.html#lm6"><span class="t">Fair</span>Kansas State Fair season turns the north side into a carnival</a>
+          <a href="map.html#lm9"><span class="t">Salt</span>Built on salt: the mine 650 feet under our feet</a>
+          <a href="map.html#lm6"><span class="t">Fair</span>State Fair season turns the north side into a carnival</a>
           <a href="map.html#lm5"><span class="t">Fox</span>Downtown and the Fox Theatre: the busiest crossroads</a>
           <a href="map.html#lm8"><span class="t">Zoo</span>Carey Park and Hutchinson Zoo: a real trek on foot</a>
         </div>
         <p style="margin-top:28px"><a class="btn" href="map.html" style="background:var(--blue);color:#fff">See all places</a></p>
       </div>
-      <aside aria-label="Live feed">
-        <h2 class="sec">Live feed</h2>
+      <aside aria-label="Hallway talk">
+        <h2 class="sec">Hallway talk</h2>
         <div class="feed">
-          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Fall 2004</em></div>Traffic is heavy at 3:15 PM on weekdays. Try Mixed mode: park the car and finish on foot to save time.</div>
-          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Tip</em></div>Running tires you out. Every 15 minutes of running costs a level of exhaustion, unless you are in the jock clique.</div>
-          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Tip</em></div>Walking and running can cut across open ground and parks. They can't go through buildings, water or highways.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Front Office</b><em>Mon</em></div>Traffic is heavy after the 3:15 bell. Park the car and finish on foot if you are in a hurry.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Front Office</b><em>Reminder</em></div>Running tires you out. Every 15 minutes at a stretch costs a level of exhaustion, unless you are a Jock.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Front Office</b><em>Reminder</em></div>Cut across open ground and parks if you like. Just not through buildings, water or the highway.</div>
         </div>
       </aside>
     </div>
@@ -205,26 +215,32 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
     </div>
   </section>
 
+  <section class="wrap cliques" id="cliques" aria-labelledby="ch">
+    <h2 class="sec" id="ch">Find your crowd</h2>
+    <p class="lead">Every hallway at Hutchinson High belongs to somebody. Choose one crowd, spend six standing points, and make it count. Every +1 standing with a crowd is a -1 with its enemy.</p>
+    <div class="cgrid" id="cgrid"></div>
+  </section>
+
   <section class="docs wrap" id="documents" aria-labelledby="dh">
-    <h2 class="sec" id="dh">Documents</h2>
-    <p style="margin-top:-8px;max-width:46em">The documents behind the map. Select any one to read it here.</p>
+    <h2 class="sec" id="dh">Student documents</h2>
+    <p style="margin-top:-8px;max-width:46em">Handouts for the Class of 2005. Select any one to read it here.</p>
     <div class="docgrid" id="docgrid"></div>
     <p class="note" id="docnote"></p>
   </section>
 
   <section class="wrap" id="landmarks" style="padding-top:34px" aria-labelledby="lh">
-    <h2 class="sec" id="lh">Landmarks</h2>
+    <h2 class="sec" id="lh">Around town</h2>
     <div class="lmgrid" id="lmgrid"></div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <div><h4>Find us</h4><p>Hutchinson, Kansas 67501<br>Fall 2004</p></div>
-    <div><h4>Explore</h4><p><a href="map.html">Interactive map</a><br><a href="#documents">Documents</a><br><a href="#landmarks">Landmarks</a></p></div>
+    <div><h4>Find us</h4><p>Hutchinson High School<br>810 E 13th Ave<br>Hutchinson, Kansas</p></div>
+    <div><h4>Explore</h4><p><a href="map.html">Town map</a><br><a href="#documents">Student documents</a><br><a href="#cliques">The crowds</a></p></div>
     <div><h4>Our mission</h4><p>Educating and empowering every Salthawk for life.</p></div>
     <div class="flogo"><img src="assets/logo-full.png" alt="Hutchinson High School, home of the Salthawks"></div>
-    <small>Fan-made project. Not affiliated with Hutchinson Public Schools (USD 308). Layout inspired by the school district's public website.</small>
+    <small>Hutchinson High School | Class of 2005 | Built on salt, standing strong. A fictional setting for a tabletop campaign. Fan-made and not affiliated with Hutchinson Public Schools (USD 308).</small>
   </div>
 </footer>
 
@@ -250,6 +266,20 @@ const DOCS=[
 const LANDMARKS=["Hutchinson High School","Gowans Stadium","Hutchinson Community College","Cosmosphere","Downtown and the Fox Theatre","Kansas State Fairgrounds","Hutchinson Regional Airport","Carey Park and Hutchinson Zoo","Strataca Salt Mine","Prairie Dunes","Sand Hills State Park","Dillon Nature Center","Hutchinson Public Library","Dillons Distribution Center"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CLIQUES=[
+["Jocks","Friday nights belong to you.","Athletics, Intimidation","Varsity Pull. Once per session, call in a coach or teammate for a ride, field access, or muscle.","Friday night is mandatory. Skipping a game costs standing.","Theater"],
+["Burnouts","Out by the back lot.","Sleight of Hand, Stealth","You know the hidden spots, who has what, and what is being said.","Adults blame you first, and detention is one bad roll away.","Valedictorians and Hall Monitors"],
+["Popular Kids","Everybody knows your name.","Persuasion, Performance","Everybody Knows You. Once per session, an invitation, party, or rumor reaches the whole school.","Image upkeep. A public failure drops your standing everywhere.","Goths"],
+["Band","The loudest crowd in the building.","Performance, Insight","The band room is a safe hub, and instrument cases hide items.","Practice eats your downtime.","Student Council"],
+["Robotics","Built different on purpose.","Investigation, Science","After-hours lab access and advantage on research.","Grades. Failing an academic check drops your standing with teachers.","Ag / FFA"],
+["Valedictorians","Top of the class, top of the list.","Investigation, History","Teacher's Pet. One free extension or excuse per season, plus access to records and faculty.","GPA pressure. A failed academic check drops your standing.","Burnouts"],
+["Ag / FFA","Early mornings and honest work.","Animal Handling, Survival","Farm trucks, tools, and open land outside town for meetings or escapes.","Chores and family obligations can pull you out of a scene.","Robotics"],
+["Student Council","Somebody has to run this place.","Persuasion, History","Hall passes, keys, announcement access, and event budget.","Image matters. Scandal drops your standing with everyone.","Band"],
+["Hall Monitors","Eyes everywhere, passes in hand.","Perception, Insight","Hall Pass. Move through the halls during class and see detention lists. Once per session, file a report and an adult acts on it right away.","Students can't stand you. Filing a report drops your standing with the target's crowd and with students overall. Adults trust you.","Burnouts"],
+["Theater","Every day is opening night.","Deception, Performance","The costume closet. Once per session, gain advantage on a disguise or impersonation.","Drama spreads fast, and so do your secrets.","Jocks"],
+["Goths","Not everyone wants the spotlight.","Arcana, Insight","The Underground Library. Once per session, you know a rumor or legend, with advantage recalling it.","Adults assume the worst, and the popular kids give you trouble.","Popular Kids"]
+];
+$('cgrid').innerHTML=CLIQUES.map(c=>'<article class="cc"><h3>'+esc(c[0])+'</h3><em>'+esc(c[1])+'</em><div class="sk">'+esc(c[2])+'</div><p><b>Perk:</b> '+esc(c[3])+'</p><p><b>Baggage:</b> '+esc(c[4])+'</p><div class="en">Enemy: '+esc(c[5])+'</div></article>').join('');
 $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+(i+1)+'</i>'+esc(n)+'</a>').join('');
 (function(){
   const grid=$('docgrid');let cur=-1;
@@ -263,7 +293,7 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
   function open(i){cur=(i+DOCS.length)%DOCS.length;const d=DOCS[cur];$('vt').textContent=d.title;f.src=d.file;$('vopen').href=d.file;v.hidden=false;document.body.style.overflow='hidden';$('vclose').focus();}
   function close(){v.hidden=true;f.src='about:blank';document.body.style.overflow='';}
   grid.addEventListener('click',e=>{const b=e.target.closest('.doc[data-i]');if(b)open(+b.dataset.i);});
-  $('readLetter').onclick=()=>open(0);$('vclose').onclick=close;$('vprev').onclick=()=>open(cur-1);$('vnext').onclick=()=>open(cur+1);
+  $('readLetter').onclick=()=>open(0);document.querySelectorAll('[data-doc]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();open(+a.dataset.doc);}));$('vclose').onclick=close;$('vprev').onclick=()=>open(cur-1);$('vnext').onclick=()=>open(cur+1);
   v.addEventListener('mousedown',e=>{if(e.target===v)close();});
   document.addEventListener('keydown',e=>{if(v.hidden)return;if(e.key==='Escape')close();if(e.key==='ArrowRight')open(cur+1);if(e.key==='ArrowLeft')open(cur-1);});
   $('vprev').hidden=$('vnext').hidden=DOCS.length<2;
