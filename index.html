@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hutchinson Maps | Fall 2004</title>
+<link rel="icon" type="image/svg+xml" href="assets/crest.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap">
 <style>
@@ -23,7 +24,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .util a:hover{text-decoration:underline}
 .head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:6px 24px 14px;flex-wrap:wrap;min-height:84px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-top:-34px}
-.brand svg{width:46px;height:56px;flex:none}
+.brand img{width:46px;height:56px;flex:none}
 .brand b{display:block;font:700 28px/1 Inter,sans-serif;color:var(--blue);letter-spacing:-.5px}
 .brand span{display:block;font:600 12.5px/1.2 Inter,sans-serif;color:var(--blue);letter-spacing:.02em;margin-top:5px}
 .nav{display:flex;gap:30px;align-items:center;font-weight:600;font-size:16px;letter-spacing:.03em;text-transform:uppercase}
@@ -42,6 +43,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .btn:hover{background:#ffc83a}
 .btn.ghost{background:transparent;color:#fff;border:2px solid #fff;margin-left:10px}
 .btn.ghost:hover{background:rgba(255,255,255,.15)}
+.mascot{position:absolute;right:max(24px,6vw);bottom:-6px;height:min(86%,380px);filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
 .dots{position:absolute;left:24px;bottom:22px;display:flex;gap:8px}
 .dots i{width:24px;height:24px;background:#f1f1f1}
 .dots i:nth-child(2){background:var(--gold)}
@@ -58,7 +60,8 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:48px}
 .cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px}
 .card{background:#fff;text-decoration:none;color:inherit;display:flex;flex-direction:column;border-bottom:3px solid var(--blue)}
-.card .pic{aspect-ratio:2/1;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;display:flex;align-items:flex-end;padding:18px;font:900 22px/1.1 "Playfair Display",serif}
+.card .pic{position:relative;overflow:hidden;aspect-ratio:2/1;background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;display:flex;align-items:flex-end;padding:18px;font:900 22px/1.1 "Playfair Display",serif}
+.card .pic img{position:absolute;right:10px;bottom:-4px;height:92%;opacity:.95}
 .card h3{font:600 20px/1.3 Inter,sans-serif;color:var(--blue);margin:16px 16px 6px}
 .card p{margin:0 16px 18px;color:#444;font-size:15px}
 .heads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 26px;margin-top:34px}
@@ -69,13 +72,13 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .post .who{display:flex;gap:12px;align-items:center;margin-bottom:8px;font-size:14px}
 .post .who b{color:var(--blue);font-weight:500}
 .post .who em{margin-left:auto;font-style:normal;color:var(--muted)}
-.av{width:34px;height:34px;background:var(--blue);color:var(--gold);border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none}
+.av{width:34px;height:34px;background:#fff;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none}
 /* documents */
 .docs{padding:54px 0 20px}
 .docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
 .doc{border:1px solid var(--line);border-top:4px solid var(--gold);background:#fff;padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:3px}
 .doc:hover{box-shadow:0 6px 18px rgba(0,60,110,.18)}
-.doc .ic{width:42px;height:52px;background:var(--blue);color:#fff;font:800 11px/1 Inter;display:grid;place-items:end center;padding-bottom:8px;border-radius:3px 12px 3px 3px}
+.doc .ic{width:38px;height:47px}
 .doc b{font-size:18px;color:var(--blue);line-height:1.25}
 .doc span{font-size:14px;color:#555}
 .doc.soon{cursor:default;border-top-color:var(--line);background:#fafafa}
@@ -104,6 +107,7 @@ footer h4{margin:0 0 8px;color:var(--gold);text-transform:uppercase;letter-spaci
 footer p,footer a{color:#fff;margin:0;font-size:15px}
 footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-top:1px solid rgba(255,255,255,.25);padding-top:16px}
 @media (max-width:900px){
+  .mascot{height:150px;right:12px;opacity:.9}
   .util{margin-left:0;border-radius:0;justify-content:center;flex-wrap:wrap;gap:8px 20px;padding:10px 16px}
   .brand{margin-top:6px}
   .nav{gap:18px;font-size:14px}
@@ -123,7 +127,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   </nav>
   <div class="head">
     <a class="brand" href="index.html" aria-label="Hutchinson Maps home">
-      <svg viewBox="0 0 52 64" aria-hidden="true"><path d="M3 4h46v26c0 17-14 26-23 31C17 56 3 47 3 30z" fill="#14284B" stroke="#FEB403" stroke-width="2.4"/><path d="M10 16c10 7 22 6 32-3-9 4-21 5-32 3z" fill="#FEB403"/><text x="26" y="42" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="26" fill="#FEB403">H</text></svg>
+      <img src="assets/crest.svg" alt="" width="46" height="56">
       <div><b>Hutchinson Maps</b><span>ROADS | RIVERS | SHORTCUTS | LANDMARKS</span></div>
     </a>
     <div class="nav"><a class="menu" href="#main"><i></i>Menu</a><a href="#landmarks">Places</a><a href="#documents">Documents</a></div>
@@ -138,6 +142,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <p>Plan a route by walking, running, biking or driving. Learn about every landmark in town, from the high school to the salt mine. Traffic follows the clock, so check the time before you go.</p>
       <a class="btn" href="map.html">Open the map</a><a class="btn ghost" href="#documents">Browse documents</a>
     </div>
+    <img class="mascot" src="assets/salthawk.svg" alt="Salthawk mascot">
     <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </section>
 
@@ -157,8 +162,8 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <div>
         <h2 class="sec">News</h2>
         <div class="cards">
-          <a class="card" href="map.html#lm2"><div class="pic">Friday night lights</div><h3>Game day slows every road near Gowans Stadium</h3><p>Set the day to Friday night in the map and watch traffic around the stadium crawl from the evening onward.</p></a>
-          <a class="card" href="map.html#lm4"><div class="pic">The Cosmosphere</div><h3>Rocket nerds meet at 1100 N Plum</h3><p>A Smithsonian-affiliated space museum with an Apollo 13 capsule. See the route from school on foot.</p></a>
+          <a class="card" href="map.html#lm2"><div class="pic">Friday night lights<img src="assets/salthawk.svg" alt=""></div><h3>Game day slows every road near Gowans Stadium</h3><p>Set the day to Friday night in the map and watch traffic around the stadium crawl from the evening onward.</p></a>
+          <a class="card" href="map.html#lm4"><div class="pic">The Cosmosphere<img src="assets/crest.svg" alt="" style="height:70%;bottom:14%"></div><h3>Rocket nerds meet at 1100 N Plum</h3><p>A Smithsonian-affiliated space museum with an Apollo 13 capsule. See the route from school on foot.</p></a>
         </div>
         <h2 class="sec" style="font-size:22px;margin-top:38px">More headlines</h2>
         <div class="heads" style="margin-top:0">
@@ -172,9 +177,9 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <aside aria-label="Live feed">
         <h2 class="sec">Live feed</h2>
         <div class="feed">
-          <div class="post"><div class="who"><span class="av">H</span><b>Hutchinson Maps</b><em>Fall 2004</em></div>Traffic is heavy at 3:15 PM on weekdays. Try Mixed mode: park the car and finish on foot to save time.</div>
-          <div class="post"><div class="who"><span class="av">H</span><b>Hutchinson Maps</b><em>Tip</em></div>Running tires you out. Every 15 minutes of running costs a level of exhaustion, unless you are in the jock clique.</div>
-          <div class="post"><div class="who"><span class="av">H</span><b>Hutchinson Maps</b><em>Tip</em></div>Walking and running can cut across open ground and parks. They can't go through buildings, water or highways.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Fall 2004</em></div>Traffic is heavy at 3:15 PM on weekdays. Try Mixed mode: park the car and finish on foot to save time.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Tip</em></div>Running tires you out. Every 15 minutes of running costs a level of exhaustion, unless you are in the jock clique.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Tip</em></div>Walking and running can cut across open ground and parks. They can't go through buildings, water or highways.</div>
         </div>
       </aside>
     </div>
@@ -182,7 +187,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
   <section class="docs wrap" id="documents" aria-labelledby="dh">
     <h2 class="sec" id="dh">Documents</h2>
-    <p style="margin-top:-8px;max-width:46em">The source PDFs the map was made from. Select any document to read it here.</p>
+    <p style="margin-top:-8px;max-width:46em">The documents behind the map. Select any one to read it here.</p>
     <div class="docgrid" id="docgrid"></div>
     <p class="note" id="docnote"></p>
   </section>
@@ -197,7 +202,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   <div class="wrap">
     <div><h4>Find us</h4><p>Hutchinson, Kansas 67501<br>Fall 2004</p></div>
     <div><h4>Explore</h4><p><a href="map.html">Interactive map</a><br><a href="#documents">Documents</a><br><a href="#landmarks">Landmarks</a></p></div>
-    <div><h4>Our mission</h4><p>Educating and empowering every Salthawk for life.</p></div>
+    <div><img src="assets/salthawk.svg" alt="Salthawk mascot" width="90" style="float:left;margin:0 14px 0 0"><h4>Our mission</h4><p>Educating and empowering every Salthawk for life.</p></div>
     <small>Fan-made project. Not affiliated with Hutchinson Public Schools (USD 308). Layout inspired by the school district's public website.</small>
   </div>
 </footer>
@@ -217,7 +222,9 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 <script>
 /* To add a document: drop the PDF in /pdfs and add a line here. */
 const DOCS=[
-  // {title:"Map of Hutchinson",file:"pdfs/map-of-hutchinson.pdf",desc:"What this document is."},
+  {title:"Welcome Letter to the Senior Class",file:"pdfs/Hutchinson_Class_of_2005.pdf",desc:"A September 2004 letter from Principal Dale Hargrove to the Class of 2005."},
+  {title:"Student Register, Class of 2005",file:"pdfs/Hutchinson_Student_Register.pdf",desc:"The registrar's form: clique, family, friends and rivals, and standing."},
+  {title:"Find Your Crowd: Clique Brochure",file:"pdfs/Hutchinson_Clique_Brochure.pdf",desc:"A guide to the cliques of Hutchinson High, with perks, baggage and enemies."},
 ];
 const LANDMARKS=["Hutchinson High School","Gowans Stadium","Hutchinson Community College","Cosmosphere","Downtown and the Fox Theatre","Kansas State Fairgrounds","Hutchinson Regional Airport","Carey Park and Hutchinson Zoo","Strataca Salt Mine","Prairie Dunes","Sand Hills State Park","Dillon Nature Center","Hutchinson Public Library","Dillons Distribution Center"];
 const $=id=>document.getElementById(id);
@@ -226,7 +233,7 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
 (function(){
   const grid=$('docgrid');let cur=-1;
   if(DOCS.length){
-    grid.innerHTML=DOCS.map((d,i)=>'<button class="doc" type="button" data-i="'+i+'"><span class="ic">PDF</span><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span></button>').join('');
+    grid.innerHTML=DOCS.map((d,i)=>'<button class="doc" type="button" data-i="'+i+'"><img class="ic" src="assets/crest.svg" alt=""><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span></button>').join('');
   }else{
     grid.innerHTML=[1,2,3].map(()=>'<div class="doc soon"><span class="ic">PDF</span><b>Document coming soon</b><span>PDFs will appear here once they are added.</span></div>').join('');
     $('docnote').textContent='No documents have been added yet.';
