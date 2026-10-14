@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Hutchinson Maps | Fall 2004</title>
-<link rel="icon" type="image/svg+xml" href="assets/crest.svg">
+<link rel="icon" type="image/png" href="assets/logo-h.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap">
 <style>
@@ -24,7 +24,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .util a:hover{text-decoration:underline}
 .head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:6px 24px 14px;flex-wrap:wrap;min-height:84px}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;margin-top:-34px}
-.brand img{width:46px;height:56px;flex:none}
+.brand img{width:64px;height:64px;flex:none;object-fit:contain}
 .brand b{display:block;font:700 28px/1 Inter,sans-serif;color:var(--blue);letter-spacing:-.5px}
 .brand span{display:block;font:600 12.5px/1.2 Inter,sans-serif;color:var(--blue);letter-spacing:.02em;margin-top:5px}
 .nav{display:flex;gap:30px;align-items:center;font-weight:600;font-size:16px;letter-spacing:.03em;text-transform:uppercase}
@@ -37,13 +37,15 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .hero{position:relative;min-height:430px;background:linear-gradient(120deg,rgba(0,80,138,.92),rgba(0,106,181,.78)),url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Hutchinson%2C_Kansas_skyline_in_2023_%28cropped%29.jpg/1280px-Hutchinson%2C_Kansas_skyline_in_2023_%28cropped%29.jpg") center/cover,var(--blue);color:#fff;display:flex;align-items:center;overflow:hidden}
 .hero-in{padding:48px 24px 78px;max-width:1160px;margin:0 auto;width:100%}
 .hero small{display:inline-block;background:var(--gold);color:#000;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:3px;font-size:12px}
-.hero h1{font:900 clamp(40px,7vw,84px)/.98 "Playfair Display",Georgia,serif;margin:16px 0 14px;max-width:11em}
-.hero p{font-size:clamp(17px,2.2vw,22px);max-width:34em;margin:0 0 26px}
+.hero h1{font:900 clamp(40px,6vw,76px)/.98 "Playfair Display",Georgia,serif;margin:16px 0 14px;max-width:8.5em}
+.hero p{font-size:clamp(17px,2.2vw,22px);max-width:30em;margin:0 0 26px}
 .btn{display:inline-block;background:var(--gold);color:#000;font-weight:700;text-decoration:none;padding:14px 26px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;font-size:14px;border:0;cursor:pointer}
 .btn:hover{background:#ffc83a}
 .btn.ghost{background:transparent;color:#fff;border:2px solid #fff;margin-left:10px}
 .btn.ghost:hover{background:rgba(255,255,255,.15)}
-.mascot{position:absolute;right:max(24px,6vw);bottom:-6px;height:min(86%,380px);filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
+.mascots{position:absolute;right:max(24px,6vw);bottom:0;height:min(88%,390px);display:flex;align-items:flex-end;gap:0;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
+.mascots img{height:100%}
+.mascots .lil{height:62%;margin-left:-14px}
 .dots{position:absolute;left:24px;bottom:22px;display:flex;gap:8px}
 .dots i{width:24px;height:24px;background:#f1f1f1}
 .dots i:nth-child(2){background:var(--gold)}
@@ -78,7 +80,7 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
 .doc{border:1px solid var(--line);border-top:4px solid var(--gold);background:#fff;padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:3px}
 .doc:hover{box-shadow:0 6px 18px rgba(0,60,110,.18)}
-.doc .ic{width:38px;height:47px}
+.doc .ic{width:56px;height:56px;object-fit:contain}
 .doc b{font-size:18px;color:var(--blue);line-height:1.25}
 .doc span{font-size:14px;color:#555}
 .doc.soon{cursor:default;border-top-color:var(--line);background:#fafafa}
@@ -86,6 +88,12 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .doc.soon .ic{background:#9aa7b4}
 .doc.soon b{color:#6b7782}
 .note{font-size:14px;color:var(--muted);margin-top:16px}
+.prin{display:grid;grid-template-columns:260px minmax(0,1fr);gap:40px;align-items:center;padding:50px 0 10px}
+.prin img{width:100%;border-radius:50%;box-shadow:0 6px 20px rgba(0,40,90,.25)}
+.prin blockquote{margin:0 0 16px;font:italic 500 22px/1.45 "Playfair Display",Georgia,serif;color:var(--navy)}
+.prin cite{display:block;font:600 15px Inter;color:var(--blue);font-style:normal;margin-bottom:18px}
+.prin .btn{background:var(--blue);color:#fff}
+@media (max-width:700px){.prin{grid-template-columns:1fr;text-align:center}.prin img{max-width:220px;margin:0 auto}}
 /* viewer */
 .viewer{position:fixed;inset:0;background:rgba(10,20,40,.7);z-index:50;display:flex;align-items:center;justify-content:center;padding:18px}
 .viewer[hidden]{display:none}
@@ -105,9 +113,11 @@ footer{background:var(--blue);color:#fff;margin-top:60px;padding:40px 0 30px}
 footer .wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:30px}
 footer h4{margin:0 0 8px;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;font-size:13px}
 footer p,footer a{color:#fff;margin:0;font-size:15px}
+footer .flogo{background:#fff;border-radius:6px;padding:8px 16px;display:flex;align-items:center;justify-content:center;max-width:230px}
+footer .flogo img{width:100%;height:auto;max-height:110px;object-fit:contain}
 footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-top:1px solid rgba(255,255,255,.25);padding-top:16px}
 @media (max-width:900px){
-  .mascot{height:150px;right:12px;opacity:.9}
+  .mascots{height:170px;right:8px}
   .util{margin-left:0;border-radius:0;justify-content:center;flex-wrap:wrap;gap:8px 20px;padding:10px 16px}
   .brand{margin-top:6px}
   .nav{gap:18px;font-size:14px}
@@ -127,7 +137,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   </nav>
   <div class="head">
     <a class="brand" href="index.html" aria-label="Hutchinson Maps home">
-      <img src="assets/crest.svg" alt="" width="46" height="56">
+      <img src="assets/logo-h.png" alt="" width="64" height="64">
       <div><b>Hutchinson Maps</b><span>ROADS | RIVERS | SHORTCUTS | LANDMARKS</span></div>
     </a>
     <div class="nav"><a class="menu" href="#main"><i></i>Menu</a><a href="#landmarks">Places</a><a href="#documents">Documents</a></div>
@@ -142,7 +152,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <p>Plan a route by walking, running, biking or driving. Learn about every landmark in town, from the high school to the salt mine. Traffic follows the clock, so check the time before you go.</p>
       <a class="btn" href="map.html">Open the map</a><a class="btn ghost" href="#documents">Browse documents</a>
     </div>
-    <img class="mascot" src="assets/salthawk.svg" alt="Salthawk mascot">
+    <div class="mascots"><img src="assets/mascot-big.png" alt="Salthawk mascot"><img class="lil" src="assets/mascot-little.png" alt="Little Salthawk"></div>
     <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
   </section>
 
@@ -162,8 +172,8 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <div>
         <h2 class="sec">News</h2>
         <div class="cards">
-          <a class="card" href="map.html#lm2"><div class="pic">Friday night lights<img src="assets/salthawk.svg" alt=""></div><h3>Game day slows every road near Gowans Stadium</h3><p>Set the day to Friday night in the map and watch traffic around the stadium crawl from the evening onward.</p></a>
-          <a class="card" href="map.html#lm4"><div class="pic">The Cosmosphere<img src="assets/crest.svg" alt="" style="height:70%;bottom:14%"></div><h3>Rocket nerds meet at 1100 N Plum</h3><p>A Smithsonian-affiliated space museum with an Apollo 13 capsule. See the route from school on foot.</p></a>
+          <a class="card" href="map.html#lm2"><div class="pic">Friday night lights<img src="assets/mascot.png" alt=""></div><h3>Game day slows every road near Gowans Stadium</h3><p>Set the day to Friday night in the map and watch traffic around the stadium crawl from the evening onward.</p></a>
+          <a class="card" href="map.html#lm4"><div class="pic" style="background:#fff;color:var(--navy)">The Cosmosphere<img src="assets/logo-h.png" alt="" style="height:80%;bottom:10%"></div><h3>Rocket nerds meet at 1100 N Plum</h3><p>A Smithsonian-affiliated space museum with an Apollo 13 capsule. See the route from school on foot.</p></a>
         </div>
         <h2 class="sec" style="font-size:22px;margin-top:38px">More headlines</h2>
         <div class="heads" style="margin-top:0">
@@ -177,11 +187,21 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <aside aria-label="Live feed">
         <h2 class="sec">Live feed</h2>
         <div class="feed">
-          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Fall 2004</em></div>Traffic is heavy at 3:15 PM on weekdays. Try Mixed mode: park the car and finish on foot to save time.</div>
-          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Tip</em></div>Running tires you out. Every 15 minutes of running costs a level of exhaustion, unless you are in the jock clique.</div>
-          <div class="post"><div class="who"><span class="av"><img src="assets/crest.svg" alt="" width="18" height="22"></span><b>Hutchinson Maps</b><em>Tip</em></div>Walking and running can cut across open ground and parks. They can't go through buildings, water or highways.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Fall 2004</em></div>Traffic is heavy at 3:15 PM on weekdays. Try Mixed mode: park the car and finish on foot to save time.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Tip</em></div>Running tires you out. Every 15 minutes of running costs a level of exhaustion, unless you are in the jock clique.</div>
+          <div class="post"><div class="who"><span class="av"><img src="assets/logo-h.png" alt="" width="26" height="26"></span><b>Hutchinson Maps</b><em>Tip</em></div>Walking and running can cut across open ground and parks. They can't go through buildings, water or highways.</div>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <section class="wrap prin" id="principal" aria-label="From the principal">
+    <img src="assets/principal-seal.png" alt="Principal Dale Hargrove, Hutchinson High School seal">
+    <div>
+      <h2 class="sec">From the principal</h2>
+      <blockquote>&ldquo;Graduation is the starting line for whatever you build next. Everything you've done in these halls gets you ready for it.&rdquo;</blockquote>
+      <cite>Dale Hargrove ("Mr. H"), Principal, Hutchinson High School</cite>
+      <button class="btn" type="button" id="readLetter">Read the welcome letter</button>
     </div>
   </section>
 
@@ -202,7 +222,8 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   <div class="wrap">
     <div><h4>Find us</h4><p>Hutchinson, Kansas 67501<br>Fall 2004</p></div>
     <div><h4>Explore</h4><p><a href="map.html">Interactive map</a><br><a href="#documents">Documents</a><br><a href="#landmarks">Landmarks</a></p></div>
-    <div><img src="assets/salthawk.svg" alt="Salthawk mascot" width="90" style="float:left;margin:0 14px 0 0"><h4>Our mission</h4><p>Educating and empowering every Salthawk for life.</p></div>
+    <div><h4>Our mission</h4><p>Educating and empowering every Salthawk for life.</p></div>
+    <div class="flogo"><img src="assets/logo-full.png" alt="Hutchinson High School, home of the Salthawks"></div>
     <small>Fan-made project. Not affiliated with Hutchinson Public Schools (USD 308). Layout inspired by the school district's public website.</small>
   </div>
 </footer>
@@ -233,7 +254,7 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
 (function(){
   const grid=$('docgrid');let cur=-1;
   if(DOCS.length){
-    grid.innerHTML=DOCS.map((d,i)=>'<button class="doc" type="button" data-i="'+i+'"><img class="ic" src="assets/crest.svg" alt=""><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span></button>').join('');
+    grid.innerHTML=DOCS.map((d,i)=>'<button class="doc" type="button" data-i="'+i+'"><img class="ic" src="assets/logo-h.png" alt=""><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span></button>').join('');
   }else{
     grid.innerHTML=[1,2,3].map(()=>'<div class="doc soon"><span class="ic">PDF</span><b>Document coming soon</b><span>PDFs will appear here once they are added.</span></div>').join('');
     $('docnote').textContent='No documents have been added yet.';
@@ -242,7 +263,7 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
   function open(i){cur=(i+DOCS.length)%DOCS.length;const d=DOCS[cur];$('vt').textContent=d.title;f.src=d.file;$('vopen').href=d.file;v.hidden=false;document.body.style.overflow='hidden';$('vclose').focus();}
   function close(){v.hidden=true;f.src='about:blank';document.body.style.overflow='';}
   grid.addEventListener('click',e=>{const b=e.target.closest('.doc[data-i]');if(b)open(+b.dataset.i);});
-  $('vclose').onclick=close;$('vprev').onclick=()=>open(cur-1);$('vnext').onclick=()=>open(cur+1);
+  $('readLetter').onclick=()=>open(0);$('vclose').onclick=close;$('vprev').onclick=()=>open(cur-1);$('vnext').onclick=()=>open(cur+1);
   v.addEventListener('mousedown',e=>{if(e.target===v)close();});
   document.addEventListener('keydown',e=>{if(v.hidden)return;if(e.key==='Escape')close();if(e.key==='ArrowRight')open(cur+1);if(e.key==='ArrowLeft')open(cur-1);});
   $('vprev').hidden=$('vnext').hidden=DOCS.length<2;
