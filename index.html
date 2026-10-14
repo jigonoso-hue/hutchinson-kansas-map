@@ -167,6 +167,10 @@ canvas.dragging{cursor:grabbing}
 .info h3{margin:0;font:600 17px/1.2 var(--font-display)}
 .info p{margin:0;color:var(--muted);font-size:13px}
 .info .acts{display:flex;gap:6px;flex-wrap:wrap}
+.info .lore{display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:8px}
+.info .lore h4{margin:0;font:600 10.5px/1 var(--font-body);letter-spacing:.09em;text-transform:uppercase;color:var(--gold-ink)}
+.info .lore h4+p{margin-bottom:4px}
+.info{max-height:calc(100% - 24px);overflow-y:auto}
 .info .x{position:absolute;top:6px;right:8px;border:0;background:none;font-size:18px;color:var(--muted)}
 @media (max-width:820px){
   .app{grid-template-columns:minmax(0,1fr);grid-template-rows:46% minmax(0,1fr)}
@@ -659,13 +663,31 @@ function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);return;}
   const wx=(sx-V.x)/V.s,wy=(sy-V.y)/V.s;if(wx<0||wy<0||wx>D.W||wy>D.H)return;
   temp={id:'temp',kind:'temp',name:'Dropped pin',x:wx,y:wy,detail:''};select(temp,false);}
 
+/* ---------- landmark lore: real-world facts plus in-game flavour ---------- */
+const LORE={
+1:["Hutchinson High School is the town's public high school, and its teams are the Salthawks, a nod to the salt beneath the city. The campus sits just east of downtown on 13th Avenue.","Home turf. Every route in the game starts to feel like a hallway sprint from here. Keep the jocks happy or save your legs, because the walk home counts."],
+2:["Gowans Stadium is the city's football stadium, where Salthawks games are played on Friday nights in the fall.","Friday night game day is the heaviest traffic of the week. Pick Friday in the time menu and watch every road near here clog up."],
+3:["Hutchinson Community College (the Blue Dragons) was founded in 1928 as Hutchinson Junior College and is one of the oldest two-year colleges in Kansas.","A place to run to when you want to look older than you are. The long open lawns are a good shortcut for anyone on foot."],
+4:["The Cosmosphere began in 1962 as a planetarium and grew into a Smithsonian-affiliated space museum. It holds the Apollo 13 command module Odyssey and the Mercury capsule Liberty Bell 7, recovered from the ocean floor in 1999.","Rocket nerds meet here. Great for a quiet stop, but a lot of ground to cover on foot if you started across town."],
+5:["Downtown Hutchinson is centred on Main Street. The Fox Theatre, an Art Deco movie palace from the early 1930s, is its best-known building and has been restored for films and live shows.","The busiest crossroads in town. Lunch hour and the evening rush hit hard here, so the car is rarely the quickest option."],
+6:["The Kansas State Fair has been held on these fairgrounds in Hutchinson every September since 1913, and is the largest annual event in the state.","Fair season turns the north side into a carnival. Expect the roads here to crawl and the midway to be tempting."],
+7:["Hutchinson Regional Airport sits east of town and has its roots in a World War II naval air station. Its long runways are visible from the highway.","Out of the way, but a good test for the runners: a long, flat, open stretch that wears you down quickly without a Kwik Shop in sight."],
+8:["Carey Park is a large city park on the south side of town along the Arkansas River. It holds the Hutchinson Zoo, a public golf course and wide shaded lawns.","Far from school, so a route here is a real trek. Park the car and finish on foot with Mixed mode, or risk a level of exhaustion."],
+9:["Strataca (formerly the Kansas Underground Salt Museum) is a working salt mine about 650 feet down. The salt layer formed roughly 275 million years ago and Hutchinson sits on one of the largest salt deposits in the world.","The one place in town you cannot map from above. Whatever happens down there stays down there."],
+10:["Prairie Dunes is a private golf club northeast of town with a famous links-style course designed by Perry Maxwell in 1937. It has hosted major championships, including the 2002 U.S. Women's Open.","Out of town, exclusive and quiet, which makes it a good place to avoid being seen."],
+11:["Sand Hills State Park covers over a thousand acres of dunes, prairie and cottonwoods along the Arkansas River valley just north of Hutchinson, with hiking and horse trails.","A good hiding spot and a long way to run. Going cross-country is slower than the roads, but nobody checks."],
+12:["Dillon Nature Center is run by the Hutchinson Recreation Commission. It has trails, wetlands, prairie and a small education building that opens onto the city's north side.","Quiet trails, good for a breather. The rest you gain here counts when exhaustion levels wear off."],
+13:["The Hutchinson Public Library is the central library for Reno County. It keeps a local history and genealogy collection and has study rooms off North Main Street.","Safe ground and quiet hours. Study here when the weather turns and the roads are slow."],
+14:["Dillons grocery stores started in Hutchinson in 1913 when John S. Dillon opened a small store. The company is still headquartered in the town and is now part of Kroger.","Every Kwik Shop in town is stocked from here. The night shift never stops, so if a shop is out of something, this is where it went."]
+};
 /* ---------- selection and info card ---------- */
 function nearest(p){let b=null,bd=1e9;places.filter(q=>q.kind==='lm').forEach(q=>{const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;b=q;}});return b?{p:b,m:bd*MPP}:null;}
 function select(p,pan){selected=p;renderInfo();draw();if(pan){const q=W2S(p.x,p.y);if(q[0]<40||q[1]<80||q[0]>cssW-40||q[1]>cssH-40)animateTo({s:Math.max(V.s,0.9),x:cssW/2-p.x*Math.max(V.s,0.9),y:cssH/2-p.y*Math.max(V.s,0.9),init:true});}}
+function loreHtml(p){const L=p.kind==='lm'&&LORE[p.num];if(!L)return'';return '<div class="lore"><h4>In the real world</h4><p>'+esc(L[0])+'</p><h4>In the game</h4><p>'+esc(L[1])+'</p></div>';}
 function renderInfo(){const el=$('info');if(!selected){el.hidden=true;return;}const p=selected;el.hidden=false;
   let sub=p.detail;if(p.kind==='temp'){const n=nearest(p);sub=n?'About '+fmtDist(n.m)+' from '+n.p.name+'.':'';}
   const saved=p.kind==='pin';
-  el.innerHTML='<button class="x" id="ix" type="button" aria-label="Close">&times;</button><h3>'+esc(p.name)+'</h3>'+(sub?'<p>'+esc(sub)+'</p>':'')+
+  el.innerHTML='<button class="x" id="ix" type="button" aria-label="Close">&times;</button><h3>'+esc(p.name)+'</h3>'+(sub?'<p>'+esc(sub)+'</p>':'')+loreHtml(p)+
    '<div class="acts"><button class="ghost pri" data-a="to" type="button">Directions here</button><button class="ghost" data-a="from" type="button">Start here</button>'+
    (p.kind==='temp'?'<button class="ghost" data-a="save" type="button">Save pin</button>':'')+(saved?'<button class="ghost" data-a="del" type="button">Remove pin</button>':'')+'</div>';
   $('ix').onclick=()=>{selected=null;if(temp&&temp===p&&!pins.includes(p))temp=null;renderInfo();draw();};
