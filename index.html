@@ -207,7 +207,7 @@ canvas.dragging{cursor:grabbing}
         <div class="combo"><input id="toIn" type="text" placeholder="Choose a destination" autocomplete="off" aria-label="Destination"><ul id="toList" hidden></ul></div>
       </div>
       <div class="modes" id="modes" role="group" aria-label="How you are travelling"></div>
-      <div class="combo-row" id="walkRow" hidden><span>Walking</span><div class="seg" role="group" aria-label="Walking style"><button type="button" data-w="free">Anywhere open</button><button type="button" data-w="roads">Roads only</button></div></div>
+      <div class="combo-row" id="walkRow" hidden><span>On foot</span><div class="seg" role="group" aria-label="Walking style"><button type="button" data-w="free">Anywhere open</button><button type="button" data-w="roads">Roads only</button></div></div>
       <div class="combo-row" id="comboRow" hidden><span>Drive, then go on foot by</span><div class="seg" role="group" aria-label="On foot by"><button type="button" data-f="walk">Walk</button><button type="button" data-f="run">Run</button><button type="button" data-f="bike">Bike</button></div><div class="combo viarow"><input id="viaIn" type="text" placeholder="Park at (optional, otherwise as close as the roads go)" autocomplete="off" aria-label="Where to park"><ul id="viaList" hidden></ul></div></div>
       <details class="opts">
         <summary>Options</summary>
@@ -389,7 +389,7 @@ function computeRoute(A,B,m,foot,noSearch){
   return{segs,time:tm,dist:dm,off,mode:m,foot:ph1,ff};
 }
 
-function footRoute(a,b,foot){return foot==='walk'&&store.walkFree?(freeWalk(a,b)||computeRoute(a,b,'walk')):computeRoute(a,b,foot);}
+function footRoute(a,b,foot){return (foot==='walk'||foot==='run')&&store.walkFree?(freeWalk(a,b,foot)||computeRoute(a,b,foot)):computeRoute(a,b,foot);}
 function comboRoute(A,B,foot,viaP){
   const v=viaP||via;
   if(!v||v===A||v===B)return comboAuto(A,B,foot);
@@ -409,13 +409,13 @@ function field(P,m){
   return{s,dist,pn,pl,S,conn:Math.hypot(P.x-s.pt[0],P.y-s.pt[1])*MPP};
 }
 /* walking time from the destination outward across the free-walking grid, up to a limit */
-function gridField(B,limit){
+function gridField(B,limit,foot){const SPD=foot==='run'?SPEED.run:SPEED.walk;
   buildGrid();const {blk,cost}=grid;const tc=nearestFree(Math.floor(B.x/G),Math.floor(B.y/G));if(!tc)return null;
   const n=GW*GH,tt=new Float32Array(n).fill(Infinity),done=new Uint8Array(n);
   const hk=[],hv=[];const push=(k,v)=>{let i=hk.length;hk.push(k);hv.push(v);while(i>0){const p=(i-1)>>1;if(hk[p]<=hk[i])break;[hk[p],hk[i]]=[hk[i],hk[p]];[hv[p],hv[i]]=[hv[i],hv[p]];i=p;}};
   const pop=()=>{const k0=hk[0],v=hv[0],lk=hk.pop(),lv=hv.pop();if(hk.length){hk[0]=lk;hv[0]=lv;let i=0;for(;;){const l=2*i+1,r=l+1;let s=i;if(l<hk.length&&hk[l]<hk[s])s=l;if(r<hk.length&&hk[r]<hk[s])s=r;if(s===i)break;[hk[s],hk[i]]=[hk[i],hk[s]];[hv[s],hv[i]]=[hv[i],hv[s]];i=s;}}return [k0,v];};
-  const c0=tc[1]*GW+tc[0],off=Math.hypot(B.x-(tc[0]*G+G/2),B.y-(tc[1]*G+G/2))*MPP/SPEED.walk;tt[c0]=off;push(off,c0);
-  const unit=G*MPP/SPEED.walk,DX=[1,-1,0,0,1,1,-1,-1],DY=[0,0,1,-1,1,-1,1,-1];
+  const c0=tc[1]*GW+tc[0],off=Math.hypot(B.x-(tc[0]*G+G/2),B.y-(tc[1]*G+G/2))*MPP/SPD;tt[c0]=off;push(off,c0);
+  const unit=G*MPP/SPD,DX=[1,-1,0,0,1,1,-1,-1],DY=[0,0,1,-1,1,-1,1,-1];
   while(hk.length){const [d,c]=pop();if(done[c])continue;if(d>limit)break;done[c]=1;const x=c%GW,y=(c/GW)|0;
     for(let k=0;k<8;k++){const nx=x+DX[k],ny=y+DY[k];if(nx<0||ny<0||nx>=GW||ny>=GH)continue;const q=ny*GW+nx;if(blk[q]||done[q])continue;if(k>=4&&(blk[y*GW+nx]||blk[ny*GW+x]))continue;
       const nd=d+(k<4?1:1.4142)*unit*(cost[c]+cost[q])/2;if(nd<tt[q]){tt[q]=nd;push(nd,q);}}}
@@ -428,8 +428,8 @@ function comboAuto(A,B,foot){
   const fa=field(A,'drive');if(!fa)return null;
   const connA=fa.conn/SPEED.walk,limit=D0.time;
   let best=null;
-  if(foot==='walk'&&store.walkFree){
-    const tt=gridField(B,limit);
+  if((foot==='walk'||foot==='run')&&store.walkFree){
+    const tt=gridField(B,limit,foot);
     if(tt)for(let nI=0;nI<N;nI++){const td=fa.dist[nI];if(!isFinite(td))continue;const tot0=connA+td;if(tot0>=limit)continue;const p=D.nodes[nI];
       const c=tt[Math.floor(p[1]/G)*GW+Math.floor(p[0]/G)];if(!isFinite(c))continue;const tot=tot0+PARK+c;if(!best||tot<best.tot)best={tot,n:nI};}
   }else{
@@ -491,7 +491,7 @@ function nearestFree(cx,cy){const {blk}=grid;cx=Math.max(0,Math.min(GW-1,cx));cy
   return null;}
 function los(a,b){const {blk}=grid;const dx=b[0]-a[0],dy=b[1]-a[1],n=Math.max(Math.abs(dx),Math.abs(dy));for(let i=1;i<=n;i++){const x=Math.round(a[0]+dx*i/n),y=Math.round(a[1]+dy*i/n);if(blk[y*GW+x])return false;
   if(i<n){const x2=Math.round(a[0]+dx*(i+.5)/n),y2=Math.round(a[1]+dy*(i+.5)/n);if(blk[y2*GW+x2])return false;}}return true;}
-function freeWalk(A,B){
+function freeWalk(A,B,foot){const fm=foot==='run'?'run':'walk';
   buildGrid();const {blk,cost}=grid;
   const sc=nearestFree(Math.floor(A.x/G),Math.floor(A.y/G)),tc=nearestFree(Math.floor(B.x/G),Math.floor(B.y/G));if(!sc||!tc)return null;
   const n=GW*GH,g=new Float32Array(n).fill(Infinity),par=new Int32Array(n).fill(-1),done=new Uint8Array(n);
@@ -513,8 +513,8 @@ function freeWalk(A,B){
   for(let k=0;k<pts.length-1;k++){const a=pts[k],b=pts[k+1];const lm=Math.hypot(b[0]-a[0],b[1]-a[1])*MPP;if(lm<0.05)continue;
     const edgeSeg=(k===0&&blk[Math.floor(A.y/G)*GW+Math.floor(A.x/G)])||(k===pts.length-2&&blk[Math.floor(B.y/G)*GW+Math.floor(B.x/G)]);
     let c=0,m=Math.max(1,Math.ceil(lm/(G*MPP)));for(let q=0;q<m;q++){const f=(q+.5)/m,cx=Math.floor((a[0]+(b[0]-a[0])*f)/G),cy=Math.floor((a[1]+(b[1]-a[1])*f)/G);c+=cost[Math.max(0,Math.min(GH-1,cy))*GW+Math.max(0,Math.min(GW-1,cx))];}c/=m;
-    const tt=lm/SPEED.walk*c;segs.push({a,b,cls:edgeSeg?-1:3,m:lm,t:tt,mode:'walk'});tm+=tt;dm+=lm;if(edgeSeg)off+=lm;}
-  return{segs,time:tm,dist:dm,off,mode:'walk',free:true};
+    const tt=lm/SPEED[fm]*c;segs.push({a,b,cls:edgeSeg?-1:3,m:lm,t:tt,mode:fm});tm+=tt;dm+=lm;if(edgeSeg)off+=lm;}
+  return{segs,time:tm,dist:dm,off,mode:fm,free:true};
 }
 
 /* ---------- formatting ---------- */
@@ -727,7 +727,7 @@ $('swapBtn').onclick=()=>{selected=null;renderInfo();const x=from;from=to;to=x;s
 function renderModes(){$('modes').innerHTML=MODES.map(m=>{const r=routes[m.id];const flag=r&&r.flag?'<i class="flag" title="Exhaustion"></i>':'';
   return '<button class="mode" type="button" data-m="'+m.id+'" aria-pressed="'+(mode===m.id)+'">'+flag+'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+m.icon+'</svg><b>'+m.label+'</b><small>'+(r?fmtTime(r.time):'none')+'</small></button>';}).join('');
   $('modes').querySelectorAll('.mode').forEach(b=>b.onclick=()=>{mode=b.dataset.m;store.mode=mode;save();pickRoute();renderModes();renderRoute();draw();fitRoute();});
-  $('walkRow').hidden=mode!=='walk';$('walkRow').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.w==='free')===!!store.walkFree)));
+  $('walkRow').hidden=mode!=='walk'&&mode!=='run';$('walkRow').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.w==='free')===!!store.walkFree)));
   const cr=$('comboRow');cr.hidden=mode!=='combo';
   cr.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===store.foot)));}
 /* ---------- routes ---------- */
@@ -749,7 +749,7 @@ function analyse(r){
 }
 function recompute(fit){
   routes={};cur=null;
-  if(from&&to&&from!==to){['walk','run','bike','drive','combo'].forEach(m=>{let r=m==='combo'?comboRoute(from,to,store.foot):(m==='walk'&&store.walkFree?(freeWalk(from,to)||computeRoute(from,to,m,store.foot)):computeRoute(from,to,m,store.foot));if(r){analyse(r);routes[m]=r;}});}
+  if(from&&to&&from!==to){['walk','run','bike','drive','combo'].forEach(m=>{let r=m==='combo'?comboRoute(from,to,store.foot):((m==='walk'||m==='run')&&store.walkFree?(freeWalk(from,to,m)||computeRoute(from,to,m,store.foot)):computeRoute(from,to,m,store.foot));if(r){analyse(r);routes[m]=r;}});}
   pickRoute();renderModes();focusPt=null;renderRoute();draw();if(fit){fitRoute();$('panel').scrollTop=0;}
 }
 function pickRoute(){cur=routes[mode]||null;if(cur)cur.steps=buildSteps(cur,to?to.name:'destination',to);}
