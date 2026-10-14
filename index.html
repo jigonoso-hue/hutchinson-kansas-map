@@ -119,6 +119,10 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .vbar a:hover,.vbar button:hover{background:rgba(255,255,255,.3)}
 .vnav{display:flex;gap:6px}
 .vbox iframe{flex:1;border:0;width:100%;background:#eee}
+.vpages{flex:1;overflow-y:auto;background:#5b6670;padding:14px 10px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;-webkit-overflow-scrolling:touch}
+.vpages canvas{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.vpages .msg{color:#fff;font-size:15px;padding:20px}
+.vcount{font:600 13px Inter;white-space:nowrap;opacity:.9}
 /* landmarks + footer */
 .lmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
 .lmgrid a{display:flex;gap:10px;align-items:center;padding:12px 14px;background:#fff;border:1px solid var(--line);text-decoration:none;color:var(--ink);font-weight:500;font-size:15px;border-radius:3px}
@@ -309,11 +313,13 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
   <div class="vbox">
     <div class="vbar">
       <h3 id="vt"></h3>
+      <span class="vcount" id="vcount"></span>
       <div class="vnav"><button type="button" id="vprev" aria-label="Previous document">Prev</button><button type="button" id="vnext" aria-label="Next document">Next</button></div>
       <a id="vopen" target="_blank" rel="noopener">Open in new tab</a>
       <button type="button" id="vclose" aria-label="Close viewer">Close</button>
     </div>
-    <iframe id="vframe" title="Document viewer"></iframe>
+    <div class="vpages" id="vpages" tabindex="0" aria-label="Document pages"></div>
+    <iframe id="vframe" title="Document viewer" hidden></iframe>
     <p class="vhelp">Trouble reading it here? <a id="vopen2" target="_blank" rel="noopener">Open the PDF in a new tab</a>.</p>
   </div>
 </div>
@@ -353,8 +359,28 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
     $('docnote').textContent='No documents have been added yet.';
   }
   const v=$('viewer'),f=$('vframe');
-  function open(i){cur=(i+DOCS.length)%DOCS.length;const d=DOCS[cur];$('vt').textContent=d.title;f.src=d.file;$('vopen').href=d.file;$('vopen2').href=d.file;v.hidden=false;document.body.style.overflow='hidden';$('vclose').focus();}
-  function close(){v.hidden=true;f.src='about:blank';document.body.style.overflow='';}
+  const pg=$('vpages');let token=0,pdfjs=null;
+  function loadPdfJs(){if(pdfjs)return pdfjs;
+    pdfjs=new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      sc.onload=()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';ok(window.pdfjsLib);};sc.onerror=()=>no(new Error('pdf.js'));document.head.appendChild(sc);});
+    pdfjs.catch(()=>{pdfjs=null;});return pdfjs;}
+  function fallback(d){pg.hidden=true;f.hidden=false;f.src=d.file;$('vcount').textContent='';}
+  async function render(d,t){
+    pg.hidden=false;f.hidden=true;pg.innerHTML='<p class="msg">Loading pages\u2026</p>';$('vcount').textContent='';
+    try{
+      const lib=await loadPdfJs();const doc=await lib.getDocument(d.file).promise;if(t!==token)return;
+      pg.innerHTML='';const n=doc.numPages;$('vcount').textContent=n+(n===1?' page':' pages');
+      const w=Math.min(pg.clientWidth-20,900)||320,dpr=Math.min(window.devicePixelRatio||1,2);
+      for(let i=1;i<=n;i++){
+        const page=await doc.getPage(i);if(t!==token)return;
+        const base=page.getViewport({scale:1}),sc=w/base.width,vp=page.getViewport({scale:sc*dpr});
+        const c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;c.style.width=(vp.width/dpr)+'px';c.setAttribute('role','img');c.setAttribute('aria-label',d.title+', page '+i+' of '+n);
+        pg.appendChild(c);await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+      }
+    }catch(e){if(t===token)fallback(d);}
+  }
+  function open(i){cur=(i+DOCS.length)%DOCS.length;const d=DOCS[cur];$('vt').textContent=d.title;$('vopen').href=d.file;$('vopen2').href=d.file;v.hidden=false;document.body.style.overflow='hidden';$('vclose').focus();pg.scrollTop=0;render(d,++token);}
+  function close(){token++;v.hidden=true;f.src='about:blank';pg.innerHTML='';document.body.style.overflow='';}
   grid.addEventListener('click',e=>{const b=e.target.closest('.doc[data-i]');if(b)open(+b.dataset.i);});
   $('readLetter').onclick=()=>open(0);document.querySelectorAll('[data-doc]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();open(+a.dataset.doc);}));$('vclose').onclick=close;$('vprev').onclick=()=>open(cur-1);$('vnext').onclick=()=>open(cur+1);
   v.addEventListener('mousedown',e=>{if(e.target===v)close();});
