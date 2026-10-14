@@ -670,17 +670,18 @@ function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);return;}
 
 /* ---------- landmark photos: real images pulled live from Wikipedia / Wikimedia Commons ---------- */
 const PHOTO_TITLES={2:["Gowans Stadium"],3:["Hutchinson Community College"],4:["Cosmosphere"],5:["Fox Theater (Hutchinson, Kansas)"],6:["Kansas State Fair"],7:["Hutchinson Regional Airport"],8:["Hutchinson Zoo","Carey Park (Hutchinson, Kansas)"],9:["Strataca"],10:["Prairie Dunes Country Club"],11:["Sand Hills State Park"],12:["Dillon Nature Center"],13:["Hutchinson Public Library"]};
-const PHOTO_FILES={};
+const PHOTO_GENERIC={1:"High school",2:"Stadium",3:"Community college",7:"General aviation",8:"Zoo",10:"Golf course",12:"Nature reserve",13:"Public library",14:"Distribution center"};
 const photos={};let photoReq=null;
 function loadPhotos(){if(photoReq)return photoReq;
-  const all=[...new Set(Object.values(PHOTO_TITLES).flat())];
+  const all=[...new Set([...Object.values(PHOTO_TITLES).flat(),...Object.values(PHOTO_GENERIC)])];
   const q=new URLSearchParams({action:'query',format:'json',prop:'pageimages',piprop:'thumbnail',pithumbsize:640,redirects:1,titles:all.join('|'),origin:'*'});
   photoReq=fetch('https://en.wikipedia.org/w/api.php?'+q).then(r=>r.json()).then(d=>{const q=d&&d.query||{};const alias={};(q.redirects||[]).forEach(r=>alias[r.from]=r.to);(q.normalized||[]).forEach(r=>alias[r.from]=alias[r.from]||r.to);
     const by={};Object.values(q.pages||{}).forEach(pg=>{if(pg.thumbnail)by[pg.title]={src:pg.thumbnail.source,title:pg.title};});
-    for(const n in PHOTO_TITLES){for(const t of PHOTO_TITLES[n]){const hit=by[alias[t]||t];if(hit){photos[n]=hit;break;}}}}).catch(()=>{});
+    for(const n in PHOTO_TITLES){for(const t of PHOTO_TITLES[n]){const hit=by[alias[t]||t];if(hit){photos[n]=hit;break;}}}
+    for(const n in PHOTO_GENERIC){if(photos[n])continue;const t=PHOTO_GENERIC[n],hit=by[alias[t]||t];if(hit)photos[n]=Object.assign({generic:true},hit);}}).catch(()=>{});
   return photoReq;}
 function photoHtml(p){if(p.kind!=='lm')return'';const ph=photos[p.num];if(!ph)return'';
-  return '<figure class="shot"><img src="'+esc(ph.src)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.closest(\'figure\').remove()"><figcaption>Photo: <a href="https://en.wikipedia.org/wiki/'+encodeURIComponent(ph.title.replace(/ /g,'_'))+'" target="_blank" rel="noopener">Wikipedia</a></figcaption></figure>';}
+  return '<figure class="shot"><img src="'+esc(ph.src)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.closest(\'figure\').remove()"><figcaption>Photo: <a href="https://en.wikipedia.org/wiki/'+encodeURIComponent(ph.title.replace(/ /g,'_'))+'" target="_blank" rel="noopener">Wikipedia</a>'+(ph.generic?' (illustrative, not the actual site)':'')+'</figcaption></figure>';}
 /* ---------- landmark lore: real-world facts plus in-game flavour ---------- */
 const LORE={
 1:["Hutchinson High School is the town's public high school, and its teams are the Salthawks, a nod to the salt beneath the city. The campus sits just east of downtown on 13th Avenue.","Home turf. Every route in the game starts to feel like a hallway sprint from here. Keep the jocks happy or save your legs, because the walk home counts."],
