@@ -50,6 +50,19 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
 .sheet .photo{position:absolute;overflow:hidden;cursor:pointer;background:transparent;border:0;padding:0}
 .sheet .photo img{width:100%;height:100%;object-fit:cover;display:block}
 .sheet .photo:hover{outline:2px solid var(--gold)}
+/* crop dialog */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(10,20,40,.7);display:grid;place-items:center;padding:14px}
+.modal[hidden]{display:none}
+.modal .card{background:#fff;border-radius:12px;padding:18px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.modal h2{margin:0;font:900 24px/1.1 "Playfair Display",Georgia,serif;color:var(--navy)}
+.modal p{margin:0;color:#555;font-size:14px}
+.cropview{position:relative;width:min(340px,100%);aspect-ratio:1;margin:0 auto;border:3px solid #B8923A;background:#222;touch-action:none;cursor:grab;user-select:none}
+.cropview.drag{cursor:grabbing}
+.cropview canvas{display:block;width:100%;height:100%}
+.cropview::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}
+.modal label{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--navy)}
+.modal input[type=range]{flex:1;min-height:44px}
+.modal .acts{display:flex;gap:8px;justify-content:flex-end}
 /* stacked form (phone) */
 .stack{display:none}
 .stack fieldset{border:1px solid var(--line);background:#fff;border-radius:8px;margin:0 0 14px;padding:12px 14px 14px}
@@ -83,6 +96,7 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
   <p class="lead">Fill out your senior's register right here. Type on the form, pick your crowd, spend your six standing points and add a student photo. Your work saves on this device as you go. When you are done, download the finished PDF.</p>
   <div class="bar" role="toolbar" aria-label="Register actions">
     <button class="btn gold" type="button" id="photoBtn">Add student photo</button>
+    <button class="btn alt" type="button" id="adjBtn" disabled>Adjust photo crop</button>
     <button class="btn" type="button" id="pdfBtn">Download PDF</button>
     <button class="btn alt" type="button" id="saveBtn">Save to file</button>
     <button class="btn alt" type="button" id="openBtn">Open saved file</button>
@@ -91,6 +105,15 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
     <span class="status" id="status" aria-live="polite">Not saved yet</span>
   </div>
   <input type="file" id="photoIn" accept="image/*" hidden>
+  <div class="modal" id="cropModal" role="dialog" aria-modal="true" aria-labelledby="cropT" hidden>
+    <div class="card">
+      <h2 id="cropT">Crop your photo</h2>
+      <p>Drag the picture to move it and use the slider to zoom. What you see inside the square is what goes on the register.</p>
+      <div class="cropview" id="cropView"><canvas id="cropCv" width="680" height="680" aria-label="Photo crop preview"></canvas></div>
+      <label>Zoom <input type="range" id="cropZoom" min="1" max="4" step="0.01" value="1" aria-label="Zoom"></label>
+      <div class="acts"><button class="btn alt" type="button" id="cropCancel">Cancel</button><button class="btn" type="button" id="cropUse">Use photo</button></div>
+    </div>
+  </div>
   <input type="file" id="openIn" accept="application/json,.json" hidden>
 
   <div class="sheet" id="sheet" aria-label="Student register, page 1"></div>
@@ -141,6 +164,7 @@ function refresh(){
   document.querySelectorAll("[data-radio]").forEach(b=>b.setAttribute("aria-checked",String(st[b.dataset.radio]===+b.dataset.i)));
   document.querySelectorAll("[data-clique]").forEach(b=>b.setAttribute("aria-checked",String(st.clique===+b.dataset.clique)));
   document.querySelectorAll("[data-text]").forEach(i=>{if(i!==document.activeElement&&i.value!==(st.text[i.dataset.text]||""))i.value=st.text[i.dataset.text]||"";});
+  $("adjBtn").disabled=!st.photo;const ab2=$("adjBtn2");if(ab2)ab2.disabled=!st.photo;
   const ph=$("photoSheet");if(ph)ph.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"";
   const pv=$("photoStack");if(pv)pv.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"No photo yet";
 }
@@ -158,7 +182,7 @@ addEventListener("resize",scale);scale();
 /* ---- phone form ---- */
 const stack=$("stack");
 (function(){
-  let h='<fieldset><legend>Student photo</legend><div class="photoBox"><div class="pv" id="photoStack">No photo yet</div><div><button type="button" class="btn gold" id="photoBtn2">Take or choose a photo</button></div></div></fieldset>';
+  let h='<fieldset><legend>Student photo</legend><div class="photoBox"><div class="pv" id="photoStack">No photo yet</div><div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="btn gold" id="photoBtn2">Take or choose a photo</button><button type="button" class="btn alt" id="adjBtn2" disabled>Adjust crop</button></div></div></fieldset>';
   const secs=[];TEXT.forEach(f=>{let s=secs.find(x=>x[0]===f.sec);if(!s){s=[f.sec,[]];secs.push(s);}s[1].push(f);});
   secs.forEach(s=>{h+='<fieldset><legend>'+s[0]+'</legend>';
     s[1].forEach(f=>{h+='<label class="f">'+f.label+'<input type="text" data-text="'+f.id+'" maxlength="120" autocomplete="off"></label>';});
@@ -172,17 +196,51 @@ const stack=$("stack");
   stack.querySelectorAll("[data-clique]").forEach(b=>b.addEventListener("click",()=>pickClique(+b.dataset.clique)));
   stack.querySelectorAll("[data-radio]").forEach(b=>b.addEventListener("click",()=>pickRadio(b.dataset.radio,+b.dataset.i)));
   $("photoBtn2").addEventListener("click",()=>$("photoIn").click());
+  $("adjBtn2").addEventListener("click",()=>openCrop(st.photo));
 })();
 /* ---- photo ---- */
 $("photoBtn").addEventListener("click",()=>$("photoIn").click());
 $("photoIn").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0];if(!f)return;
-  const img=new Image(),url=URL.createObjectURL(f);
-  img.onload=()=>{const s=Math.min(img.width,img.height),c=document.createElement("canvas");c.width=c.height=480;
-    c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,480,480);
-    st.photo=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);changed();e.target.value="";};
-  img.onerror=()=>{$("status").textContent="That file could not be read as a picture.";URL.revokeObjectURL(url);};
-  img.src=url;
+  const url=URL.createObjectURL(f);openCrop(url,()=>URL.revokeObjectURL(url));e.target.value="";
+});
+$("adjBtn").addEventListener("click",()=>openCrop(st.photo));
+/* ---- crop dialog: drag to move, slider or wheel or pinch to zoom; the square is exactly what is kept ---- */
+const cm=$("cropModal"),cv=$("cropCv"),cx2=cv.getContext("2d"),cview=$("cropView"),czoom=$("cropZoom");
+let ci=null,ccx=0,ccy=0,cz=1,cdone=null;const cptr=new Map();let pinch0=0,pz0=1;
+function cbase(){return Math.min(ci.width,ci.height);}                 /* source px visible at zoom 1 */
+function cspan(){return cbase()/cz;}                                   /* source px visible now */
+function cclamp(){const h=cspan()/2;ccx=Math.max(h,Math.min(ci.width-h,ccx));ccy=Math.max(h,Math.min(ci.height-h,ccy));}
+function cdraw(){cclamp();const sp=cspan();cx2.fillStyle="#222";cx2.fillRect(0,0,cv.width,cv.height);cx2.drawImage(ci,ccx-sp/2,ccy-sp/2,sp,sp,0,0,cv.width,cv.height);}
+function openCrop(src,done){
+  if(!src)return;const img=new Image();
+  img.onload=()=>{const m=1600,k=Math.min(1,m/Math.max(img.width,img.height));
+    if(k<1){const c=document.createElement("canvas");c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);ci=c;}else ci=img;
+    cz=1;czoom.value=1;ccx=ci.width/2;ccy=ci.height/2;cdone=done||null;cm.hidden=false;document.body.style.overflow="hidden";cdraw();$("cropUse").focus();};
+  img.onerror=()=>{$("status").textContent="That file could not be read as a picture.";if(done)done();};
+  img.src=src;
+}
+function closeCrop(){cm.hidden=true;document.body.style.overflow="";ci=null;if(cdone){cdone();cdone=null;}}
+function setZoom(z){const o=cspan();cz=Math.max(1,Math.min(4,z));czoom.value=cz;cdraw();}
+czoom.addEventListener("input",()=>setZoom(+czoom.value));
+cview.addEventListener("wheel",e=>{e.preventDefault();setZoom(cz*(e.deltaY<0?1.08:1/1.08));},{passive:false});
+cview.addEventListener("pointerdown",e=>{cview.setPointerCapture(e.pointerId);cptr.set(e.pointerId,[e.clientX,e.clientY]);cview.classList.add("drag");if(cptr.size===2){const [a,b]=[...cptr.values()];pinch0=Math.hypot(a[0]-b[0],a[1]-b[1]);pz0=cz;}});
+cview.addEventListener("pointermove",e=>{
+  if(!cptr.has(e.pointerId))return;const prev=cptr.get(e.pointerId);cptr.set(e.pointerId,[e.clientX,e.clientY]);
+  if(cptr.size===2){const [a,b]=[...cptr.values()];const d=Math.hypot(a[0]-b[0],a[1]-b[1]);if(pinch0)setZoom(pz0*d/pinch0);return;}
+  const r=cview.getBoundingClientRect(),k=cspan()/r.width;ccx-=(e.clientX-prev[0])*k;ccy-=(e.clientY-prev[1])*k;cdraw();
+});
+const endp=e=>{cptr.delete(e.pointerId);if(!cptr.size)cview.classList.remove("drag");pinch0=0;};
+cview.addEventListener("pointerup",endp);cview.addEventListener("pointercancel",endp);
+cview.tabIndex=0;
+cview.addEventListener("keydown",e=>{const st1=cspan()*0.04;if(e.key==="ArrowLeft"){ccx-=st1;}else if(e.key==="ArrowRight"){ccx+=st1;}else if(e.key==="ArrowUp"){ccy-=st1;}else if(e.key==="ArrowDown"){ccy+=st1;}else if(e.key==="+"||e.key==="="){setZoom(cz*1.1);return;}else if(e.key==="-"){setZoom(cz/1.1);return;}else return;e.preventDefault();cdraw();});
+$("cropCancel").addEventListener("click",closeCrop);
+cm.addEventListener("mousedown",e=>{if(e.target===cm)closeCrop();});
+document.addEventListener("keydown",e=>{if(!cm.hidden&&e.key==="Escape")closeCrop();});
+$("cropUse").addEventListener("click",()=>{
+  const out=document.createElement("canvas");out.width=out.height=480;const sp=cspan();
+  out.getContext("2d").drawImage(ci,ccx-sp/2,ccy-sp/2,sp,sp,0,0,480,480);
+  st.photo=out.toDataURL("image/jpeg",0.88);closeCrop();changed();
 });
 /* ---- save / open / clear ---- */
 $("saveBtn").addEventListener("click",()=>{
