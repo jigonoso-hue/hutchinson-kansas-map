@@ -46,6 +46,9 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
 .sheet .mk[aria-checked="true"]::after{content:"";position:absolute;inset:18%;background:#0b2a6b}
 .sheet .mk.box[aria-checked="true"]::after{clip-path:polygon(14% 0,50% 36%,86% 0,100% 14%,64% 50%,100% 86%,86% 100%,50% 64%,14% 100%,0 86%,36% 50%,0 14%);inset:0}
 .sheet .mk.dot[aria-checked="true"]::after{border-radius:50%;inset:22%}
+.sheet .mk[aria-disabled="true"]{cursor:not-allowed;background:rgba(110,110,110,.28)}
+.sheet .mk[aria-disabled="true"]:hover{background:rgba(110,110,110,.28)}
+.stack .opt[aria-disabled="true"]{opacity:.35;cursor:not-allowed}
 .sheet .ptsbox{position:absolute;display:grid;place-items:center;font-weight:700;color:#0b2a6b;font-size:calc(var(--pt)*11)}
 .sheet .photo{position:absolute;overflow:hidden;cursor:pointer;background:transparent;border:0;padding:0}
 .sheet .photo img{width:100%;height:100%;object-fit:cover;display:block}
@@ -150,6 +153,7 @@ const KEY="hhs-student-register-v1";
 const $=id=>document.getElementById(id);
 let st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")st=Object.assign(st,s);}catch(e){}
+let capReset=false;
 const pct=(v,t)=>(v/t*100)+"%";
 const place=(el,x,y,w,h)=>{el.style.left=pct(x,PW);el.style.top=pct(y,PH);el.style.width=pct(w,PW);el.style.height=pct(h,PH);};
 const points=()=>{let n=0,any=false;for(const k of ["grades","fin","pop"]){const g=RADIOS[k],i=st[k];if(i!==null&&i!==undefined){n+=g.opts[i][1];any=true;}}return n;};
@@ -158,10 +162,10 @@ function save(msg){try{localStorage.setItem(KEY,JSON.stringify(st));$("status").
 function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>save(),250);refresh();}
 function refresh(){
   const n=points(),p=$("pts");p.textContent="Points spent: "+n+" of 6";
-  p.className="pts"+(n===6?" ok":(n>6?" bad":""));
+  p.className="pts"+(n===CAP?" ok":(n>CAP?" bad":""));
   p.title=n>6?"You are over by "+(n-6)+" point"+(n-6===1?"":"s"):(n<6?"You have "+(6-n)+" left to spend":"All 6 points spent");
   const pb=document.getElementById("ptsval");if(pb)pb.textContent=n||"";
-  document.querySelectorAll("[data-radio]").forEach(b=>b.setAttribute("aria-checked",String(st[b.dataset.radio]===+b.dataset.i)));
+  document.querySelectorAll("[data-radio]").forEach(b=>{const k=b.dataset.radio,i=+b.dataset.i,on=st[k]===i;b.setAttribute("aria-checked",String(on));const dis=!on&&!canPick(k,i);b.setAttribute("aria-disabled",String(dis));b.title=dis?"Costs "+RADIOS[k].opts[i][1]+" points; you only have "+(CAP-others(k))+" left for this row":"";});
   document.querySelectorAll("[data-clique]").forEach(b=>b.setAttribute("aria-checked",String(st.clique===+b.dataset.clique)));
   document.querySelectorAll("[data-text]").forEach(i=>{if(i!==document.activeElement&&i.value!==(st.text[i.dataset.text]||""))i.value=st.text[i.dataset.text]||"";});
   $("adjBtn").disabled=!st.photo;const ab2=$("adjBtn2");if(ab2)ab2.disabled=!st.photo;
@@ -169,7 +173,16 @@ function refresh(){
   const pv=$("photoStack");if(pv)pv.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"No photo yet";
 }
 function pickClique(i){st.clique=st.clique===i?null:i;changed();}
-function pickRadio(k,i){st[k]=st[k]===i?null:i;changed();}
+const CAP=6;
+const others=k=>{let n=0;for(const j of ["grades","fin","pop"]){if(j===k)continue;const i=st[j];if(i!==null&&i!==undefined)n+=RADIOS[j].opts[i][1];}return n;};
+const canPick=(k,i)=>others(k)+RADIOS[k].opts[i][1]<=CAP;
+function warn(msg){const p=$("pts");$("status").textContent=msg;p.classList.add("bad");setTimeout(()=>refresh(),1400);}
+function pickRadio(k,i){
+  if(st[k]===i){st[k]=null;changed();return;}
+  if(!canPick(k,i)){const left=CAP-others(k),cost=RADIOS[k].opts[i][1];warn("Not enough points. "+RADIOS[k].opts[i][0]+" costs "+cost+" and you only have "+left+" to spend on "+RADIOS[k].label+". Lower another standing first.");return;}
+  st[k]=i;changed();
+}
+function fixCap(){if(points()>CAP){st.grades=st.fin=st.pop=null;return true;}return false;}
 /* ---- desktop sheet ---- */
 const sheet=$("sheet");
 TEXT.forEach(f=>{const i=document.createElement("input");i.type="text";i.dataset.text=f.id;i.setAttribute("aria-label",f.label);i.autocomplete="off";i.maxLength=120;place(i,f.x0,f.y-13,f.x1-f.x0,14);i.addEventListener("input",()=>{st.text[f.id]=i.value;changed();});sheet.appendChild(i);});
@@ -251,7 +264,7 @@ $("saveBtn").addEventListener("click",()=>{
 $("openBtn").addEventListener("click",()=>$("openIn").click());
 $("openIn").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0];if(!f)return;
-  f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o!=="object"||!o.text)throw 0;st={text:o.text||{},clique:o.clique??null,grades:o.grades??null,fin:o.fin??null,pop:o.pop??null,photo:o.photo||null};save("Opened "+f.name);refresh();}catch(err){$("status").textContent="That file is not a saved register.";}e.target.value="";});
+  f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o!=="object"||!o.text)throw 0;st={text:o.text||{},clique:o.clique??null,grades:o.grades??null,fin:o.fin??null,pop:o.pop??null,photo:o.photo||null};const reset=fixCap();save(reset?"Opened "+f.name+", but its standings were over 6 points, so they were cleared.":"Opened "+f.name);refresh();}catch(err){$("status").textContent="That file is not a saved register.";}e.target.value="";});
 });
 $("clearBtn").addEventListener("click",()=>{if(confirm("Clear everything on this register and start over?")){st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};save("Cleared");refresh();}});
 const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student";
@@ -276,7 +289,7 @@ $("pdfBtn").addEventListener("click",async()=>{
   }catch(err){$("status").textContent=err.message||"Could not make the PDF.";}
   btn.disabled=false;btn.textContent=old;
 });
-refresh();
+capReset=fixCap();refresh();if(capReset){save("Your standings were over the 6-point cap, so they were cleared. Pick them again.");}
 </script>
 </body>
 </html>
