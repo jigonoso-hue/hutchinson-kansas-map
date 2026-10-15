@@ -298,7 +298,7 @@ const DOCS=[
   {title:"Find Your Crowd: Clique Brochure",file:"pdfs/Hutchinson_Clique_Brochure.pdf",desc:"A guide to the cliques of Hutchinson High, with perks, baggage and enemies."},
   {title:"Who Runs the Halls: Clique Leaders Guide",file:"pdfs/Hutchinson_Clique_Leaders_Player_Guide.pdf",desc:"Who leads each crowd: names, hangouts, wants, how to earn their trust, and the whispers."},
 ];
-const LANDMARKS=["Hutchinson High School","Gowans Stadium","Hutchinson Community College","Cosmosphere","Downtown and the Fox Theatre","Kansas State Fairgrounds","Hutchinson Regional Airport","Carey Park and Hutchinson Zoo","Strataca Salt Mine","Prairie Dunes","Sand Hills State Park","Dillon Nature Center","Hutchinson Public Library","Dillons Distribution Center","Salt Flats Radio Tower","Starlite Drive-In","Fairlawn Burial Park","Westside Water Tower","Reno County Courthouse"];
+const LANDMARKS=["Hutchinson High School","Gowans Stadium","Hutchinson Community College","Cosmosphere","Downtown and the Fox Theatre","Kansas State Fairgrounds","Hutchinson Regional Airport","Carey Park and Hutchinson Zoo","Strataca Salt Mine","Prairie Dunes","Sand Hills State Park","Dillon Nature Center","Hutchinson Public Library","Dillons Distribution Center","Salt Flats Radio Tower","Starlite Drive-In","Fairlawn Burial Park","Westside Water Tower","Reno County Courthouse","Dettmer Auto Yard"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const CLIQUES=[
@@ -317,7 +317,7 @@ const CLIQUES=[
 ];
 const CLIQUE_INFO={
 "Jocks":["Brock \"Tank\" Hargrove (the principal's son) and Dana Kessler",[["Gowans Stadium",2],["Starlite Drive-In",16]]],
-"Burnouts":["Ricky \"Razor\" Dunleavy and Shelby Marsh",[["Hutchinson High School back lot",1],["Starlite Drive-In",16],["Kwik Shops",14]]],
+"Burnouts":["Ricky \"Razor\" Dunleavy and Shelby Marsh",[["Hutchinson High School back lot",1],["Starlite Drive-In",16],["Kwik Shops",14],["Dettmer Auto Yard",20]]],
 "Popular Kids":["Kayleigh Dunbar and Chase Whitaker",[["Starlite Drive-In",16],["Carey Park",8]]],
 "Band":["Lindsey Voss and Terrence \"T-Bone\" Mabry",[["Hutchinson High School",1],["Gowans Stadium",2]]],
 "Robotics":["Wendell Ng and Fiona Kowalczyk",[["Cosmosphere",4],["Salt Flats Radio Tower",15]]],
@@ -326,7 +326,7 @@ const CLIQUE_INFO={
 "Student Council":["Allison Whitcomb and Darnell Greer",[["Hutchinson High School main office",1],["Reno County Courthouse",19]]],
 "Hall Monitors":["Gordon \"Gordie\" Pruitt and Wanda Schaeffer",[["Hutchinson High School",1],["Westside Water Tower",18]]],
 "Theater":["Julian Prescott and Opal Vance",[["Fox Theatre",5],["Hutchinson High School auditorium",1],["Starlite Drive-In",16]]],
-"Bullies":["Cole \"Crusher\" Dettmer and Tiffany \"Tiff\" Rourke",[["Hutchinson High School east stairwell",1],["Gowans Stadium lot",2]]],
+"Bullies":["Cole \"Crusher\" Dettmer and Tiffany \"Tiff\" Rourke",[["Hutchinson High School east stairwell",1],["Gowans Stadium lot",2],["Dettmer Auto Yard",20]]],
 "Goths":["Morgan \"Mourn\" Teague and Silas Hartwell",[["Public Library",13],["Fairlawn Burial Park",17]]]
 };
 $('cgrid').innerHTML=CLIQUES.map(c=>{const i=CLIQUE_INFO[c[0]]||['',[]];
