@@ -314,7 +314,22 @@ const CLIQUES=[
 ["Theater","Every day is opening night.","Deception, Performance","The costume closet. Once per session, gain advantage on a disguise or impersonation.","Drama spreads fast, and so do your secrets.","Jocks"],
 ["Goths","Not everyone wants the spotlight.","Arcana, Insight","The Underground Library. Once per session, you know a rumor or legend, with advantage recalling it.","Adults assume the worst, and the popular kids give you trouble.","Popular Kids"]
 ];
-$('cgrid').innerHTML=CLIQUES.map(c=>'<details class="cc"><summary><h3>'+esc(c[0])+'</h3><em>'+esc(c[1])+'</em></summary><div class="body"><div class="sk">'+esc(c[2])+'</div><p><b>Perk:</b> '+esc(c[3])+'</p><p><b>Baggage:</b> '+esc(c[4])+'</p><div class="en">Enemy: '+esc(c[5])+'</div></div></details>').join('');
+const CLIQUE_INFO={
+"Jocks":["Brock \"Tank\" Hargrove (the principal's son) and Dana Kessler",[["Gowans Stadium",2],["Starlite Drive-In",16]]],
+"Burnouts":["Ricky \"Razor\" Dunleavy and Shelby Marsh",[["Hutchinson High School back lot",1],["Starlite Drive-In",16],["Kwik Shops",14]]],
+"Popular Kids":["Kayleigh Dunbar and Chase Whitaker",[["Starlite Drive-In",16],["Carey Park",8]]],
+"Band":["Lindsey Voss and Terrence \"T-Bone\" Mabry",[["Hutchinson High School",1],["Gowans Stadium",2]]],
+"Robotics":["Wendell Ng and Fiona Kowalczyk",[["Cosmosphere",4],["Salt Flats Radio Tower",15]]],
+"Valedictorians":["Ellie Park and Nathaniel Brandt",[["Hutchinson Community College",3],["Public Library",13]]],
+"Ag / FFA":["Colt Brandvold and Maribel Sandoval",[["Kansas State Fairgrounds",6]]],
+"Student Council":["Allison Whitcomb and Darnell Greer",[["Hutchinson High School main office",1]]],
+"Hall Monitors":["Gordon \"Gordie\" Pruitt and Wanda Schaeffer",[["Hutchinson High School",1],["Westside Water Tower",18]]],
+"Theater":["Julian Prescott and Opal Vance",[["Fox Theatre",5],["Hutchinson High School auditorium",1],["Starlite Drive-In",16]]],
+"Goths":["Morgan \"Mourn\" Teague and Silas Hartwell",[["Public Library",13],["Fairlawn Burial Park",17]]]
+};
+$('cgrid').innerHTML=CLIQUES.map(c=>{const i=CLIQUE_INFO[c[0]]||['',[]];
+  const hang=i[1].map(h=>'<a href="map.html#lm'+h[1]+'">'+esc(h[0])+'</a>').join(', ');
+  return '<details class="cc"><summary><h3>'+esc(c[0])+'</h3><em>'+esc(c[1])+'</em></summary><div class="body"><div class="sk">'+esc(c[2])+'</div><p><b>Led by:</b> '+esc(i[0])+'</p><p><b>Hangouts:</b> '+hang+'</p><p><b>Perk:</b> '+esc(c[3])+'</p><p><b>Baggage:</b> '+esc(c[4])+'</p><div class="en">Enemy: '+esc(c[5])+'</div></div></details>';}).join('');
 if(window.matchMedia('(min-width:700px)').matches)document.querySelectorAll('.cc').forEach(d=>d.open=true);
 $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+(i+1)+'</i>'+esc(n)+'</a>').join('');
 (function(){
