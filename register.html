@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Student Register | Hutchinson High School</title>
+<link rel="icon" type="image/png" href="assets/logo-h.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;900&display=swap">
+<style>
+/* Layout: slim school header, a toolbar, then page 1 of the register as a fillable sheet (desktop) or a stacked form (phone). */
+:root{--blue:#006AB5;--blue-dk:#00508a;--gold:#FEB403;--ice:#EBF7FF;--ink:#2d2d2d;--muted:#6a6a6a;--line:#d8d2bf;--navy:#14284B;--cream:#F7F3E8}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 Inter,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--ice)}
+a{color:var(--blue)}
+button,input,textarea{font:inherit}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.top{background:#fff;border-top:6px solid var(--blue);box-shadow:0 1px 6px rgba(0,60,110,.15)}
+.top .in{max-width:1100px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top img{height:46px;width:auto}
+.top b{font:700 18px Inter;color:var(--blue)}
+.top nav{margin-left:auto;display:flex;gap:18px;font-weight:600}
+.top nav a{text-decoration:none;min-height:44px;display:inline-flex;align-items:center}
+.wrap{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px 0 4px;color:var(--navy)}
+.lead{margin:0 0 14px;color:#444;max-width:46em}
+.bar{position:sticky;top:0;z-index:20;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;box-shadow:0 2px 8px rgba(0,60,110,.1)}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:10px 16px;font-weight:600;cursor:pointer;min-height:44px}
+.btn:hover{background:var(--blue-dk)}
+.btn.alt{background:#fff;color:var(--blue);border:2px solid var(--blue)}
+.btn.alt:hover{background:var(--ice)}
+.btn.gold{background:var(--gold);color:#000}
+.status{margin-left:auto;font-size:13px;color:var(--muted)}
+.pts{font-weight:700;color:var(--navy);padding:6px 10px;background:var(--ice);border-radius:6px}
+.pts.bad{background:#f8e3de;color:#a02335}
+.pts.ok{background:#e2f0e6;color:#1d6b3a}
+/* sheet (desktop overlay) */
+.sheet{position:relative;width:100%;max-width:850px;margin:0 auto;aspect-ratio:612/792;background:var(--cream) url("assets/register-form.png") center/100% 100% no-repeat;box-shadow:0 6px 24px rgba(0,40,90,.25);--pt:1.39px;font-family:"Times New Roman",Times,serif}
+.sheet input[type=text]{position:absolute;background:transparent;border:0;border-radius:2px;padding:0 2px;margin:0;color:#0b2a6b;font-family:inherit;font-size:calc(var(--pt)*9.8);width:auto}
+.sheet input[type=text]:hover{background:rgba(0,106,181,.07)}
+.sheet input[type=text]:focus{background:rgba(254,180,3,.2);outline:none;box-shadow:0 0 0 1.5px var(--gold)}
+.sheet .mk{position:absolute;padding:0;margin:0;border:0;background:transparent;cursor:pointer;color:#0b2a6b}
+.sheet .mk:hover{background:rgba(0,106,181,.12)}
+.sheet .mk.box{border-radius:1px}
+.sheet .mk.dot{border-radius:50%}
+.sheet .mk[aria-checked="true"]::after{content:"";position:absolute;inset:18%;background:#0b2a6b}
+.sheet .mk.box[aria-checked="true"]::after{clip-path:polygon(14% 0,50% 36%,86% 0,100% 14%,64% 50%,100% 86%,86% 100%,50% 64%,14% 100%,0 86%,36% 50%,0 14%);inset:0}
+.sheet .mk.dot[aria-checked="true"]::after{border-radius:50%;inset:22%}
+.sheet .ptsbox{position:absolute;display:grid;place-items:center;font-weight:700;color:#0b2a6b;font-size:calc(var(--pt)*11)}
+.sheet .photo{position:absolute;overflow:hidden;cursor:pointer;background:transparent;border:0;padding:0}
+.sheet .photo img{width:100%;height:100%;object-fit:cover;display:block}
+.sheet .photo:hover{outline:2px solid var(--gold)}
+/* stacked form (phone) */
+.stack{display:none}
+.stack fieldset{border:1px solid var(--line);background:#fff;border-radius:8px;margin:0 0 14px;padding:12px 14px 14px}
+.stack legend{font:700 13px Inter;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:var(--navy);padding:4px 10px;border-radius:4px}
+.stack label.f{display:block;margin:10px 0 0;font-weight:600;color:var(--navy);font-size:14px}
+.stack label.f input{display:block;width:100%;margin-top:3px;padding:11px 10px;border:1px solid #b7bfce;border-radius:6px;background:#fff;font-size:16px;color:#0b2a6b}
+.stack .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.stack .opt{border:2px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font-weight:600;color:var(--navy);cursor:pointer;min-height:44px}
+.stack .opt[aria-checked="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.stack .row{margin-top:12px}
+.stack .row b{display:block;color:var(--navy)}
+.stack .row small{color:var(--muted)}
+.stack .photoBox{display:flex;gap:14px;align-items:center}
+.stack .photoBox .pv{width:96px;height:96px;border:2px solid #B8923A;background:#fff;overflow:hidden;display:grid;place-items:center;font-size:11px;font-weight:700;color:#777;text-align:center;flex:none}
+.stack .pv img{width:100%;height:100%;object-fit:cover}
+.note{font-size:13px;color:var(--muted);margin-top:14px;text-align:center}
+@media (max-width:760px){
+  .sheet{display:none}
+  .stack{display:block}
+  .bar{position:static}
+  .status{margin-left:0;width:100%}
+  .top nav{margin-left:0}
+}
+@media print{.top,.bar,.note,.lead,h1{display:none}.sheet{box-shadow:none;max-width:none}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in"><img src="assets/logo-h.png" alt=""><b>Hutchinson High School</b><nav><a href="index.html">Home</a><a href="index.html#documents">Documents</a><a href="index.html#cliques">The crowds</a></nav></div></header>
+<main class="wrap">
+  <h1>Student Register</h1>
+  <p class="lead">Fill out your senior's register right here. Type on the form, pick your crowd, spend your six standing points and add a student photo. Your work saves on this device as you go. When you are done, download the finished PDF.</p>
+  <div class="bar" role="toolbar" aria-label="Register actions">
+    <button class="btn gold" type="button" id="photoBtn">Add student photo</button>
+    <button class="btn" type="button" id="pdfBtn">Download PDF</button>
+    <button class="btn alt" type="button" id="saveBtn">Save to file</button>
+    <button class="btn alt" type="button" id="openBtn">Open saved file</button>
+    <button class="btn alt" type="button" id="clearBtn">Start over</button>
+    <span class="pts" id="pts" role="status" aria-live="polite">Points spent: 0 of 6</span>
+    <span class="status" id="status" aria-live="polite">Not saved yet</span>
+  </div>
+  <input type="file" id="photoIn" accept="image/*" hidden>
+  <input type="file" id="openIn" accept="application/json,.json" hidden>
+
+  <div class="sheet" id="sheet" aria-label="Student register, page 1"></div>
+  <form class="stack" id="stack" onsubmit="return false" aria-label="Student register form"></form>
+  <p class="note">Your information stays in this browser and is only used to fill in the PDF you download. Need the full rules? <a href="pdfs/Hutchinson_Student_Register.pdf" target="_blank" rel="noopener">Open the Student Register and rules (PDF)</a>.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script>
+/* All coordinates are PDF points, measured from the top-left of the 612 x 792 page. */
+const PW=612,PH=792;
+const TEXT=[
+ {id:"name",label:"Name",x0:77.5,x1:278,y:156,sec:"Student"},{id:"nick",label:"Nickname",x0:339,x1:428,y:156,sec:"Student"},{id:"cls",label:"Class",x0:470.5,x1:564,y:156,sec:"Student"},
+ {id:"after",label:"After graduation I want",x0:147.2,x1:564,y:228,sec:"Student"},{id:"hide",label:"Something I'm hiding",x0:138.5,x1:564,y:250,sec:"Student"},
+ {id:"mom",label:"Mother / Guardian",x0:128.5,x1:298,y:298,sec:"Family"},{id:"momjob",label:"Occupation",x0:361.5,x1:564,y:298,sec:"Family"},
+ {id:"dad",label:"Father / Guardian",x0:125.5,x1:298,y:318,sec:"Family"},{id:"dadjob",label:"Occupation",x0:361.5,x1:564,y:318,sec:"Family"},
+ {id:"sib1",label:"Siblings (name, age, where)",x0:160.2,x1:564,y:338,sec:"Family"},{id:"sib2",label:"More siblings",x0:52,x1:564,y:356,sec:"Family"},
+ {id:"other",label:"Other household / relatives",x0:158.7,x1:564,y:376,sec:"Family"},
+ {id:"f1",label:"Friend",x0:81,x1:298,y:426,sec:"Friends and rivals"},{id:"f1how",label:"How you know them",x0:396.3,x1:564,y:426,sec:"Friends and rivals"},
+ {id:"f2",label:"Friend",x0:81,x1:298,y:448,sec:"Friends and rivals"},{id:"f2how",label:"How you know them",x0:396.3,x1:564,y:448,sec:"Friends and rivals"},
+ {id:"f3",label:"Friend",x0:81,x1:298,y:470,sec:"Friends and rivals"},{id:"f3how",label:"How you know them",x0:396.3,x1:564,y:470,sec:"Friends and rivals"},
+ {id:"rival",label:"Rival",x0:75.5,x1:298,y:492,sec:"Friends and rivals"},{id:"why",label:"Why",x0:335.5,x1:564,y:492,sec:"Friends and rivals"}
+];
+const CLIQUES=[["Jocks",158,172],["Band",259.5,172],["Ag / FFA",361,172],["Theater",462.5,172],["Burnouts",158,185],["Robotics",259.5,185],["Student Council",361,185],["Goths",462.5,185],["Popular Kids",158,198],["Valedictorians",259.5,198],["Hall Monitors",361,198],["Bullies",462.5,198]];
+const BOX=8;
+const XS=[238,310.8,383.5,456.2,529];
+const RADIOS={
+ grades:{label:"Current Grades",note:"Teachers, scholarships, and who trusts your facts",y:572,opts:[["F",0,XS[0]],["D",1,XS[1]],["C",2,XS[2]],["B",3,XS[3]],["A",4,XS[4]]]},
+ fin:{label:"Family Finances",note:"Wheels, cash, free time, and who can afford to help",y:616,opts:[["Lower",0,XS[0]],["Middle",2,XS[2]],["Upper",4,XS[4]]]},
+ pop:{label:"Popularity",note:"Who listens, who talks, and what spreads",y:660,opts:[["Invisible",0,XS[0]],["Overlooked",1,XS[1]],["Known",2,XS[2]],["Liked",3,XS[3]],["Popular",4,XS[4]]]}
+};
+const DOT=14,PTSBOX=[502,702,528,718],PHOTO=[496,30,564,98];
+const KEY="hhs-student-register-v1";
+const $=id=>document.getElementById(id);
+let st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")st=Object.assign(st,s);}catch(e){}
+const pct=(v,t)=>(v/t*100)+"%";
+const place=(el,x,y,w,h)=>{el.style.left=pct(x,PW);el.style.top=pct(y,PH);el.style.width=pct(w,PW);el.style.height=pct(h,PH);};
+const points=()=>{let n=0,any=false;for(const k of ["grades","fin","pop"]){const g=RADIOS[k],i=st[k];if(i!==null&&i!==undefined){n+=g.opts[i][1];any=true;}}return n;};
+let saveTimer=null;
+function save(msg){try{localStorage.setItem(KEY,JSON.stringify(st));$("status").textContent=msg||"Saved on this device";}catch(e){$("status").textContent="Could not save here (storage full or blocked). Use Save to file.";}}
+function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>save(),250);refresh();}
+function refresh(){
+  const n=points(),p=$("pts");p.textContent="Points spent: "+n+" of 6";
+  p.className="pts"+(n===6?" ok":(n>6?" bad":""));
+  p.title=n>6?"You are over by "+(n-6)+" point"+(n-6===1?"":"s"):(n<6?"You have "+(6-n)+" left to spend":"All 6 points spent");
+  const pb=document.getElementById("ptsval");if(pb)pb.textContent=n||"";
+  document.querySelectorAll("[data-radio]").forEach(b=>b.setAttribute("aria-checked",String(st[b.dataset.radio]===+b.dataset.i)));
+  document.querySelectorAll("[data-clique]").forEach(b=>b.setAttribute("aria-checked",String(st.clique===+b.dataset.clique)));
+  document.querySelectorAll("[data-text]").forEach(i=>{if(i!==document.activeElement&&i.value!==(st.text[i.dataset.text]||""))i.value=st.text[i.dataset.text]||"";});
+  const ph=$("photoSheet");if(ph)ph.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"";
+  const pv=$("photoStack");if(pv)pv.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"No photo yet";
+}
+function pickClique(i){st.clique=st.clique===i?null:i;changed();}
+function pickRadio(k,i){st[k]=st[k]===i?null:i;changed();}
+/* ---- desktop sheet ---- */
+const sheet=$("sheet");
+TEXT.forEach(f=>{const i=document.createElement("input");i.type="text";i.dataset.text=f.id;i.setAttribute("aria-label",f.label);i.autocomplete="off";i.maxLength=120;place(i,f.x0,f.y-13,f.x1-f.x0,14);i.addEventListener("input",()=>{st.text[f.id]=i.value;changed();});sheet.appendChild(i);});
+CLIQUES.forEach((c,idx)=>{const b=document.createElement("button");b.type="button";b.className="mk box";b.dataset.clique=idx;b.setAttribute("role","checkbox");b.setAttribute("aria-label",c[0]);place(b,c[1]-1,c[2]-1,BOX+2,BOX+2);b.addEventListener("click",()=>pickClique(idx));sheet.appendChild(b);});
+for(const k in RADIOS){RADIOS[k].opts.forEach((o,i)=>{const b=document.createElement("button");b.type="button";b.className="mk dot";b.dataset.radio=k;b.dataset.i=i;b.setAttribute("role","radio");b.setAttribute("aria-label",RADIOS[k].label+": "+o[0]+" ("+o[1]+" points)");place(b,o[2],RADIOS[k].y,DOT,DOT);b.addEventListener("click",()=>pickRadio(k,i));sheet.appendChild(b);});}
+const pbx=document.createElement("div");pbx.className="ptsbox";pbx.id="ptsval";place(pbx,PTSBOX[0],PTSBOX[1],PTSBOX[2]-PTSBOX[0],PTSBOX[3]-PTSBOX[1]);sheet.appendChild(pbx);
+const phb=document.createElement("button");phb.type="button";phb.className="photo";phb.id="photoSheet";phb.setAttribute("aria-label","Add student photo");place(phb,PHOTO[0]+1,PHOTO[1]+1,PHOTO[2]-PHOTO[0]-2,PHOTO[3]-PHOTO[1]-2);phb.addEventListener("click",()=>$("photoIn").click());sheet.appendChild(phb);
+function scale(){sheet.style.setProperty("--pt",(sheet.clientWidth/PW)+"px");}
+addEventListener("resize",scale);scale();
+/* ---- phone form ---- */
+const stack=$("stack");
+(function(){
+  let h='<fieldset><legend>Student photo</legend><div class="photoBox"><div class="pv" id="photoStack">No photo yet</div><div><button type="button" class="btn gold" id="photoBtn2">Take or choose a photo</button></div></div></fieldset>';
+  const secs=[];TEXT.forEach(f=>{let s=secs.find(x=>x[0]===f.sec);if(!s){s=[f.sec,[]];secs.push(s);}s[1].push(f);});
+  secs.forEach(s=>{h+='<fieldset><legend>'+s[0]+'</legend>';
+    s[1].forEach(f=>{h+='<label class="f">'+f.label+'<input type="text" data-text="'+f.id+'" maxlength="120" autocomplete="off"></label>';});
+    if(s[0]==="Student"){h+='<div class="row"><b>Clique (choose one)</b><div class="opts" role="group" aria-label="Clique">'+CLIQUES.map((c,i)=>'<button type="button" class="opt" role="radio" data-clique="'+i+'">'+c[0]+'</button>').join("")+'</div></div>';}
+    h+='</fieldset>';});
+  h+='<fieldset><legend>Standing</legend><p style="margin:6px 0 0;font-size:14px;color:#555">Spend 6 points. No standing can go above 4. Pick one box per row.</p>';
+  for(const k in RADIOS){const g=RADIOS[k];h+='<div class="row"><b>'+g.label+'</b><small>'+g.note+'</small><div class="opts" role="radiogroup" aria-label="'+g.label+'">'+g.opts.map((o,i)=>'<button type="button" class="opt" role="radio" data-radio="'+k+'" data-i="'+i+'">'+o[0]+' ('+o[1]+')</button>').join("")+'</div></div>';}
+  h+='</fieldset>';
+  stack.innerHTML=h;
+  stack.querySelectorAll("[data-text]").forEach(i=>i.addEventListener("input",()=>{st.text[i.dataset.text]=i.value;changed();}));
+  stack.querySelectorAll("[data-clique]").forEach(b=>b.addEventListener("click",()=>pickClique(+b.dataset.clique)));
+  stack.querySelectorAll("[data-radio]").forEach(b=>b.addEventListener("click",()=>pickRadio(b.dataset.radio,+b.dataset.i)));
+  $("photoBtn2").addEventListener("click",()=>$("photoIn").click());
+})();
+/* ---- photo ---- */
+$("photoBtn").addEventListener("click",()=>$("photoIn").click());
+$("photoIn").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const img=new Image(),url=URL.createObjectURL(f);
+  img.onload=()=>{const s=Math.min(img.width,img.height),c=document.createElement("canvas");c.width=c.height=480;
+    c.getContext("2d").drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,480,480);
+    st.photo=c.toDataURL("image/jpeg",0.85);URL.revokeObjectURL(url);changed();e.target.value="";};
+  img.onerror=()=>{$("status").textContent="That file could not be read as a picture.";URL.revokeObjectURL(url);};
+  img.src=url;
+});
+/* ---- save / open / clear ---- */
+$("saveBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(st)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=slug(st.text.name||"student")+"-register.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  save("Saved on this device and downloaded a copy");
+});
+$("openBtn").addEventListener("click",()=>$("openIn").click());
+$("openIn").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o!=="object"||!o.text)throw 0;st={text:o.text||{},clique:o.clique??null,grades:o.grades??null,fin:o.fin??null,pop:o.pop??null,photo:o.photo||null};save("Opened "+f.name);refresh();}catch(err){$("status").textContent="That file is not a saved register.";}e.target.value="";});
+});
+$("clearBtn").addEventListener("click",()=>{if(confirm("Clear everything on this register and start over?")){st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};save("Cleared");refresh();}});
+const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student";
+/* ---- PDF export (fills page 1 of the real PDF) ---- */
+$("pdfBtn").addEventListener("click",async()=>{
+  const btn=$("pdfBtn");btn.disabled=true;const old=btn.textContent;btn.textContent="Making PDF...";
+  try{
+    if(!window.PDFLib)throw new Error("The PDF tool did not load. Check your connection and try again.");
+    const {PDFDocument,StandardFonts,rgb}=PDFLib;
+    const bytes=await fetch("pdfs/Hutchinson_Student_Register_Form.pdf").then(r=>{if(!r.ok)throw new Error("Could not load the blank form.");return r.arrayBuffer();});
+    const doc=await PDFDocument.load(bytes);const page=doc.getPage(0);
+    const font=await doc.embedFont(StandardFonts.TimesRoman),bold=await doc.embedFont(StandardFonts.TimesRomanBold);
+    const ink=rgb(0.043,0.165,0.42),yy=y=>PH-y;
+    TEXT.forEach(f=>{const v=(st.text[f.id]||"").trim();if(!v)return;let size=9.8;const max=f.x1-f.x0-4;while(size>6&&font.widthOfTextAtSize(v,size)>max)size-=0.3;page.drawText(v,{x:f.x0+2,y:yy(f.y)+3,size,font,color:ink});});
+    if(st.clique!==null){const c=CLIQUES[st.clique],x=c[1],y=c[2];const o={thickness:1.4,color:ink};page.drawLine({start:{x:x+1.2,y:yy(y)-1.2},end:{x:x+BOX-1.2,y:yy(y+BOX)+1.2},...o});page.drawLine({start:{x:x+1.2,y:yy(y+BOX)+1.2},end:{x:x+BOX-1.2,y:yy(y)-1.2},...o});}
+    for(const k in RADIOS){const i=st[k];if(i===null||i===undefined)continue;const o=RADIOS[k].opts[i];page.drawCircle({x:o[2]+DOT/2,y:yy(RADIOS[k].y+DOT/2),size:DOT/2-2.6,color:ink});}
+    const n=points();if(n){const w=bold.widthOfTextAtSize(String(n),11);page.drawText(String(n),{x:(PTSBOX[0]+PTSBOX[2])/2-w/2,y:yy(PTSBOX[3])+5,size:11,font:bold,color:ink});}
+    if(st.photo){const img=await doc.embedJpg(st.photo);const x=PHOTO[0]+1.2,w=PHOTO[2]-PHOTO[0]-2.4,y=yy(PHOTO[3])+1.2,h=PHOTO[3]-PHOTO[1]-2.4;page.drawImage(img,{x,y,width:w,height:h});}
+    doc.setTitle("Student Register: "+(st.text.name||"Student"));
+    const out=await doc.save();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out],{type:"application/pdf"}));a.download=slug(st.text.name||"student")+"-student-register.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    $("status").textContent="PDF downloaded";
+  }catch(err){$("status").textContent=err.message||"Could not make the PDF.";}
+  btn.disabled=false;btn.textContent=old;
+});
+refresh();
+</script>
+</body>
+</html>
