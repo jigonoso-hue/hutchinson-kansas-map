@@ -688,7 +688,11 @@ function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);return;}
 
 /* ---------- landmark photos: real images pulled live from Wikipedia / Wikimedia Commons ---------- */
 const PHOTO_TITLES={2:["Gowans Stadium"],3:["Hutchinson Community College"],4:["Cosmosphere"],5:["Fox Theater (Hutchinson, Kansas)"],6:["Kansas State Fair"],7:["Hutchinson Regional Airport"],8:["Hutchinson Zoo","Carey Park (Hutchinson, Kansas)"],9:["Strataca"],10:["Prairie Dunes Country Club"],11:["Sand Hills State Park"],12:["Dillon Nature Center"],13:["Hutchinson Public Library"]};
-const PHOTO_LOCAL={15:'assets/loc-radio-tower.svg',16:'assets/loc-drive-in.svg',17:'assets/loc-cemetery.svg',18:'assets/loc-water-tower.svg'};
+const PHOTO_WEB={
+15:{file:"KSAC Radio Towers Manhattan Kansas.jpg",by:"Spacini",lic:"CC BY-SA 3.0",pos:"50% 18%"},
+16:{file:"Drive-In Movie Theater Screen.jpg",by:"Kevin",lic:"CC BY 2.0",pos:"50% 45%"},
+17:{file:"Markers, Saint Anthony Cemetery, Chase County, Kansas.jpg",by:"Ser Amantio di Nicolao",lic:"CC0",pos:"50% 60%"},
+18:{file:"New Strawn, Kansas water tower.jpg",by:"JohnTheMetalheadCarGuy00",lic:"CC0",pos:"50% 55%"}};
 const PHOTO_GENERIC={1:"High school",2:"Stadium",3:"Community college",7:"General aviation",8:"Zoo",10:"Golf course",12:"Nature reserve",13:"Public library",14:"Distribution center"};
 const photos={};let photoReq=null;
 function loadPhotos(){if(photoReq)return photoReq;
@@ -699,7 +703,7 @@ function loadPhotos(){if(photoReq)return photoReq;
     for(const n in PHOTO_TITLES){for(const t of PHOTO_TITLES[n]){const hit=by[alias[t]||t];if(hit){photos[n]=hit;break;}}}
     for(const n in PHOTO_GENERIC){if(photos[n])continue;const t=PHOTO_GENERIC[n],hit=by[alias[t]||t];if(hit)photos[n]=Object.assign({generic:true},hit);}}).catch(()=>{});
   return photoReq;}
-function photoHtml(p){if(p.kind!=='lm')return'';if(PHOTO_LOCAL[p.num])return '<figure class="shot"><img src="'+PHOTO_LOCAL[p.num]+'" alt="'+esc(p.name)+'"></figure>';const ph=photos[p.num];if(!ph)return'';
+function photoHtml(p){if(p.kind!=='lm')return'';const w=PHOTO_WEB[p.num];if(w){const f=encodeURIComponent(w.file.replace(/ /g,'_'));return '<figure class="shot"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/'+f+'?width=640" alt="'+esc(p.name)+'" loading="lazy" style="object-position:'+w.pos+'" onerror="this.closest(\'figure\').remove()"><figcaption>Photo: '+esc(w.by)+', '+esc(w.lic)+', via <a href="https://commons.wikimedia.org/wiki/File:'+f+'" target="_blank" rel="noopener">Wikimedia Commons</a></figcaption></figure>';}const ph=photos[p.num];if(!ph)return'';
   return '<figure class="shot"><img src="'+esc(ph.src)+'" alt="'+esc(p.name)+'" loading="lazy" onerror="this.closest(\'figure\').remove()"><figcaption>Photo: <a href="https://en.wikipedia.org/wiki/'+encodeURIComponent(ph.title.replace(/ /g,'_'))+'" target="_blank" rel="noopener">Wikipedia</a>'+(ph.generic?' (illustrative, not the actual site)':'')+'</figcaption></figure>';}
 /* ---------- landmark lore: real-world facts plus in-game flavour ---------- */
 const LORE={
