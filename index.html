@@ -216,7 +216,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
   <nav class="quick" aria-label="Quick links">
     <a href="pdfs/Hutchinson_Class_of_2005.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M8 14l16 12 16-12"/><rect x="6" y="10" width="36" height="28" rx="2"/></svg>Welcome letter</a>
-    <a href="pdfs/Hutchinson_Student_Register.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14"/></svg>Student register</a>
+    <a href="register.html" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14"/></svg>Student register</a>
     <a href="pdfs/Hutchinson_Clique_Brochure.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M6 10h16v28H6zM26 10h16v28H26z"/><path d="M12 18h6M12 24h6M32 18h6M32 24h6"/></svg>Clique brochure</a>
     <a href="#cliques"><svg viewBox="0 0 48 48"><circle cx="16" cy="16" r="6"/><circle cx="34" cy="18" r="5"/><path d="M4 40c0-9 6-14 12-14s12 5 12 14M28 40c0-7 4-11 9-11s8 4 8 11"/></svg>The crowds</a>
     <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Town map</a>
@@ -299,6 +299,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 <script>
 /* To add a document: drop the PDF in /pdfs and add a line here. */
 const DOCS=[
+  {title:"Fill Out Your Student Register",file:"register.html",desc:"Type your senior's register online, pick your crowd, spend your standing points, add a student photo, then save it or download the PDF.",action:"Fill it out and save it"},
   {title:"Welcome Letter to the Senior Class",file:"pdfs/Hutchinson_Class_of_2005.pdf",desc:"A September 2004 letter from Principal Dale Hargrove to the Class of 2005."},
   {title:"Student Register, Class of 2005",file:"pdfs/Hutchinson_Student_Register.pdf",desc:"The registrar's form, plus 2 pages of character creation rules: the three standings, backgrounds and awakening."},
   {title:"Find Your Crowd: Clique Brochure",file:"pdfs/Hutchinson_Clique_Brochure.pdf",desc:"A guide to the cliques of Hutchinson High, with perks, baggage and enemies."},
@@ -371,7 +372,7 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
 (function(){
   const grid=$('docgrid');
   if(DOCS.length){
-    grid.innerHTML=DOCS.map(d=>'<a class="doc" href="'+esc(d.file)+'" target="_blank" rel="noopener"><img class="ic" src="assets/logo-h.png" alt=""><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span><span class="open">Open PDF in a new tab</span></a>').join('');
+    grid.innerHTML=DOCS.map(d=>'<a class="doc" href="'+esc(d.file)+'" target="_blank" rel="noopener"><img class="ic" src="assets/logo-h.png" alt=""><b>'+esc(d.title)+'</b><span>'+esc(d.desc||'')+'</span><span class="open">'+esc(d.action||'Open PDF in a new tab')+'</span></a>').join('');
   }else{
     grid.innerHTML=[1,2,3].map(()=>'<div class="doc soon"><span class="ic">PDF</span><b>Document coming soon</b><span>PDFs will appear here once they are added.</span></div>').join('');
     $('docnote').textContent='No documents have been added yet.';
