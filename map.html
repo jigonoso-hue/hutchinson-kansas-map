@@ -153,6 +153,9 @@ button{cursor:pointer}
 .rules{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
 .rules b{color:var(--ink);font-weight:600}
 .empty{color:var(--muted);font-size:13px}
+.clearRoute{display:block;margin:-4px 0 10px auto;border:1px solid var(--line);background:var(--field);color:var(--ink);border-radius:8px;padding:6px 12px;font:600 13px inherit;cursor:pointer}
+.clearRoute:hover{border-color:var(--ink)}
+.clearRoute[hidden]{display:none}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--land)}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 canvas.dragging{cursor:grabbing}
@@ -229,6 +232,7 @@ canvas.dragging{cursor:grabbing}
         <button class="swap" id="swapBtn" type="button" aria-label="Swap start and destination"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2v12M2 11l3 3 3-3M11 14V2M8 5l3-3 3 3"/></svg></button>
         <div class="combo"><input id="toIn" type="text" placeholder="Choose a destination" autocomplete="off" aria-label="Destination"><ul id="toList" hidden></ul></div>
       </div>
+      <button class="clearRoute" id="clearBtn" type="button" hidden>Clear route</button>
       <div class="modes" id="modes" role="group" aria-label="How you are travelling"></div>
       <div class="combo-row" id="walkRow" hidden><span>On foot</span><div class="seg" role="group" aria-label="Walking style"><button type="button" data-w="free">Anywhere open</button><button type="button" data-w="roads">Roads only</button></div></div>
       <div class="combo-row" id="comboRow" hidden><span>Drive, then go on foot by</span><div class="seg" role="group" aria-label="On foot by"><button type="button" data-f="walk">Walk</button><button type="button" data-f="run">Run</button><button type="button" data-f="bike">Bike</button></div><div class="combo viarow"><input id="viaIn" type="text" placeholder="Park at (optional, otherwise as close as the roads go)" autocomplete="off" aria-label="Where to park"><ul id="viaList" hidden></ul></div></div>
@@ -771,10 +775,11 @@ function makeCombo(inp,list,setter){
 }
 makeCombo($('fromIn'),$('fromList'),p=>{from=p;selected=null;renderInfo();syncFields();recompute(true);});
 makeCombo($('toIn'),$('toList'),p=>{to=p;selected=null;renderInfo();syncFields();recompute(true);});
-function syncFields(){const f=$('fromIn'),t=$('toIn'),v=$('viaIn');if(document.activeElement!==v)v.value=via?via.name:'';if(document.activeElement!==f)f.value=from?from.name:'';if(document.activeElement!==t)t.value=to?to.name:'';}
+function syncFields(){const cb=$('clearBtn');if(cb)cb.hidden=!(from||to||via);const f=$('fromIn'),t=$('toIn'),v=$('viaIn');if(document.activeElement!==v)v.value=via?via.name:'';if(document.activeElement!==f)f.value=from?from.name:'';if(document.activeElement!==t)t.value=to?to.name:'';}
 makeCombo($('viaIn'),$('viaList'),p=>{via=p;selected=null;renderInfo();syncFields();recompute(true);});
 $('viaIn').addEventListener('input',e=>{if(!e.target.value.trim()&&via){via=null;recompute(false);}});
 $('comboRow').querySelectorAll('button').forEach(b=>b.onclick=()=>{store.foot=b.dataset.f;save();recompute(false);fitRoute();});
+$('clearBtn').onclick=()=>{from=null;to=null;via=null;selected=null;renderInfo();syncFields();recompute(false);};
 $('swapBtn').onclick=()=>{selected=null;renderInfo();const x=from;from=to;to=x;syncFields();recompute(true);};
 
 /* ---------- modes ---------- */
