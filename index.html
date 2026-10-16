@@ -44,7 +44,10 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offse
 .hero p{font-size:clamp(17px,2.2vw,22px);max-width:30em;margin:0 0 26px}
 .btn{display:inline-block;background:var(--gold);color:#000;font-weight:700;text-decoration:none;padding:14px 26px;border-radius:4px;text-transform:uppercase;letter-spacing:.05em;font-size:14px;border:0;cursor:pointer}
 .btn:hover{background:#ffc83a}
-.btn.ghost{background:transparent;color:#fff;border:2px solid #fff;margin-left:10px}
+.btn.ghost{background:transparent;color:#fff;border:2px solid #fff;margin:0 10px 0 0}
+.btn.big{font-size:clamp(15px,2.4vw,19px);padding:18px 34px;box-shadow:0 6px 18px rgba(0,0,0,.35);display:block;width:fit-content;max-width:100%;margin-bottom:14px}
+.hero-sub{display:flex;flex-wrap:wrap;gap:10px}
+.hero-sub .btn.ghost{margin:0}
 .btn.ghost:hover{background:rgba(255,255,255,.15)}
 .mascots{position:absolute;right:max(24px,6vw);bottom:0;height:min(88%,390px);display:flex;align-items:flex-end;gap:0;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
 .mascots img{height:100%}
@@ -208,7 +211,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <small>Class of 2005</small>
       <h1>Welcome back, Salthawks.</h1>
       <p>Senior year starts now. Pick your crowd, spend your standing, and find your way around town. Built on salt, standing strong.</p>
-      <a class="btn" href="#documents">Student documents</a><a class="btn ghost" href="map.html">Town map</a>
+      <a class="btn big" href="register.html">Fill out your student register</a><div class="hero-sub"><a class="btn ghost" href="#documents">Student documents</a><a class="btn ghost" href="map.html">Town map</a></div>
     </div>
     <div class="mascots"><img src="assets/mascot-big.png" alt="Salthawk mascot"><img class="lil" src="assets/mascot-little.png" alt="Little Salthawk"></div>
     <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
@@ -216,7 +219,6 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
   <nav class="quick" aria-label="Quick links">
     <a href="pdfs/Hutchinson_Class_of_2005.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M8 14l16 12 16-12"/><rect x="6" y="10" width="36" height="28" rx="2"/></svg>Welcome letter</a>
-    <a href="register.html" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8M18 24h14M18 31h14"/></svg>Student register</a>
     <a href="pdfs/Hutchinson_Clique_Brochure.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M6 10h16v28H6zM26 10h16v28H26z"/><path d="M12 18h6M12 24h6M32 18h6M32 24h6"/></svg>Clique brochure</a>
     <a href="#cliques"><svg viewBox="0 0 48 48"><circle cx="16" cy="16" r="6"/><circle cx="34" cy="18" r="5"/><path d="M4 40c0-9 6-14 12-14s12 5 12 14M28 40c0-7 4-11 9-11s8 4 8 11"/></svg>The crowds</a>
     <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Town map</a>
@@ -299,7 +301,6 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 <script>
 /* To add a document: drop the PDF in /pdfs and add a line here. */
 const DOCS=[
-  {title:"Fill Out Your Student Register",file:"register.html",desc:"Type your senior's register online, pick your crowd, spend your standing points, add a student photo, then save it or download the PDF.",action:"Fill it out and save it"},
   {title:"Welcome Letter to the Senior Class",file:"pdfs/Hutchinson_Class_of_2005.pdf",desc:"A September 2004 letter from Principal Dale Hargrove to the Class of 2005."},
   {title:"Student Register, Class of 2005",file:"pdfs/Hutchinson_Student_Register.pdf",desc:"The registrar's form, plus 2 pages of character creation rules: the three standings, backgrounds and awakening."},
   {title:"Find Your Crowd: Clique Brochure",file:"pdfs/Hutchinson_Clique_Brochure.pdf",desc:"A guide to the cliques of Hutchinson High, with perks, baggage and enemies."},
