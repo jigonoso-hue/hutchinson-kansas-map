@@ -275,7 +275,7 @@ canvas.dragging{cursor:grabbing}
     <canvas id="cv" role="img" aria-label="Map of Hutchinson, Kansas with roads, rivers, parks and landmarks. Tap to drop a pin."></canvas>
     <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Fit whole town" style="font-size:12px">All</button></div>
     <div class="info" id="info" hidden></div>
-    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span></div>
+    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i>Golf course</span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
@@ -662,8 +662,7 @@ function drawWealth(){
 }
 function drawWealthLabels(){
   const fs=Math.max(11,Math.min(17,12*Math.max(V.s,.9)));
-  WLAB.forEach(l=>{const q=W2S(l[0],l[1]);halo(l[2],q[0],q[1],'700 '+fs+'px IBM Plex Sans,system-ui,sans-serif',colors.ink);});
-  GOLF.forEach(g=>{const q=W2S(g[0],g[1]);ctx.beginPath();ctx.moveTo(q[0],q[1]+9);ctx.lineTo(q[0],q[1]-9);ctx.lineWidth=1.6;ctx.strokeStyle='#2E5E3A';ctx.stroke();ctx.beginPath();ctx.moveTo(q[0],q[1]-9);ctx.lineTo(q[0]+9,q[1]-5.5);ctx.lineTo(q[0],q[1]-2);ctx.closePath();ctx.fillStyle='#D8453C';ctx.fill();if(V.s>.9)halo(g[2],q[0],q[1]+20,'600 11px IBM Plex Sans,system-ui,sans-serif','#2E5E3A');});
+  GOLF.forEach(g=>{const q=W2S(g[0],g[1]);ctx.beginPath();ctx.moveTo(q[0],q[1]+9);ctx.lineTo(q[0],q[1]-9);ctx.lineWidth=1.6;ctx.strokeStyle='#2E5E3A';ctx.stroke();ctx.beginPath();ctx.moveTo(q[0],q[1]-9);ctx.lineTo(q[0]+9,q[1]-5.5);ctx.lineTo(q[0],q[1]-2);ctx.closePath();ctx.fillStyle='#D8453C';ctx.fill();});
 }
 function drawGated(){
   ctx.beginPath();GATED.forEach((q,i)=>{const s=W2S(q[0],q[1]);i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});ctx.closePath();
@@ -672,35 +671,59 @@ function drawGated(){
   ctx.beginPath();ctx.moveTo(g[0]-5,g[1]-4);ctx.lineTo(g[0]-5,g[1]+4);ctx.moveTo(g[0],g[1]-4);ctx.lineTo(g[0],g[1]+4);ctx.moveTo(g[0]+5,g[1]-4);ctx.lineTo(g[0]+5,g[1]+4);ctx.lineWidth=1.3;ctx.stroke();
   if(V.s>1.2){const c=W2S(842,404);halo('GATED',c[0],c[1],'700 11px IBM Plex Sans,system-ui,sans-serif','#3b2a1d');}
 }
-/* salt caves: one chamber under every Kwik Shop, tunnels that weave between them */
-let CAVE=null;
+/* salt caves: a woven cavern system under the whole town, with a big chamber under every Kwik Shop */
+let CAVE=null,rockPat=null;
+function rng32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 function buildCaves(){
-  const N=[];D.kw.forEach((k,i)=>N.push({x:k[0],y:k[1],r:17,t:'kw',n:i+1}));
-  [[9,34],[15,22],[1,20],[19,20],[21,18],[17,20],[5,22]].forEach(([num,r])=>{const l=D.lm.find(q=>q[0]===num);if(l)N.push({x:l[3],y:l[4],r,t:'lm',n:num});});
-  const E2=[],key=(a,b)=>a<b?a+'_'+b:b+'_'+a,seen=new Set();
+  const R=rng32(20041016);buildGrid();
+  const N=[];
+  D.kw.forEach((k,i)=>N.push({x:k[0],y:k[1],r:26+R()*8,t:'kw'}));
+  [[9,60],[15,34],[1,34],[19,28],[21,26],[17,32],[5,30],[24,30],[22,26],[23,26]].forEach(([num,r])=>{const l=D.lm.find(q=>q[0]===num);if(l)N.push({x:l[3],y:l[4],r,t:'lm',n:num});});
+  const B=grid&&grid.B;let tries=0;
+  while(N.length<92&&tries<9000){tries++;const x=60+R()*1190,y=330+R()*1230;const ci=((y/G)|0)*GW+((x/G)|0);if(B&&!B[ci]&&R()<.75)continue;
+    if(N.some(q=>Math.hypot(q.x-x,q.y-y)<62))continue;N.push({x,y,r:13+R()*R()*38,t:'x'});}
+  const E2=[],seen=new Set(),key=(a,b)=>a<b?a+'_'+b:b+'_'+a;
   const add=(a,b)=>{const k=key(a,b);if(a===b||seen.has(k))return;seen.add(k);E2.push([a,b]);};
-  N.forEach((p,i)=>{const d=N.map((q,j)=>[j,Math.hypot(p.x-q.x,p.y-q.y)]).filter(q=>q[0]!==i).sort((a,b)=>a[1]-b[1]);add(i,d[0][0]);add(i,d[1][0]);if(p.t==='kw'){add(i,d[2][0]);add(i,d[3][0]);}});
+  N.forEach((p,i)=>{const d=N.map((q,j)=>[j,Math.hypot(p.x-q.x,p.y-q.y)]).filter(q=>q[0]!==i&&q[1]<330).sort((a,b)=>a[1]-b[1]);const k=p.t==='kw'?4:3;for(let m=0;m<Math.min(k,d.length);m++)add(i,d[m][0]);});
   const par=N.map((_,i)=>i),f=i=>par[i]===i?i:(par[i]=f(par[i]));E2.forEach(([a,b])=>{par[f(a)]=f(b);});
   const all=[];for(let i=0;i<N.length;i++)for(let j=i+1;j<N.length;j++)all.push([i,j,Math.hypot(N[i].x-N[j].x,N[i].y-N[j].y)]);all.sort((a,b)=>a[2]-b[2]);
   all.forEach(([a,b])=>{if(f(a)!==f(b)){par[f(a)]=f(b);add(a,b);}});
-  const paths=E2.map(([a,b])=>{const A=N[a],B=N[b],dx=B.x-A.x,dy=B.y-A.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
-    const h=((a*73856093)^(b*19349663))>>>0,s1=((h&255)/255-.5)*.7,s2=(((h>>8)&255)/255-.5)*.7;
-    return{a:[A.x,A.y],c1:[A.x+dx*.33+nx*L*s1,A.y+dy*.33+ny*L*s1],c2:[A.x+dx*.66+nx*L*s2,A.y+dy*.66+ny*L*s2],b:[B.x,B.y]};});
-  CAVE={N,paths};
+  const tun=E2.map(([a,b])=>{const A=N[a],Bn=N[b],dx=Bn.x-A.x,dy=Bn.y-A.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
+    const s1=(R()-.5)*.55,s2=(R()-.5)*.55,c1=[A.x+dx*.33+nx*L*s1,A.y+dy*.33+ny*L*s1],c2=[A.x+dx*.66+nx*L*s2,A.y+dy*.66+ny*L*s2];
+    const pts=[],steps=Math.max(8,Math.round(L/9));let w1=R()*6,w2=R()*6;
+    for(let i=0;i<=steps;i++){const t=i/steps,u=1-t;let x=u*u*u*A.x+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*Bn.x,y=u*u*u*A.y+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*Bn.y;
+      const e=Math.sin(Math.PI*t);w1+=(R()-.5)*1.6;w2+=(R()-.5)*1.6;x+=nx*Math.sin(w1)*4.5*e+(R()-.5)*1.2;y+=ny*Math.sin(w1)*4.5*e+(R()-.5)*1.2;pts.push([x,y,0.75+0.5*Math.abs(Math.sin(w2*.9+i*.35))]);}
+    return{pts,w:7+R()*8};});
+  const rooms=N.map(n=>{const k=Math.max(14,Math.round(n.r*.9)),ph=[R()*6,R()*6,R()*6],pts=[];
+    for(let i=0;i<k;i++){const a=i/k*6.283,m=1+.22*Math.sin(a*2+ph[0])+.14*Math.sin(a*3+ph[1])+.08*Math.sin(a*5+ph[2])+(R()-.5)*.08;pts.push([n.x+Math.cos(a)*n.r*m,n.y+Math.sin(a)*n.r*m*.84]);}
+    const cols=[];const nc=n.r>30?3+((R()*3)|0):n.r>20?1+((R()*2)|0):0;for(let c=0;c<nc;c++){const a=R()*6.283,d=R()*n.r*.55;cols.push([n.x+Math.cos(a)*d,n.y+Math.sin(a)*d*.8,1.6+R()*2.4]);}
+    return{n,pts,cols};});
+  const spark=[];tun.forEach(t=>{t.pts.forEach((p,i)=>{if(R()<.35)spark.push([p[0]+(R()-.5)*t.w*.8,p[1]+(R()-.5)*t.w*.8,R()]);});});rooms.forEach(r=>{for(let i=0;i<Math.round(r.n.r*.5);i++){const a=R()*6.283,d=Math.sqrt(R())*r.n.r*.8;spark.push([r.n.x+Math.cos(a)*d,r.n.y+Math.sin(a)*d*.8,R()]);}});
+  CAVE={N,tun,rooms,spark};
+  const c=document.createElement('canvas');c.width=c.height=160;const x=c.getContext('2d');x.fillStyle='#1c110c';x.fillRect(0,0,160,160);
+  for(let i=0;i<1400;i++){x.fillStyle='rgba('+(R()<.5?'0,0,0':'110,80,60')+','+(.05+R()*.16)+')';x.fillRect(R()*160,R()*160,1+R()*3,1+R()*3);}
+  rockPat=ctx.createPattern(c,'repeat');
 }
 function drawCaves(){
   if(!CAVE)buildCaves();
-  ctx.fillStyle='rgba(20,11,7,.66)';ctx.fillRect(0,0,cssW,cssH);
-  const w=Math.max(2.4,Math.min(9,4.2*V.s));
-  const run=()=>{ctx.beginPath();CAVE.paths.forEach(p=>{const a=W2S(p.a[0],p.a[1]),c1=W2S(p.c1[0],p.c1[1]),c2=W2S(p.c2[0],p.c2[1]),b=W2S(p.b[0],p.b[1]);ctx.moveTo(a[0],a[1]);ctx.bezierCurveTo(c1[0],c1[1],c2[0],c2[1],b[0],b[1]);});};
+  ctx.fillStyle=rockPat;ctx.globalAlpha=.82;ctx.fillRect(0,0,cssW,cssH);ctx.globalAlpha=1;
+  const z=V.s,sc=Math.max(.45,Math.min(3,z*1.15));
   ctx.lineCap='round';ctx.lineJoin='round';
-  run();ctx.strokeStyle='rgba(255,200,150,.18)';ctx.lineWidth=w+9;ctx.stroke();
-  run();ctx.strokeStyle='#1b0f09';ctx.lineWidth=w+3.2;ctx.stroke();
-  run();ctx.strokeStyle='#EAC7AE';ctx.lineWidth=w;ctx.stroke();
-  CAVE.N.forEach(n=>{const s=W2S(n.x,n.y),r=Math.max(7,n.r*Math.max(V.s,.5)*1.15);
-    ctx.beginPath();for(let i=0;i<=18;i++){const a=i/18*6.283,k=1+.16*Math.sin(a*3+n.x)+.1*Math.sin(a*5+n.y);const px=s[0]+Math.cos(a)*r*k,py=s[1]+Math.sin(a)*r*k*.82;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();
-    ctx.fillStyle=n.t==='kw'?'#F7E3D1':'#F3D5BD';ctx.fill();ctx.lineWidth=2.2;ctx.strokeStyle='#1b0f09';ctx.stroke();});
-  if(V.s>1.1)CAVE.N.forEach(n=>{if(n.t!=='lm'||n.n!==9)return;const s=W2S(n.x,n.y);halo('Old salt mine',s[0],s[1]+n.r*V.s+14,'600 11px IBM Plex Sans,system-ui,sans-serif','#EAC7AE');});
+  const tpath=t=>{ctx.beginPath();t.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});};
+  const rpath=r=>{ctx.beginPath();r.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});ctx.closePath();};
+  const pass=(wAdd,col,k)=>{ctx.strokeStyle=col;CAVE.tun.forEach(t=>{tpath(t);ctx.lineWidth=(t.w*sc*k)+wAdd;ctx.stroke();});};
+  pass(11,'rgba(0,0,0,.55)',1);          /* shadow in the rock */
+  pass(5.5,'#3A2619',1);                 /* wall */
+  pass(3,'#7B5A47',1);                   /* lit rim */
+  pass(0,'#C9A28A',1);                   /* floor */
+  pass(-1.5,'#E2C6B0',.7);               /* salt floor */
+  pass(0,'rgba(255,240,228,.5)',.28);    /* glint down the middle */
+  CAVE.rooms.forEach(r=>{rpath(r);ctx.fillStyle='#3A2619';ctx.fill();ctx.lineWidth=3.4*sc+3;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='#7B5A47';ctx.stroke();
+    const q=W2S(r.n.x,r.n.y),rad=Math.max(6,r.n.r*z*1.1),g=ctx.createRadialGradient(q[0],q[1],rad*.1,q[0],q[1],rad);g.addColorStop(0,'#F0DCCB');g.addColorStop(.6,'#D9B8A0');g.addColorStop(1,'#A98068');
+    ctx.save();rpath(r);ctx.clip();ctx.fillStyle=g;ctx.fill();ctx.restore();
+    r.cols.forEach(c=>{const p=W2S(c[0],c[1]),cr=Math.max(1.6,c[2]*z*1.1);ctx.beginPath();ctx.ellipse(p[0],p[1],cr,cr*.8,0,0,6.283);ctx.fillStyle='#4A3226';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#F0DCCB';ctx.stroke();});
+    if(r.n.t==='kw'){ctx.beginPath();ctx.ellipse(q[0],q[1],Math.max(4,rad*.28),Math.max(3,rad*.22),0,0,6.283);ctx.strokeStyle='rgba(60,35,22,.7)';ctx.lineWidth=1.6;ctx.stroke();}});
+  CAVE.spark.forEach(p=>{const q=W2S(p[0],p[1]);ctx.fillStyle='rgba(255,255,255,'+(.35+p[2]*.6)+')';const s=Math.max(.8,(.6+p[2]*1.2)*Math.min(z,2));ctx.fillRect(q[0]-s/2,q[1]-s/2,s,s);});
 }
 let focusPt=null;
 function draw(){
