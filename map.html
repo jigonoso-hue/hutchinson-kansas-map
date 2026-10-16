@@ -338,7 +338,7 @@ D.kw.forEach((k,i)=>places.push({id:'kw'+(i+1),kind:'kw',num:i+1,name:'Kwik Shop
 let pins=(store.pins||[]).filter(p=>p&&isFinite(p.x)&&isFinite(p.y)).map(p=>({id:p.id,kind:'pin',name:p.name,x:p.x,y:p.y,detail:'Saved pin'}));
 let temp=null, selected=null, from=null, to=null, via=null, mode=store.mode||'run', routes={}, cur=null;
 const byId=id=>places.find(p=>p.id===id)||pins.find(p=>p.id===id)||(temp&&temp.id===id?temp:null);
-from=byId('lm1'); to=byId('lm8');
+from=null; to=null;
 
 /* ---------- road graph ---------- */
 const N=D.nodes.length;
