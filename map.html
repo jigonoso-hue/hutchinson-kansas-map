@@ -275,7 +275,7 @@ canvas.dragging{cursor:grabbing}
     <canvas id="cv" role="img" aria-label="Map of Hutchinson, Kansas with roads, rivers, parks and landmarks. Tap to drop a pin."></canvas>
     <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Fit whole town" style="font-size:12px">All</button></div>
     <div class="info" id="info" hidden></div>
-    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#3E9B8F"></i>Upper middle: nice house, a decent car, a new phone</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span></div>
+    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
@@ -497,7 +497,7 @@ function buildGrid(){
   const n=GW*GH,rd=rc.getImageData(0,0,GW,GH).data,wd=wc.getImageData(0,0,GW,GH).data,hd=hc.getImageData(0,0,GW,GH).data,pd=pc.getImageData(0,0,GW,GH).data;
   const R=new Uint8Array(n),Wt=new Uint8Array(n),Hh=new Uint8Array(n),P=new Uint8Array(n);
   for(let i=0;i<n;i++){R[i]=rd[i*4+3]>70?1:0;Wt[i]=wd[i*4+3]>110?1:0;Hh[i]=hd[i*4+3]>110?1:0;P[i]=pd[i*4+3]>110?1:0;}
-  const comp=new Int32Array(n).fill(-1),stack=new Int32Array(n),order=new Int32Array(n),B=new Uint8Array(n);
+  const comp=new Int32Array(n).fill(-1),stack=new Int32Array(n),order=new Int32Array(n),B=new Uint8Array(n),CI=[];
   let nc=0,oi=0;
   for(let s=0;s<n;s++){
     if(comp[s]>=0||R[s]||Wt[s]||Hh[s])continue;
@@ -508,13 +508,14 @@ function buildGrid(){
       if(x<GW-1){const q=c+1;if(comp[q]<0&&!R[q]&&!Wt[q]&&!Hh[q]){comp[q]=nc;stack[sp++]=q;}}
       if(y>0){const q=c-GW;if(comp[q]<0&&!R[q]&&!Wt[q]&&!Hh[q]){comp[q]=nc;stack[sp++]=q;}}
       if(y<GH-1){const q=c+GW;if(comp[q]<0&&!R[q]&&!Wt[q]&&!Hh[q]){comp[q]=nc;stack[sp++]=q;}}}
+    CI[nc]=[cnt,park,edge];
     if(cnt<=AMAX&&cnt>=8&&!edge&&park/cnt<0.3){
       for(let k=start;k<oi;k++){const c=order[k],x=c%GW,y=(c/GW)|0;
         if(x>0&&x<GW-1&&y>0&&y<GH-1&&comp[c-1]===nc&&comp[c+1]===nc&&comp[c-GW]===nc&&comp[c+GW]===nc)B[c]=1;}}
     nc++;}
   const blk=new Uint8Array(n),cost=new Float32Array(n);
   for(let i=0;i<n;i++){blk[i]=(Wt[i]||Hh[i]||B[i])&&!R[i]?1:0;cost[i]=R[i]?1:(P[i]?1.1:1.2);}
-  grid={blk,cost,B,n};paintMask();return grid;
+  grid={blk,cost,B,n,comp,CI,nc};paintMask();return grid;
 }
 function paintMask(){
   if(!grid)return;if(!maskCv){maskCv=document.createElement('canvas');maskCv.width=GW;maskCv.height=GH;}
@@ -629,34 +630,37 @@ function marker(p){
 /* ---------- overlays: gated community, wealth zones, salt caves ---------- */
 const GATED=[[772,452],[800,444],[832,428],[838,376],[872,376],[880,420],[906,440],[912,472],[896,492],[888,552],[800,552],[782,500]];
 const GATE=[846,552];
-const WZ={poor:'#C8553D',mid:'#D8A93C',up:'#3E9B8F',rich:'#7A5BD8'};
-/* weighted-nearest seeds (x, y, reach, tier): every built-up cell joins exactly one zone, so zones never overlap */
+const WZ={poor:'#C8553D',mid:'#D8A93C',rich:'#7A5BD8'};
+/* every road-bounded block joins exactly one zone (weighted nearest seed: x, y, reach, tier), so zones follow the street grid and never overlap */
 const WSEEDS=[
- [845,462,55,'rich'],[1255,505,95,'rich'],[190,600,60,'rich'],[300,575,32,'rich'],[270,430,95,'up'],
- [400,640,115,'up'],[180,735,75,'up'],[705,742,75,'up'],[640,540,70,'up'],
+ [845,462,55,'rich'],[1255,505,95,'rich'],[190,600,60,'rich'],[300,575,32,'rich'],[240,520,40,'rich'],
+ [400,640,115,'mid'],[180,735,75,'mid'],[705,742,75,'mid'],[640,540,70,'mid'],[270,430,95,'mid'],
  [60,850,115,'poor'],[230,1480,190,'poor'],[300,1330,120,'poor'],[850,985,95,'poor'],[880,1070,65,'poor'],
  [560,950,230,'mid'],[850,800,150,'mid'],[480,1160,150,'mid'],[330,900,120,'mid'],[1000,640,110,'mid'],[1100,900,100,'mid']
 ];
-const WLAB=[[845,415,'RICH','rich'],[1255,470,'RICH','rich'],[185,640,'RICH','rich'],[480,585,'UPPER MIDDLE','up'],[60,810,'POOR','poor'],[260,1440,'POOR','poor'],[850,1015,'POOR','poor'],[600,1020,'MIDDLE','mid']];
+const WLAB=[[845,415,'RICH','rich'],[1255,470,'RICH','rich'],[185,640,'RICH','rich'],[60,810,'POOR','poor'],[260,1440,'POOR','poor'],[850,1015,'POOR','poor'],[600,1020,'MIDDLE','mid']];
 const GOLF=[[1255,545,'Prairie Dunes golf'],[262,610,'Country Club']];
 let wzCv=null;
 function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
+function seedTier(wx,wy){let best=1e18,bt='mid',bs=null,bd=0;for(const sd of WSEEDS){const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bt=sd[3];bs=sd;bd=Math.hypot(dx,dy);}}return bt==='rich'&&bd>bs[2]*1.3?'mid':bt;}
 function buildWealth(){
   buildGrid();if(!grid||wzCv)return;
-  const n=GW*GH,B=grid.B,T=new Uint8Array(n),tmp=new Uint8Array(n),R=3;
-  for(let y=0;y<GH;y++){let s=0;for(let x=-R;x<GW;x++){if(x+R<GW&&B[y*GW+x+R])s++;if(x-R-1>=0&&B[y*GW+x-R-1])s--;if(x>=0&&s>0)tmp[y*GW+x]=1;}}
-  for(let x=0;x<GW;x++){let s=0;for(let y=-R;y<GH;y++){if(y+R<GH&&tmp[(y+R)*GW+x])s++;if(y-R-1>=0&&tmp[(y-R-1)*GW+x])s--;if(y>=0&&s>0)T[y*GW+x]=1;}}
-  const tiers=['poor','mid','up','rich'],col={poor:[200,85,61],mid:[216,169,60],up:[62,155,143],rich:[122,91,216]};
+  const n=GW*GH,comp=grid.comp,nc=grid.nc,CI=grid.CI,sx=new Float64Array(nc),sy=new Float64Array(nc);
+  for(let i=0;i<n;i++){const c=comp[i];if(c>=0){sx[c]+=(i%GW);sy[c]+=((i/GW)|0);}}
+  const tier=new Array(nc);
+  for(let c=0;c<nc;c++){const ci=CI[c];if(!ci)continue;const [cnt,park,edge]=ci;if(cnt<8||cnt>1200||edge||park/cnt>=.3)continue;tier[c]=seedTier(sx[c]/cnt*G,sy[c]/cnt*G);}
+  const col={poor:[200,85,61],mid:[216,169,60],rich:[122,91,216]};
   wzCv=document.createElement('canvas');wzCv.width=GW;wzCv.height=GH;const cx=wzCv.getContext('2d');const img=cx.createImageData(GW,GH);
-  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const i=y*GW+x;if(!T[i])continue;const wx=x*G,wy=y*G;let best=1e18,bt='mid';if(wx<48&&wy>1450)continue;
-    if(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)){bt='rich';}
-    else for(const sd of WSEEDS){const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bt=sd[3];}}
-    const c=col[bt];img.data[i*4]=c[0];img.data[i*4+1]=c[1];img.data[i*4+2]=c[2];img.data[i*4+3]=bt==='rich'?170:150;}
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const i=y*GW+x,c=comp[i];if(c<0)continue;let t=tier[c];const wx=x*G,wy=y*G;
+    if(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)&&!grid.blk[i]||(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)&&CI[c]&&CI[c][0]<=1200))t='rich';
+    if(!t)continue;const k=col[t];img.data[i*4]=k[0];img.data[i*4+1]=k[1];img.data[i*4+2]=k[2];img.data[i*4+3]=t==='rich'?175:155;}
   cx.putImageData(img,0,0);
 }
 function drawWealth(){
   buildWealth();if(!wzCv)return;
   ctx.imageSmoothingEnabled=true;ctx.drawImage(wzCv,V.x,V.y,GW*G*V.s,GH*G*V.s);
+}
+function drawWealthLabels(){
   const fs=Math.max(11,Math.min(17,12*Math.max(V.s,.9)));
   WLAB.forEach(l=>{const q=W2S(l[0],l[1]);halo(l[2],q[0],q[1],'700 '+fs+'px IBM Plex Sans,system-ui,sans-serif',colors.ink);});
   GOLF.forEach(g=>{const q=W2S(g[0],g[1]);ctx.beginPath();ctx.moveTo(q[0],q[1]+9);ctx.lineTo(q[0],q[1]-9);ctx.lineWidth=1.6;ctx.strokeStyle='#2E5E3A';ctx.stroke();ctx.beginPath();ctx.moveTo(q[0],q[1]-9);ctx.lineTo(q[0]+9,q[1]-5.5);ctx.lineTo(q[0],q[1]-2);ctx.closePath();ctx.fillStyle='#D8453C';ctx.fill();if(V.s>.9)halo(g[2],q[0],q[1]+20,'600 11px IBM Plex Sans,system-ui,sans-serif','#2E5E3A');});
@@ -720,6 +724,7 @@ function draw(){
   p=W2S(560,1470);halo('Arkansas River',p[0],p[1],'italic 500 '+fs+'px Newsreader,Georgia,serif','#3E7FA6',.84);
   [['61',790,795],['50',1262,1395]].forEach(([t,x,y])=>{const q=W2S(x,y);ctx.beginPath();ctx.roundRect(q[0]-9,q[1]-8,18,16,4);ctx.fillStyle=colors.panel;ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle=colors.ink;ctx.stroke();ctx.fillStyle=colors.ink;ctx.font='600 10px IBM Plex Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q[0],q[1]+.5);});
   drawGated();
+  if(store.wealth)drawWealthLabels();
   if(store.caves)drawCaves();
   drawRoute();
   if(store.kwik)places.filter(p=>p.kind==='kw').forEach(marker);
