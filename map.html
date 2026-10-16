@@ -681,7 +681,7 @@ function buildSys(R,sp){
   const N=sp.fixed.map(f=>Object.assign({},f));let tries=0;const B=grid&&grid.B;
   while(N.length<sp.count&&tries<12000){tries++;const x=sp.x0+R()*(sp.x1-sp.x0),y=sp.y0+R()*(sp.y1-sp.y0);
     if(sp.useB&&B){const ci=((y/G)|0)*GW+((x/G)|0);if(!B[ci]&&R()<.75)continue;}
-    if(N.some(q=>Math.hypot(q.x-x,q.y-y)<sp.gap))continue;
+    if(N.some(q=>Math.hypot(q.x-x,q.y-y)<Math.max(sp.gap,q.r*.9+22)))continue;
     const big=R()<sp.bigP;N.push({x,y,r:big?sp.bigR[0]+R()*(sp.bigR[1]-sp.bigR[0]):sp.rMin+R()*R()*sp.rVar,t:big&&sp.ruins?'f':'x'});}
   const E2=[],seen=new Set(),key=(a,b)=>a<b?a+'_'+b:b+'_'+a;
   const add=(a,b)=>{const k=key(a,b);if(a===b||seen.has(k))return;seen.add(k);E2.push([a,b]);};
@@ -709,7 +709,7 @@ function mkRock(R,base,hi){const c=document.createElement('canvas');c.width=c.he
 function buildCaves(){
   const R=rng32(20041016);buildGrid();
   const fixed=[];D.kw.forEach((k,i)=>fixed.push({x:k[0],y:k[1],r:26+R()*8,t:'kw'}));
-  [[9,60],[15,34],[1,40],[19,28],[21,26],[17,32],[5,30],[24,30],[22,26],[23,26]].forEach(([num,r])=>{const l=D.lm.find(q=>q[0]===num);if(l)fixed.push({x:l[3],y:l[4],r,t:'lm',n:num});});
+  [[9,60],[15,34],[1,76],[19,28],[21,26],[17,32],[5,30],[24,30],[22,26],[23,26]].forEach(([num,r])=>{const l=D.lm.find(q=>q[0]===num);if(l)fixed.push({x:l[3],y:l[4],r,t:'lm',n:num});});
   CAVE=buildSys(R,{fixed,count:92,x0:60,x1:1250,y0:330,y1:1560,useB:true,gap:62,bigP:0,bigR:[0,0],rMin:13,rVar:38,reach:330,k:3,w0:7,w1:8,spark:.35,ruins:false});
   rockPat=mkRock(R,'#1c110c','110,80,60');
   const R2=rng32(1987);
@@ -738,7 +738,7 @@ function drawCaves(){
       r.ring.forEach(c=>{const p=W2S(c[0],c[1]),cr=Math.max(1.8,c[2]*z*1.2);ctx.beginPath();if(c[3]){ctx.moveTo(p[0]-cr,p[1]+cr*.6);ctx.lineTo(p[0]-cr*.3,p[1]-cr*.4);ctx.lineTo(p[0]+cr,p[1]+cr*.6);ctx.closePath();}else{ctx.rect(p[0]-cr*.7,p[1]-cr*1.4,cr*1.4,cr*2.2);}ctx.fillStyle='#2A2644';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle=pal.colHi;ctx.stroke();});}});
   C.spark.forEach(p=>{const q=W2S(p[0],p[1]);ctx.fillStyle='rgba('+pal.spark+','+(.3+p[2]*.6)+')';const s=Math.max(.8,(.6+p[2]*1.2)*Math.min(z,2));ctx.fillRect(q[0]-s/2,q[1]-s/2,s,s);});
   /* the pit under the school's cavern */
-  const pq=W2S(PIT[0],PIT[1]),pr=Math.max(7,15*Math.max(z,.55));
+  const pq=W2S(PIT[0],PIT[1]),pr=9;
   if(!L2){[1.5,1.25,1].forEach((k,i)=>{ctx.beginPath();ctx.ellipse(pq[0],pq[1],pr*k,pr*k*.8,0,0,6.283);ctx.fillStyle=['#5A3F2F','#2A1A11','#030204'][i];ctx.fill();});
     ctx.beginPath();ctx.ellipse(pq[0],pq[1],pr*1.5,pr*1.2,0,0,6.283);ctx.lineWidth=1.6;ctx.strokeStyle='#E2C6B0';ctx.stroke();}
   else{const g=ctx.createRadialGradient(pq[0],pq[1],2,pq[0],pq[1],pr*3);g.addColorStop(0,'rgba(230,226,255,.9)');g.addColorStop(1,'rgba(150,140,220,0)');ctx.fillStyle=g;ctx.fillRect(pq[0]-pr*3,pq[1]-pr*3,pr*6,pr*6);}
