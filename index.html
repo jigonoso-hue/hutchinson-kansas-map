@@ -187,6 +187,23 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 }
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* background music player (home page only) */
+.mp{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;font-family:inherit}
+.mp-bar{display:flex;align-items:center;gap:10px;background:#0f2a47;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 14px 6px 6px;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:calc(100vw - 24px)}
+.mp-play{width:44px;height:44px;border-radius:50%;border:0;background:var(--gold,#f2b722);color:#000;display:grid;place-items:center;cursor:pointer;flex:none}
+.mp-play svg{width:18px;height:18px;fill:currentColor}
+.mp-meta{display:flex;flex-direction:column;min-width:0;line-height:1.2;text-align:left;background:none;border:0;color:inherit;cursor:pointer;padding:0}
+.mp-meta b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-meta small{font-size:11px;opacity:.75}
+.mp-vol{width:70px;accent-color:var(--gold,#f2b722)}
+.mp-info{position:absolute;left:0;bottom:calc(100% + 10px);width:min(320px,calc(100vw - 24px));background:#fff;color:#1a1a1a;border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.3);font-size:14px;line-height:1.45}
+.mp-info[hidden]{display:none}
+.mp-info h3{margin:0 0 4px;font:700 16px/1.2 "Playfair Display",Georgia,serif}
+.mp-info p{margin:0 0 8px}
+.mp-info .tag{display:inline-block;background:#0f2a47;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.mp-info .x{position:absolute;top:2px;right:6px;border:0;background:none;font-size:22px;width:36px;height:36px;cursor:pointer;color:#555}
+@media (max-width:520px){.mp-vol{display:none}}
 </style>
 </head>
 <body>
@@ -365,6 +382,39 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
     grid.innerHTML=[1,2,3].map(()=>'<div class="doc soon"><span class="ic">PDF</span><b>Document coming soon</b><span>PDFs will appear here once they are added.</span></div>').join('');
     $('docnote').textContent='No documents have been added yet.';
   }
+})();
+</script>
+
+<div class="mp" id="mp">
+  <div class="mp-info" id="mpInfo" hidden role="dialog" aria-label="About the music">
+    <button class="x" id="mpX" type="button" aria-label="Close">&times;</button>
+    <span class="tag">Coming in December</span>
+    <h3>Battle of the Bands</h3>
+    <p>This is the sound of the senior class this fall. This song is on every Walkman, and it is the one the Band kids keep warming up with in the practice rooms.</p>
+    <p>The annual <b>Battle of the Bands</b> is set for December, in the Hutchinson High gym. Sign-ups open soon. Ask around in the band room.</p>
+  </div>
+  <div class="mp-bar">
+    <button class="mp-play" id="mpPlay" type="button" aria-label="Play music"><svg id="mpIc" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>
+    <button class="mp-meta" id="mpMeta" type="button" aria-label="About this song and the December Battle of the Bands"><b>Make Believe</b><small>Mother Mother &middot; tap for info</small></button>
+    <input class="mp-vol" id="mpVol" type="range" min="0" max="100" value="18" aria-label="Volume">
+  </div>
+  <audio id="mpAudio" src="assets/audio/background.mp3" loop preload="none"></audio>
+</div>
+<script>
+(function(){
+  const a=document.getElementById('mpAudio'),btn=document.getElementById('mpPlay'),ic=document.getElementById('mpIc'),vol=document.getElementById('mpVol'),info=document.getElementById('mpInfo');
+  const PLAY='M7 4l13 8-13 8z',PAUSE='M6 4h4v16H6zM14 4h4v16h-4z';
+  let want=true;try{want=localStorage.getItem('hhs-music')!=='off';}catch(e){}
+  a.volume=.18;
+  const paint=()=>{ic.firstElementChild.setAttribute('d',a.paused?PLAY:PAUSE);btn.setAttribute('aria-label',a.paused?'Play music':'Pause music');};
+  const save=v=>{try{localStorage.setItem('hhs-music',v?'on':'off');}catch(e){}};
+  btn.onclick=()=>{if(a.paused){a.play().then(()=>save(true)).catch(()=>{});}else{a.pause();save(false);}};
+  a.addEventListener('play',paint);a.addEventListener('pause',paint);
+  vol.oninput=()=>{a.volume=vol.value/100;};
+  document.getElementById('mpMeta').onclick=()=>{info.hidden=!info.hidden;};
+  document.getElementById('mpX').onclick=()=>{info.hidden=true;};
+  /* browsers block sound until a first tap, so start quietly on the first interaction */
+  if(want){a.play().catch(()=>{const go=()=>{a.play().catch(()=>{});['pointerdown','keydown','touchstart'].forEach(t=>removeEventListener(t,go,true));};['pointerdown','keydown','touchstart'].forEach(t=>addEventListener(t,go,true));});}
 })();
 </script>
 </body>
