@@ -753,7 +753,7 @@ function draw(){
   if(store.wealth)drawWealthLabels();
   if(store.caves)drawCaves();
   drawRoute();
-  if(store.kwik)places.filter(p=>p.kind==='kw').forEach(marker);
+  if(store.kwik&&!store.caves)places.filter(p=>p.kind==='kw').forEach(marker);
   const shownLm=places.filter(p=>p.kind==='lm'&&(!store.caves||p.num===9));
   shownLm.forEach(marker);
   if(z>1.7)shownLm.forEach(l=>{const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
