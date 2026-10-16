@@ -690,12 +690,13 @@ function buildCaves(){
   all.forEach(([a,b])=>{if(f(a)!==f(b)){par[f(a)]=f(b);add(a,b);}});
   const tun=E2.map(([a,b])=>{const A=N[a],Bn=N[b],dx=Bn.x-A.x,dy=Bn.y-A.y,L=Math.hypot(dx,dy)||1,nx=-dy/L,ny=dx/L;
     const s1=(R()-.5)*.55,s2=(R()-.5)*.55,c1=[A.x+dx*.33+nx*L*s1,A.y+dy*.33+ny*L*s1],c2=[A.x+dx*.66+nx*L*s2,A.y+dy*.66+ny*L*s2];
-    const pts=[],steps=Math.max(8,Math.round(L/9));let w1=R()*6,w2=R()*6;
+    const pts=[],steps=Math.max(10,Math.round(L/6));let w1=R()*6,w2=R()*6;
     for(let i=0;i<=steps;i++){const t=i/steps,u=1-t;let x=u*u*u*A.x+3*u*u*t*c1[0]+3*u*t*t*c2[0]+t*t*t*Bn.x,y=u*u*u*A.y+3*u*u*t*c1[1]+3*u*t*t*c2[1]+t*t*t*Bn.y;
-      const e=Math.sin(Math.PI*t);w1+=(R()-.5)*1.6;w2+=(R()-.5)*1.6;x+=nx*Math.sin(w1)*4.5*e+(R()-.5)*1.2;y+=ny*Math.sin(w1)*4.5*e+(R()-.5)*1.2;pts.push([x,y,0.75+0.5*Math.abs(Math.sin(w2*.9+i*.35))]);}
+      const e=Math.sin(Math.PI*t);w1+=(R()-.5)*1.6;w2+=(R()-.5)*1.6;x+=nx*Math.sin(w1)*4.5*e+(R()-.5)*1.2;y+=ny*Math.sin(w1)*4.5*e+(R()-.5)*1.2;pts.push([x,y,0.7+0.55*Math.abs(Math.sin(w2*.9+i*.35)),(R()-.5)*.7,(R()-.5)*.7]);}
+    for(let i=0;i<pts.length;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],tx=b[0]-a[0],ty=b[1]-a[1],tl=Math.hypot(tx,ty)||1;pts[i][5]=-ty/tl;pts[i][6]=tx/tl;}
     return{pts,w:7+R()*8};});
-  const rooms=N.map(n=>{const k=Math.max(14,Math.round(n.r*.9)),ph=[R()*6,R()*6,R()*6],pts=[];
-    for(let i=0;i<k;i++){const a=i/k*6.283,m=1+.22*Math.sin(a*2+ph[0])+.14*Math.sin(a*3+ph[1])+.08*Math.sin(a*5+ph[2])+(R()-.5)*.08;pts.push([n.x+Math.cos(a)*n.r*m,n.y+Math.sin(a)*n.r*m*.84]);}
+  const rooms=N.map(n=>{const k=Math.max(22,Math.round(n.r*1.6)),ph=[R()*6,R()*6,R()*6],pts=[];
+    for(let i=0;i<k;i++){const a=i/k*6.283,m=1+.22*Math.sin(a*2+ph[0])+.14*Math.sin(a*3+ph[1])+.08*Math.sin(a*5+ph[2])+.05*Math.sin(a*9+ph[0])+(R()-.5)*.2;pts.push([n.x+Math.cos(a)*n.r*m,n.y+Math.sin(a)*n.r*m*.84]);}
     const cols=[];const nc=n.r>30?3+((R()*3)|0):n.r>20?1+((R()*2)|0):0;for(let c=0;c<nc;c++){const a=R()*6.283,d=R()*n.r*.55;cols.push([n.x+Math.cos(a)*d,n.y+Math.sin(a)*d*.8,1.6+R()*2.4]);}
     return{n,pts,cols};});
   const spark=[];tun.forEach(t=>{t.pts.forEach((p,i)=>{if(R()<.35)spark.push([p[0]+(R()-.5)*t.w*.8,p[1]+(R()-.5)*t.w*.8,R()]);});});rooms.forEach(r=>{for(let i=0;i<Math.round(r.n.r*.5);i++){const a=R()*6.283,d=Math.sqrt(R())*r.n.r*.8;spark.push([r.n.x+Math.cos(a)*d,r.n.y+Math.sin(a)*d*.8,R()]);}});
@@ -709,20 +710,23 @@ function drawCaves(){
   ctx.fillStyle=rockPat;ctx.globalAlpha=.82;ctx.fillRect(0,0,cssW,cssH);ctx.globalAlpha=1;
   const z=V.s,sc=Math.max(.45,Math.min(3,z*1.15));
   ctx.lineCap='round';ctx.lineJoin='round';
-  const tpath=t=>{ctx.beginPath();t.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});};
-  const rpath=r=>{ctx.beginPath();r.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});ctx.closePath();};
-  const pass=(wAdd,col,k)=>{ctx.strokeStyle=col;CAVE.tun.forEach(t=>{tpath(t);ctx.lineWidth=(t.w*sc*k)+wAdd;ctx.stroke();});};
-  pass(11,'rgba(0,0,0,.55)',1);          /* shadow in the rock */
-  pass(5.5,'#3A2619',1);                 /* wall */
-  pass(3,'#7B5A47',1);                   /* lit rim */
-  pass(0,'#C9A28A',1);                   /* floor */
-  pass(-1.5,'#E2C6B0',.7);               /* salt floor */
-  pass(0,'rgba(255,240,228,.5)',.28);    /* glint down the middle */
-  CAVE.rooms.forEach(r=>{rpath(r);ctx.fillStyle='#3A2619';ctx.fill();ctx.lineWidth=3.4*sc+3;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.stroke();ctx.lineWidth=3;ctx.strokeStyle='#7B5A47';ctx.stroke();
-    const q=W2S(r.n.x,r.n.y),rad=Math.max(6,r.n.r*z*1.1),g=ctx.createRadialGradient(q[0],q[1],rad*.1,q[0],q[1],rad);g.addColorStop(0,'#F0DCCB');g.addColorStop(.6,'#D9B8A0');g.addColorStop(1,'#A98068');
-    ctx.save();rpath(r);ctx.clip();ctx.fillStyle=g;ctx.fill();ctx.restore();
-    r.cols.forEach(c=>{const p=W2S(c[0],c[1]),cr=Math.max(1.6,c[2]*z*1.1);ctx.beginPath();ctx.ellipse(p[0],p[1],cr,cr*.8,0,0,6.283);ctx.fillStyle='#4A3226';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#F0DCCB';ctx.stroke();});
-    if(r.n.t==='kw'){ctx.beginPath();ctx.ellipse(q[0],q[1],Math.max(4,rad*.28),Math.max(3,rad*.22),0,0,6.283);ctx.strokeStyle='rgba(60,35,22,.7)';ctx.lineWidth=1.6;ctx.stroke();}});
+  /* one merged shape: tunnels and chambers are filled together in each pass, so there are no seams */
+  const hwOf=(t,p)=>t.w*sc*.5*p[2];
+  const shape=m=>{
+    CAVE.tun.forEach(t=>{ctx.beginPath();const L=[],Rr=[];t.pts.forEach(p=>{const q=W2S(p[0],p[1]),h=hwOf(t,p);L.push([q[0]+p[5]*(h*(1+p[3])+m),q[1]+p[6]*(h*(1+p[3])+m)]);Rr.push([q[0]-p[5]*(h*(1+p[4])+m),q[1]-p[6]*(h*(1+p[4])+m)]);});
+      L.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=Rr.length-1;i>=0;i--)ctx.lineTo(Rr[i][0],Rr[i][1]);ctx.closePath();ctx.fill();
+      [t.pts[0],t.pts[t.pts.length-1]].forEach(p=>{const q=W2S(p[0],p[1]);ctx.beginPath();ctx.arc(q[0],q[1],hwOf(t,p)+m,0,6.283);ctx.fill();});});
+    CAVE.rooms.forEach(r=>{ctx.beginPath();r.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]),cx=W2S(r.n.x,r.n.y),dx=q[0]-cx[0],dy=q[1]-cx[1],dl=Math.hypot(dx,dy)||1,e=m;const x=q[0]+dx/dl*e,y=q[1]+dy/dl*e;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.closePath();ctx.fill();});};
+  const layer=(m,col)=>{ctx.fillStyle=col;shape(m);};
+  layer(9,'rgba(0,0,0,.5)');
+  layer(4.5,'#2E1D13');
+  layer(2,'#7B5A47');
+  layer(0,'#C9A28A');
+  CAVE.rooms.forEach(r=>{const q=W2S(r.n.x,r.n.y),rad=Math.max(6,r.n.r*z*1.1),g=ctx.createRadialGradient(q[0],q[1],rad*.05,q[0],q[1],rad*1.05);g.addColorStop(0,'rgba(245,228,214,.95)');g.addColorStop(.55,'rgba(232,206,186,.55)');g.addColorStop(1,'rgba(232,206,186,0)');ctx.fillStyle=g;ctx.fillRect(q[0]-rad*1.1,q[1]-rad*1.1,rad*2.2,rad*2.2);});
+  ctx.lineCap='round';ctx.lineJoin='round';
+  CAVE.tun.forEach(t=>{ctx.beginPath();t.pts.forEach((p,i)=>{const q=W2S(p[0],p[1]);i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]);});ctx.strokeStyle='rgba(240,222,206,.55)';ctx.lineWidth=Math.max(1.4,t.w*sc*.34);ctx.stroke();});
+  CAVE.rooms.forEach(r=>{r.cols.forEach(c=>{const p=W2S(c[0],c[1]),cr=Math.max(1.6,c[2]*z*1.1);ctx.beginPath();ctx.ellipse(p[0],p[1],cr,cr*.8,0,0,6.283);ctx.fillStyle='#4A3226';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle='#F0DCCB';ctx.stroke();});
+    if(r.n.t==='kw'){const q=W2S(r.n.x,r.n.y),rad=Math.max(6,r.n.r*z*1.1);ctx.beginPath();ctx.ellipse(q[0],q[1],Math.max(4,rad*.28),Math.max(3,rad*.22),0,0,6.283);ctx.strokeStyle='rgba(60,35,22,.7)';ctx.lineWidth=1.6;ctx.stroke();}});
   CAVE.spark.forEach(p=>{const q=W2S(p[0],p[1]);ctx.fillStyle='rgba(255,255,255,'+(.35+p[2]*.6)+')';const s=Math.max(.8,(.6+p[2]*1.2)*Math.min(z,2));ctx.fillRect(q[0]-s/2,q[1]-s/2,s,s);});
 }
 let focusPt=null;
