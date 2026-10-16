@@ -275,7 +275,7 @@ canvas.dragging{cursor:grabbing}
     <canvas id="cv" role="img" aria-label="Map of Hutchinson, Kansas with roads, rivers, parks and landmarks. Tap to drop a pin."></canvas>
     <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Fit whole town" style="font-size:12px">All</button></div>
     <div class="info" id="info" hidden></div>
-    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#6F5BD0"></i>Rich: new car, new phone, more of everything</span></div>
+    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#3E9B8F"></i>Upper middle: nice house, a decent car, a new phone</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
@@ -629,22 +629,37 @@ function marker(p){
 /* ---------- overlays: gated community, wealth zones, salt caves ---------- */
 const GATED=[[772,452],[800,444],[832,428],[838,376],[872,376],[880,420],[906,440],[912,472],[896,492],[888,552],[800,552],[782,500]];
 const GATE=[846,552];
-const WZ={poor:'#C8553D',mid:'#D8A93C',rich:'#6F5BD0'};
-const ZONES=[
- {t:'mid',n:'MIDDLE',p:[[130,430],[780,430],[780,1260],[130,1260]]},
- {t:'mid',n:'',p:[[780,380],[1150,380],[1150,900],[780,900]]},
- {t:'poor',n:'POOR',p:[[0,690],[170,690],[190,1010],[0,1010]]},
- {t:'poor',n:'POOR',p:[[0,1250],[430,1250],[450,1640],[0,1640]]},
- {t:'poor',n:'POOR',p:[[700,930],[960,930],[960,1060],[700,1060]]},
- {t:'rich',n:'',p:GATED},
- {t:'rich',n:'RICH',p:[[1190,400],[1320,400],[1320,570],[1190,570]]},
- {t:'rich',n:'RICH',p:[[940,790],[1100,790],[1100,900],[940,900]]}
+const WZ={poor:'#C8553D',mid:'#D8A93C',up:'#3E9B8F',rich:'#7A5BD8'};
+/* weighted-nearest seeds (x, y, reach, tier): every built-up cell joins exactly one zone, so zones never overlap */
+const WSEEDS=[
+ [845,462,55,'rich'],[1255,505,95,'rich'],[190,600,60,'rich'],[300,575,32,'rich'],[270,430,95,'up'],
+ [400,640,115,'up'],[180,735,75,'up'],[705,742,75,'up'],[640,540,70,'up'],
+ [60,850,115,'poor'],[230,1480,190,'poor'],[300,1330,120,'poor'],[850,985,95,'poor'],[880,1070,65,'poor'],
+ [560,950,230,'mid'],[850,800,150,'mid'],[480,1160,150,'mid'],[330,900,120,'mid'],[1000,640,110,'mid'],[1100,900,100,'mid']
 ];
-function zoneLabel(p){let x=0,y=0;p.forEach(q=>{x+=q[0];y+=q[1];});return[x/p.length,y/p.length];}
+const WLAB=[[845,415,'RICH','rich'],[1255,470,'RICH','rich'],[185,640,'RICH','rich'],[480,585,'UPPER MIDDLE','up'],[60,810,'POOR','poor'],[260,1440,'POOR','poor'],[850,1015,'POOR','poor'],[600,1020,'MIDDLE','mid']];
+const GOLF=[[1255,545,'Prairie Dunes golf'],[262,610,'Country Club']];
+let wzCv=null;
+function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
+function buildWealth(){
+  buildGrid();if(!grid||wzCv)return;
+  const n=GW*GH,B=grid.B,T=new Uint8Array(n),tmp=new Uint8Array(n),R=3;
+  for(let y=0;y<GH;y++){let s=0;for(let x=-R;x<GW;x++){if(x+R<GW&&B[y*GW+x+R])s++;if(x-R-1>=0&&B[y*GW+x-R-1])s--;if(x>=0&&s>0)tmp[y*GW+x]=1;}}
+  for(let x=0;x<GW;x++){let s=0;for(let y=-R;y<GH;y++){if(y+R<GH&&tmp[(y+R)*GW+x])s++;if(y-R-1>=0&&tmp[(y-R-1)*GW+x])s--;if(y>=0&&s>0)T[y*GW+x]=1;}}
+  const tiers=['poor','mid','up','rich'],col={poor:[200,85,61],mid:[216,169,60],up:[62,155,143],rich:[122,91,216]};
+  wzCv=document.createElement('canvas');wzCv.width=GW;wzCv.height=GH;const cx=wzCv.getContext('2d');const img=cx.createImageData(GW,GH);
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const i=y*GW+x;if(!T[i])continue;const wx=x*G,wy=y*G;let best=1e18,bt='mid';if(wx<48&&wy>1450)continue;
+    if(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)){bt='rich';}
+    else for(const sd of WSEEDS){const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bt=sd[3];}}
+    const c=col[bt];img.data[i*4]=c[0];img.data[i*4+1]=c[1];img.data[i*4+2]=c[2];img.data[i*4+3]=bt==='rich'?170:150;}
+  cx.putImageData(img,0,0);
+}
 function drawWealth(){
-  ZONES.forEach(zn=>{ctx.beginPath();zn.p.forEach((q,i)=>{const s=W2S(q[0],q[1]);i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});ctx.closePath();
-    ctx.globalAlpha=zn.t==='rich'?.42:.30;ctx.fillStyle=WZ[zn.t];ctx.fill();ctx.globalAlpha=.8;ctx.lineWidth=1.4;ctx.setLineDash([6,4]);ctx.strokeStyle=WZ[zn.t];ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;});
-  ZONES.forEach(zn=>{if(!zn.n)return;const c=zoneLabel(zn.p),s=W2S(c[0],c[1]);halo(zn.n,s[0],s[1],'700 '+Math.max(11,Math.min(18,12*Math.max(V.s,.9)))+'px IBM Plex Sans,system-ui,sans-serif',WZ[zn.t]);});
+  buildWealth();if(!wzCv)return;
+  ctx.imageSmoothingEnabled=true;ctx.drawImage(wzCv,V.x,V.y,GW*G*V.s,GH*G*V.s);
+  const fs=Math.max(11,Math.min(17,12*Math.max(V.s,.9)));
+  WLAB.forEach(l=>{const q=W2S(l[0],l[1]);halo(l[2],q[0],q[1],'700 '+fs+'px IBM Plex Sans,system-ui,sans-serif',colors.ink);});
+  GOLF.forEach(g=>{const q=W2S(g[0],g[1]);ctx.beginPath();ctx.moveTo(q[0],q[1]+9);ctx.lineTo(q[0],q[1]-9);ctx.lineWidth=1.6;ctx.strokeStyle='#2E5E3A';ctx.stroke();ctx.beginPath();ctx.moveTo(q[0],q[1]-9);ctx.lineTo(q[0]+9,q[1]-5.5);ctx.lineTo(q[0],q[1]-2);ctx.closePath();ctx.fillStyle='#D8453C';ctx.fill();if(V.s>.9)halo(g[2],q[0],q[1]+20,'600 11px IBM Plex Sans,system-ui,sans-serif','#2E5E3A');});
 }
 function drawGated(){
   ctx.beginPath();GATED.forEach((q,i)=>{const s=W2S(q[0],q[1]);i?ctx.lineTo(s[0],s[1]):ctx.moveTo(s[0],s[1]);});ctx.closePath();
