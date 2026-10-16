@@ -163,7 +163,10 @@ button{cursor:pointer}
 .wleg{position:absolute;right:12px;bottom:56px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;font-size:11.5px;color:var(--muted);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:3px}
 .wleg[hidden]{display:none}
 .wleg span{display:inline-flex;align-items:center;gap:6px}
-.wleg i{display:inline-block;width:14px;height:10px;border-radius:2px}
+.wleg i{display:inline-block;width:14px;height:10px;border-radius:2px;flex:none}
+.wleg b{color:var(--ink);font-weight:600}
+.wleg em{font-style:normal}
+@media (max-width:760px){.wleg{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px 12px;left:12px;right:12px;bottom:64px;padding:6px 10px;font-size:12px}.wleg em{display:none}}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--land)}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 canvas.dragging{cursor:grabbing}
@@ -277,7 +280,7 @@ canvas.dragging{cursor:grabbing}
     <canvas id="cv" role="img" aria-label="Map of Hutchinson, Kansas with roads, rivers, parks and landmarks. Tap to drop a pin."></canvas>
     <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Fit whole town" style="font-size:12px">All</button></div>
     <div class="info" id="info" hidden></div>
-    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i>Poor: hand-me-downs, bike, a job to buy anything</span><span><i style="background:#D8A93C"></i>Middle: new clothes, an old phone, a beater car</span><span><i style="background:#7A5BD8"></i>Rich: new car, new phone, more of everything</span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i>Golf course</span></div>
+    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i><b>Poor</b><em>: hand-me-downs, bike, a job to buy anything</em></span><span><i style="background:#D8A93C"></i><b>Middle</b><em>: new clothes, an old phone, a beater car</em></span><span><i style="background:#7A5BD8"></i><b>Rich</b><em>: new car, new phone, more of everything</em></span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i><b>Golf course</b></span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
@@ -738,7 +741,7 @@ function drawCaves(){
       r.ring.forEach(c=>{const p=W2S(c[0],c[1]),cr=Math.max(1.8,c[2]*z*1.2);ctx.beginPath();if(c[3]){ctx.moveTo(p[0]-cr,p[1]+cr*.6);ctx.lineTo(p[0]-cr*.3,p[1]-cr*.4);ctx.lineTo(p[0]+cr,p[1]+cr*.6);ctx.closePath();}else{ctx.rect(p[0]-cr*.7,p[1]-cr*1.4,cr*1.4,cr*2.2);}ctx.fillStyle='#2A2644';ctx.fill();ctx.lineWidth=1;ctx.strokeStyle=pal.colHi;ctx.stroke();});}});
   C.spark.forEach(p=>{const q=W2S(p[0],p[1]);ctx.fillStyle='rgba('+pal.spark+','+(.3+p[2]*.6)+')';const s=Math.max(.8,(.6+p[2]*1.2)*Math.min(z,2));ctx.fillRect(q[0]-s/2,q[1]-s/2,s,s);});
   /* the pit under the school's cavern */
-  const pq=W2S(PIT[0],PIT[1]),pr=9;
+  const pq=W2S(PIT[0],PIT[1]),pr=Math.max(2.5,12*z);
   if(!L2){[1.5,1.25,1].forEach((k,i)=>{ctx.beginPath();ctx.ellipse(pq[0],pq[1],pr*k,pr*k*.8,0,0,6.283);ctx.fillStyle=['#5A3F2F','#2A1A11','#030204'][i];ctx.fill();});
     ctx.beginPath();ctx.ellipse(pq[0],pq[1],pr*1.5,pr*1.2,0,0,6.283);ctx.lineWidth=1.6;ctx.strokeStyle='#E2C6B0';ctx.stroke();}
   else{const g=ctx.createRadialGradient(pq[0],pq[1],2,pq[0],pq[1],pr*3);g.addColorStop(0,'rgba(230,226,255,.9)');g.addColorStop(1,'rgba(150,140,220,0)');ctx.fillStyle=g;ctx.fillRect(pq[0]-pr*3,pq[1]-pr*3,pr*6,pr*6);}
