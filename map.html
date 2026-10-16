@@ -177,7 +177,7 @@ button{cursor:pointer}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
 canvas.dragging{cursor:grabbing}
 .zoom{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line)}
-.zoom button{width:36px;height:36px;background:var(--panel);border:0;border-top:1px solid var(--line);font-size:18px;line-height:1}
+.zoom button{min-width:36px;width:auto;padding:0 6px;height:36px;background:var(--panel);border:0;border-top:1px solid var(--line);font-size:18px;line-height:1}
 .zoom button:first-child{border-top:0}
 .legend[hidden]{display:none}
 .legend{position:absolute;left:12px;bottom:56px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:11.5px;color:var(--muted);box-shadow:var(--shadow);display:flex;gap:10px;flex-wrap:wrap;max-width:calc(100% - 24px)}
@@ -320,7 +320,7 @@ canvas.dragging{cursor:grabbing}
   <main class="mapwrap" id="mapwrap">
     <canvas id="cv" role="img" aria-label="Map of Hutchinson, Kansas with roads, rivers, parks and landmarks. Tap to drop a pin."></canvas>
     <div class="chips" id="chips" role="group" aria-label="Map overlays"><button class="chip" id="lyrWealth" type="button" aria-pressed="false">Wealth zones</button><button class="chip" id="lyrCave" type="button" aria-pressed="false">Salt caves</button><span class="lvlgrp" id="lvlRow" hidden><button class="chip" id="lvl1" type="button" aria-pressed="true">Level 1</button><button class="chip" id="lvl2" type="button" aria-pressed="false">Level 2</button></span></div>
-    <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Fit whole town" style="font-size:12px">All</button></div>
+    <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Center the map" style="font-size:11px">Center</button></div>
     <div class="info" id="info" hidden></div>
     <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i><b>Poor</b><em>: hand-me-downs, bike, a job to buy anything</em></span><span><i style="background:#D8A93C"></i><b>Middle</b><em>: new clothes, an old phone, a beater car</em></span><span><i style="background:#7A5BD8"></i><b>Rich</b><em>: new car, new phone, more of everything</em></span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i><b>Golf course</b></span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
