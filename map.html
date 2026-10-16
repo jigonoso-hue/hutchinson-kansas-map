@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Hutchinson Maps</title>
 <link rel="icon" type="image/png" href="assets/logo-h.png">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -42,7 +42,8 @@
   --shadow:0 2px 10px rgba(0,0,0,.5); color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--font-body);overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--font-body);overflow:hidden;touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+.panel,.info,.chips{touch-action:pan-y}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -248,6 +249,8 @@ canvas.dragging{cursor:grabbing}
   .zoom button{width:44px;height:44px}
   .keybtn{bottom:calc(var(--sheet) + 12px);left:max(10px,env(safe-area-inset-left,0px));transition:bottom .3s cubic-bezier(.2,.8,.2,1);border-radius:999px;padding:9px 16px}
   body.info-open .keybtn{bottom:calc(52dvh + 12px)}
+  .panel.hide{box-shadow:0 -4px 14px rgba(10,20,45,.18)}
+  body.sheet-hide .zoom{bottom:auto}
   body.sheet-full .keybtn,body.sheet-full .legend,body.sheet-full .wleg{display:none}
   .legend{bottom:calc(var(--sheet) + 60px);transition:bottom .3s cubic-bezier(.2,.8,.2,1)}
   .wleg{bottom:calc(var(--sheet) + 60px);transition:bottom .3s cubic-bezier(.2,.8,.2,1)}
@@ -1060,25 +1063,28 @@ $('timeModal').addEventListener('keydown',e=>{if(e.key==='Escape'){$('timeModal'
 $('timeModal').addEventListener('mousedown',e=>{if(e.target===$('timeModal'))$('timeModal').hidden=true;});
 if(location.hash==='#test')window.__hm={places,computeRoute,analyse,store,E};
 
+['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
+let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea'))e.preventDefault();lastTap=n;},{passive:false});
+document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!e.target.closest('canvas'))e.preventDefault();},{passive:false});
 /* ---------- bottom sheet (phones): peek / half / full, drag the handle ---------- */
 let sheetState='peek';
 function peekPx(){const pn=$('panel'),m=$('modes');if(!pn||!m)return 276;const r=m.getBoundingClientRect(),p=pn.getBoundingClientRect();return Math.round(Math.min(innerHeight*.5,(r.bottom-p.top)+pn.scrollTop+16));}
-function snaps(){const pk=peekPx(),vh=innerHeight;return{peek:pk,half:Math.max(pk+150,Math.round(vh*.62)),full:Math.round(vh*.9)};}
+function snaps(){const pk=peekPx(),vh=innerHeight;return{hide:34,peek:pk,half:Math.max(pk+150,Math.round(vh*.62)),full:Math.round(vh*.9)};}
 function setSheet(st){
   const pn=$('panel');
   if(!isMob()){sheetPx=0;document.documentElement.style.removeProperty('--sheet');pn.classList.remove('peek','drag');return;}
-  sheetState=st;document.body.classList.toggle('sheet-full',st==='full');const H=snaps()[st];sheetPx=H;document.documentElement.style.setProperty('--sheet',H+'px');pn.classList.toggle('peek',st==='peek');if(st==='peek')pn.scrollTop=0;
+  sheetState=st;document.body.classList.toggle('sheet-full',st==='full');document.body.classList.toggle('sheet-hide',st==='hide');const H=snaps()[st];sheetPx=H;document.documentElement.style.setProperty('--sheet',H+'px');pn.classList.toggle('peek',st==='peek'||st==='hide');pn.classList.toggle('hide',st==='hide');if(st==='peek'||st==='hide')pn.scrollTop=0;
 }
 (function(){
   const g=$('grab'),pn=$('panel');let y0=0,h0=0,t0=0,moved=false,id=null;
   g.addEventListener('pointerdown',e=>{if(!isMob())return;id=e.pointerId;g.setPointerCapture(id);y0=e.clientY;h0=sheetPx;t0=performance.now();moved=false;pn.classList.add('drag');pn.classList.remove('peek');});
-  g.addEventListener('pointermove',e=>{if(id!==e.pointerId)return;const dy=y0-e.clientY;if(Math.abs(dy)>5)moved=true;const sn=snaps(),h=Math.max(sn.peek*.9,Math.min(sn.full,h0+dy));document.documentElement.style.setProperty('--sheet',h+'px');sheetPx=h;});
+  g.addEventListener('pointermove',e=>{if(id!==e.pointerId)return;const dy=y0-e.clientY;if(Math.abs(dy)>5)moved=true;const sn=snaps(),h=Math.max(sn.hide,Math.min(sn.full,h0+dy));document.documentElement.style.setProperty('--sheet',h+'px');sheetPx=h;});
   const end=e=>{if(id!==e.pointerId)return;id=null;pn.classList.remove('drag');const sn=snaps();
-    if(!moved){setSheet(sheetState==='peek'?'half':'peek');if(sheetState!=='peek'&&sheetPx&&cur)fitRoute();return;}
+    if(!moved){setSheet(sheetState==='peek'||sheetState==='hide'?'half':'peek');if(sheetState!=='peek'&&sheetPx&&cur)fitRoute();return;}
     const v=(y0-e.clientY)/Math.max(60,performance.now()-t0),proj=sheetPx+v*160;let best='peek',bd=1e9;for(const k in sn){const d=Math.abs(sn[k]-proj);if(d<bd){bd=d;best=k;}}
-    setSheet(best);if(cur&&best!=='full')fitRoute();};
+    setSheet(best);if(best!=='full'){if(cur)fitRoute();else if(best==='hide')animateTo(fitView());}};
   g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end);
-  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSheet(sheetState==='peek'?'half':sheetState==='half'?'full':'peek');}});
+  g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSheet(sheetState==='hide'?'peek':sheetState==='peek'?'half':sheetState==='half'?'full':'hide');}});
   ['fromIn','toIn','viaIn'].forEach(i=>{const el=$(i);if(el)el.addEventListener('focus',()=>{if(isMob()&&sheetState!=='full')setSheet('full');});});
   addEventListener('resize',()=>{setSheet(sheetState);});
 })();
