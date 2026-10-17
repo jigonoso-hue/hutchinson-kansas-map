@@ -794,28 +794,33 @@ function drawCaves(){
 
 /* ---------- campus close-up: appears when you zoom in on the school block ---------- */
 const CAMPUS={x0:524,y0:773,x1:620,y1:864};
+const CAMPUS2={x0:524,y0:872,x1:620,y1:975};
 /* footpaths: nodes are [x,y] in map units, edges join node indexes. Kept as data so walking routes can use them later. */
 const CAMPUS_PATHS={
   nodes:[[571,774.5],[571,788],[571,818],[571,846],[571,862.5],[525,818],[525,774.5],[619,774.5],[619,862.5],[525,862.5],
          [548,818],[567,818],[567,846],[548,846],[558,832],[538,818],[538,788],[558,788],[558,818],[538,846],
-         [592,788],[592,803],[592,813],[592,825],[606,813],[612,813],[619,813],[612,788],[612,835],[585,846],[606,846],[585,825],[580,806],[604,806],[558,862.5],[600,862.5]],
+         [592,788],[592,803],[592,813],[592,825],[606,813],[612,813],[619,813],[612,788],[612,835],[585,846],[606,846],[585,825],[580,806],[604,806],[558,862.5],[600,862.5],
+         /* south block, from index 36 */
+         [571,872.5],[525,872.5],[619,872.5],[525,974],[619,974],[554,872.5],[554,917],[554,935],[554,974],[525,935],[539,899],[539,935],[590,935],[619,935],[590,927],[546,941],[546,935],[571,935],[571,974],[571,958],[525,958],[530,958],[571,950],[619,950],[554,899]],
   edges:[[0,1],[1,2],[2,3],[3,4],[2,5],[5,15],[15,10],[10,18],[18,11],[11,2],[10,13],[13,12],[12,11],[10,14],[14,12],[14,11],[14,13],[15,16],[16,17],[17,18],[17,1],[15,19],[19,13],
          [1,20],[20,21],[21,22],[22,23],[22,24],[24,25],[25,26],[20,27],[27,25],[25,28],[3,29],[29,30],[30,28],[23,31],[31,29],[31,2],[21,32],[21,33],[32,22],[33,22],
-         [6,0],[0,7],[7,26],[26,8],[8,4],[4,9],[9,5],[5,6],[3,34],[4,34],[35,4],[29,35]]
+         [6,0],[0,7],[7,26],[26,8],[8,4],[4,9],[9,5],[5,6],[3,34],[4,34],[35,4],[29,35],
+         [4,36],[36,41],[41,37],[36,38],[41,60],[60,42],[42,43],[43,44],[37,45],[45,56],[56,39],[39,44],[44,54],[54,40],[38,49],[49,59],[59,40],
+         [45,47],[47,52],[52,43],[43,53],[53,48],[48,49],[46,60],[50,48],[51,52],[53,58],[58,55],[55,54],[57,55],[56,57],[58,59]]
 };
+
 let CAMPUS_TREES=null;
 function campusRects(){
-  /* buildings and hard surfaces, used to place trees only on lawn */
   return [[527,776,568,787],[530,790,546,806],[550,790,566,800],[550,804,566,816],[530,810,546,826],[530,830,546,844],[530,848,566,860],
-    [574,776,616,788],[574,790,610,802],[574,802,586,822],[598,802,610,830],[586,814,598,822],[576,828,594,844],[600,836,616,852],[574,846,592,856],[574,857,598,862],[600,857,618,862],[611,790,618,836]];
+    [574,776,616,788],[574,790,610,802],[574,802,586,822],[598,802,610,830],[586,814,598,822],[576,828,594,844],[600,836,616,852],[574,846,592,856],[574,857,598,862],[600,857,618,862],[611,790,618,836],
+    [526,874,552,898],[526,922,552,934],[556,874,618,916],[584,918,596,926],[530,942,570,956],[534,960,570,970],[572,936,618,948],[574,952,618,960]];
 }
 function campusTrees(){
   if(CAMPUS_TREES)return CAMPUS_TREES;
   const R=rng32(2005),rects=campusRects(),T=[];
   const bad=(x,y)=>rects.some(r=>x>r[0]-1.6&&x<r[2]+1.6&&y>r[1]-1.6&&y<r[3]+1.6)||(x>547&&x<569&&y>818&&y<847)||(x>585&&x<599&&y>802&&y<813)||
     CAMPUS_PATHS.edges.some(e=>{const p=CAMPUS_PATHS.nodes[e[0]],q=CAMPUS_PATHS.nodes[e[1]],dx=q[0]-p[0],dy=q[1]-p[1],l2=dx*dx+dy*dy||1;let t=((x-p[0])*dx+(y-p[1])*dy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(p[0]+dx*t-x,p[1]+dy*t-y)<2.2;});
-  for(let y=776;y<862;y+=3.6)for(let x=526;x<619;x+=3.6){const px=x+(R()-.5)*2.4,py=y+(R()-.5)*2.4;if(px<526.5||px>618.5||py<775.5||py>862)continue;if(bad(px,py))continue;if(R()<.62)T.push([px,py,1.3+R()*1.1]);}
-  /* a few trees inside the quad and courtyard, kept off the paths */
+  for(const [bx0,by0,bx1,by1] of [[526,776,619,862],[526,874,619,974]])for(let y=by0;y<by1;y+=3.6)for(let x=bx0;x<bx1;x+=3.6){const px=x+(R()-.5)*2.4,py=y+(R()-.5)*2.4;if(px<bx0+.5||px>bx1-.5||py<by0-.5||py>by1)continue;if(bad(px,py))continue;if(R()<.62)T.push([px,py,1.3+R()*1.1]);}
   [[551,823],[564,823],[551,842],[564,842],[588,806],[596,806]].forEach(t=>T.push([t[0],t[1],1.6]));
   CAMPUS_TREES=T;return T;
 }
@@ -823,8 +828,8 @@ function drawCampus(){
   const z=V.s,a=Math.max(0,Math.min(1,(z-2.7)/1.3));if(a<=0)return;
   const X=(x,y)=>W2S(x,y),R=(x0,y0,x1,y1)=>{const p=X(x0,y0),q=X(x1,y1);return[p[0],p[1],q[0]-p[0],q[1]-p[1]];};
   const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
-  const C=dark?{ground:'#27354B',lawn:'#2D5240',lawn2:'#27493A',track:'#9A5B48',bldg:'#52618A',bldg2:'#63749D',roof:'#2F3B58',lot:'#3B4A66',line:'#E8ECF5',tree:'#2F6B4A',tree2:'#3C7E58',walk:'#8E9BB8',walkE:'#202B40',ink:'#D5DEF2',shade:'rgba(0,0,0,.35)',door:'#F0C96A'}
-    :{ground:'#E8E1C8',lawn:'#C2DCA3',lawn2:'#B3D294',track:'#D28A6A',bldg:'#D6C4A4',bldg2:'#C4AE88',roof:'#8F7A57',lot:'#D4CDB4',line:'#FFFFFF',tree:'#86B26F',tree2:'#6FA05C',walk:'#F8F4E6',walkE:'#B9AE8C',ink:'#43391F',shade:'rgba(60,45,20,.22)',door:'#C0392B'};
+  const C=dark?{lawn:'#2D5240',lawn2:'#27493A',track:'#9A5B48',bldg:'#52618A',bldg2:'#63749D',roof:'#2F3B58',lot:'#3B4A66',line:'#E8ECF5',tree:'#2F6B4A',tree2:'#3C7E58',walk:'#8E9BB8',walkE:'#202B40',ink:'#D5DEF2',shade:'rgba(0,0,0,.35)',door:'#F0C96A',dome:'#7487B8',water:'#3F6F96'}
+    :{lawn:'#C2DCA3',lawn2:'#B3D294',track:'#D28A6A',bldg:'#D6C4A4',bldg2:'#C4AE88',roof:'#8F7A57',lot:'#D4CDB4',line:'#FFFFFF',tree:'#86B26F',tree2:'#6FA05C',walk:'#F8F4E6',walkE:'#B9AE8C',ink:'#43391F',shade:'rgba(60,45,20,.22)',door:'#C0392B',dome:'#E9DFC8',water:'#9CC5DB'};
   ctx.save();ctx.globalAlpha=a;
   const rr=Math.max(1,.5*z),sh=Math.max(.8,.55*z);
   const box=(x0,y0,x1,y1,fill,stroke,rad,shadow)=>{const r=R(x0,y0,x1,y1);if(shadow){ctx.beginPath();ctx.roundRect(r[0]+sh,r[1]+sh*1.1,r[2],r[3],rad==null?rr:rad);ctx.fillStyle=C.shade;ctx.fill();}
@@ -832,42 +837,57 @@ function drawCampus(){
   const bld=(x0,y0,x1,y1,fill)=>{const r=box(x0,y0,x1,y1,fill||C.bldg,C.roof,rr,true);const ins=Math.max(1.5,.9*z);ctx.beginPath();ctx.roundRect(r[0]+ins,r[1]+ins,r[2]-2*ins,r[3]-2*ins,Math.max(0,rr-1));ctx.lineWidth=Math.max(.5,.16*z);ctx.strokeStyle=C.roof;ctx.globalAlpha=a*.45;ctx.stroke();ctx.globalAlpha=a;};
   const lbl=(t,x,y,min)=>{if(z>=min){const q=X(x,y);halo(t,q[0],q[1],'600 '+Math.max(10,Math.min(14,2*z))+'px IBM Plex Sans,system-ui,sans-serif',C.ink);}};
   const stripes=(x0,y0,x1,y1,n,vert)=>{ctx.beginPath();for(let i=0;i<=n;i++){const t=i/n;const p=vert?X(x0+(x1-x0)*t,y0):X(x0,y0+(y1-y0)*t),q=vert?X(x0+(x1-x0)*t,y1):X(x1,y0+(y1-y0)*t);ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);}ctx.lineWidth=Math.max(.4,.14*z);ctx.strokeStyle=C.line;ctx.stroke();};
-  /* ground + lawn */
-  box(CAMPUS.x0,CAMPUS.y0,CAMPUS.x1,CAMPUS.y1,C.lawn,null,0);
-  /* hard surfaces */
-  box(527,776,568,787,C.lot,null,rr);stripes(528.5,777.5,566.5,785.5,20,true);   /* college north lot */
-  box(530,848,566,860,C.lot,null,rr);                                         /* athletic center forecourt */
-  box(611,790,618,836,C.lot,null,rr);                                         /* bus loop */
+  const line=(x0,y0,x1,y1,w,al)=>{const p=X(x0,y0),q=X(x1,y1);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.lineWidth=Math.max(.4,w*z);ctx.strokeStyle=C.line;if(al!=null)ctx.globalAlpha=a*al;ctx.stroke();ctx.globalAlpha=a;};
+  /* ---- ground: lawns, lots, fields (everything flat) ---- */
+  box(CAMPUS.x0,CAMPUS.y0,CAMPUS.x1,CAMPUS.y1,C.lawn,null,0);box(CAMPUS2.x0,CAMPUS2.y0,CAMPUS2.x1,CAMPUS2.y1,C.lawn,null,0);
+  box(527,776,568,787,C.lot,null,rr);stripes(528.5,777.5,566.5,785.5,20,true);
+  box(530,848,566,860,C.lot,null,rr);stripes(531.5,849.5,564.5,858.5,18,true);
+  box(611,790,618,836,C.lot,null,rr);
   box(574,857,598,862,C.lot,null,rr);stripes(575.5,858,596.5,861.2,13,true);
   box(600,857,618,862,C.lot,null,rr);stripes(601.5,858,616.5,861.2,9,true);
-  /* athletic field north of the high school: turf, track, lines */
-  box(574,776,616,788,C.track,null,Math.max(2,5*z*.4));
-  box(577,778,613,786,C.lawn2,null,Math.max(2,3.5*z*.4));
-  ctx.beginPath();{const p=X(595,777.6),q=X(595,786.4);ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);}ctx.lineWidth=Math.max(.5,.16*z);ctx.strokeStyle=C.line;ctx.stroke();
-  for(let i=1;i<=7;i++){const x=577+i*4.5,p=X(x,778.3),q=X(x,785.7);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.lineWidth=Math.max(.4,.1*z);ctx.globalAlpha=a*.5;ctx.stroke();ctx.globalAlpha=a;}
-  /* quad lawn */
-  box(548,819,567,846,C.lawn2,null,Math.max(2,2.5*z*.3));
-  /* courtyard */
-  box(587,804,597,812,C.lawn2,null,Math.max(2,1.5*z*.3));
-  /* college buildings */
-  bld(530,790,546,806);bld(550,790,566,800,C.bldg2);bld(550,804,566,816);bld(530,810,546,826,C.bldg2);bld(530,830,546,844);bld(530,848,566,860,C.bldg2);
-  /* high school buildings */
-  bld(574,790,610,802);bld(574,802,586,822,C.bldg2);bld(598,802,610,830,C.bldg2);bld(586,814,598,822);bld(576,828,594,844,C.bldg2);bld(600,836,616,852);bld(574,846,592,856);
-  /* gym court, sign, flag */
-  {const g=X(585,836);ctx.beginPath();ctx.roundRect(g[0]-6.2*z,g[1]-3.7*z,12.4*z,7.4*z,Math.max(1,.8*z));ctx.strokeStyle=C.line;ctx.lineWidth=Math.max(.6,.2*z);ctx.stroke();ctx.beginPath();ctx.moveTo(g[0],g[1]-3.7*z);ctx.lineTo(g[0],g[1]+3.7*z);ctx.stroke();ctx.beginPath();ctx.arc(g[0],g[1],1.5*z,0,6.283);ctx.stroke();}
-  /* tree canopy */
-  campusTrees().forEach(t=>{const q=X(t[0],t[1]),r=Math.max(1.4,t[2]*z);ctx.beginPath();ctx.arc(q[0]+r*.25,q[1]+r*.3,r,0,6.283);ctx.fillStyle=C.shade;ctx.fill();ctx.beginPath();ctx.arc(q[0],q[1],r,0,6.283);ctx.fillStyle=C.tree;ctx.fill();ctx.beginPath();ctx.arc(q[0]-r*.25,q[1]-r*.25,r*.55,0,6.283);ctx.fillStyle=C.tree2;ctx.fill();});
-  /* footpaths */
+  box(574,776,616,788,C.track,null,Math.max(2,5*z*.4));box(577,778,613,786,C.lawn2,null,Math.max(2,3.5*z*.4));line(595,777.6,595,786.4,.16);
+  for(let i=1;i<=7;i++)line(577+i*4.5,778.3,577+i*4.5,785.7,.1,.5);
+  box(548,819,567,846,C.lawn2,null,Math.max(2,2.5*z*.3));box(587,804,597,812,C.lawn2,null,Math.max(2,1.5*z*.3));
+  /* south block ground */
+  box(526,922,552,934,C.lot,null,rr);stripes(527.5,923.5,550.5,932.5,13,true);               /* Cosmosphere lot */
+  box(534,960,570,970,C.lot,null,rr);stripes(535.5,961.5,568.5,968.5,18,true);               /* athletic forecourt */
+  box(572,936,618,948,C.lot,null,rr);stripes(573.5,937.5,616.5,946.5,23,true);               /* stadium lot */
+  box(527,900,551,920,C.lawn2,null,Math.max(2,2*z*.3));                                      /* rocket garden */
+  /* stadium: track, turf, lines */
+  box(556,874,618,916,C.lot,null,rr);
+  box(562,876,612,914,C.track,null,Math.max(2,9*z*.3));box(567,880,607,910,C.lawn2,null,Math.max(2,6*z*.3));
+  line(587,880,587,910,.16);{const c=X(587,895);ctx.beginPath();ctx.arc(c[0],c[1],4*z,0,6.283);ctx.lineWidth=Math.max(.5,.16*z);ctx.strokeStyle=C.line;ctx.stroke();}
+  box(567,888,572,902,C.lawn2,C.line,1);box(602,888,607,902,C.lawn2,C.line,1);
+  /* tennis courts */
+  box(574,952,618,960,C.lawn2,null,rr);
+  for(let i=0;i<4;i++){box(576+i*10.5,953,584+i*10.5,959,dark?'#3E6A8F':'#8FB7D6',C.line,1);line(580+i*10.5,953,580+i*10.5,959,.12);}
+  /* ---- footpaths: drawn before buildings, so they run under them ---- */
   ctx.lineCap='round';ctx.lineJoin='round';
   const wp=()=>{ctx.beginPath();CAMPUS_PATHS.edges.forEach(e=>{const p=X(CAMPUS_PATHS.nodes[e[0]][0],CAMPUS_PATHS.nodes[e[0]][1]),q=X(CAMPUS_PATHS.nodes[e[1]][0],CAMPUS_PATHS.nodes[e[1]][1]);ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);});};
   const pw=Math.max(1.6,1.15*z);wp();ctx.strokeStyle=C.walkE;ctx.lineWidth=pw+Math.max(1,.4*z);ctx.stroke();wp();ctx.strokeStyle=C.walk;ctx.lineWidth=pw;ctx.stroke();
-  /* doors and entrances */
-  [[538,806],[558,800],[558,804],[538,810],[538,830],[548,848],[580,802],[592,802],[604,802],[592,822],[592,828],[585,844],[608,836],[583,846],[606,836]].forEach(d=>{const q=X(d[0],d[1]);ctx.beginPath();ctx.arc(q[0],q[1],Math.max(1.2,.55*z),0,6.283);ctx.fillStyle=C.door;ctx.fill();});
-  /* gates in the perimeter sidewalk */
-  [[571,774.5],[571,862.5],[525,818],[619,813]].forEach(d=>{const q=X(d[0],d[1]),r=Math.max(2.4,.9*z);ctx.beginPath();ctx.arc(q[0],q[1],r,0,6.283);ctx.fillStyle=C.walk;ctx.fill();ctx.lineWidth=Math.max(1,.3*z);ctx.strokeStyle=C.walkE;ctx.stroke();});
+  /* ---- buildings over the paths ---- */
+  bld(530,790,546,806);bld(550,790,566,800,C.bldg2);bld(550,804,566,816);bld(530,810,546,826,C.bldg2);bld(530,830,546,844);
+  bld(574,790,610,802);bld(574,802,586,822,C.bldg2);bld(598,802,610,830,C.bldg2);bld(586,814,598,822);bld(576,828,594,844,C.bldg2);bld(600,836,616,852);bld(574,846,592,856);
+  {const g=X(585,836);ctx.beginPath();ctx.roundRect(g[0]-6.2*z,g[1]-3.7*z,12.4*z,7.4*z,Math.max(1,.8*z));ctx.strokeStyle=C.line;ctx.lineWidth=Math.max(.6,.2*z);ctx.stroke();ctx.beginPath();ctx.moveTo(g[0],g[1]-3.7*z);ctx.lineTo(g[0],g[1]+3.7*z);ctx.stroke();ctx.beginPath();ctx.arc(g[0],g[1],1.5*z,0,6.283);ctx.stroke();}
+  /* south block buildings */
+  {bld(526,874,552,898,C.bldg2);                                                         /* Cosmosphere hall */
+   const c=X(539,886);ctx.beginPath();ctx.arc(c[0]+sh,c[1]+sh,8.6*z,0,6.283);ctx.fillStyle=C.shade;ctx.fill();ctx.beginPath();ctx.arc(c[0],c[1],8.6*z,0,6.283);ctx.fillStyle=C.dome;ctx.fill();ctx.lineWidth=Math.max(.8,.3*z);ctx.strokeStyle=C.roof;ctx.stroke();
+   for(let i=-2;i<=2;i++){const p=X(539+i*3.2,886-8.4),q=X(539+i*3.2,886+8.4);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.lineWidth=Math.max(.4,.12*z);ctx.globalAlpha=a*.45;ctx.strokeStyle=C.roof;ctx.stroke();ctx.globalAlpha=a;}
+   /* rocket in the garden */
+   const r0=X(539,904),r1=X(539,918);ctx.beginPath();ctx.moveTo(r0[0],r0[1]-1.6*z);ctx.quadraticCurveTo(r0[0]+1.6*z,r0[1]+2*z,r0[0]+1.4*z,r1[0]?r1[1]:r1[1]);ctx.lineTo(r0[0]-1.4*z,r1[1]);ctx.quadraticCurveTo(r0[0]-1.6*z,r0[1]+2*z,r0[0],r0[1]-1.6*z);ctx.fillStyle=C.bldg;ctx.fill();ctx.lineWidth=Math.max(.6,.2*z);ctx.strokeStyle=C.roof;ctx.stroke();}
+  bld(584,918,596,926);                                                                  /* concessions */
+  bld(530,942,570,956,C.bldg2);                                                          /* Athletic Center */
+  /* stadium stands */
+  bld(556,876,562,914,C.bldg2);bld(612,876,618,914,C.bldg2);
+  /* tree canopy */
+  campusTrees().forEach(t=>{const q=X(t[0],t[1]),r=Math.max(1.4,t[2]*z);ctx.beginPath();ctx.arc(q[0]+r*.25,q[1]+r*.3,r,0,6.283);ctx.fillStyle=C.shade;ctx.fill();ctx.beginPath();ctx.arc(q[0],q[1],r,0,6.283);ctx.fillStyle=C.tree;ctx.fill();ctx.beginPath();ctx.arc(q[0]-r*.25,q[1]-r*.25,r*.55,0,6.283);ctx.fillStyle=C.tree2;ctx.fill();});
+  /* doors and gates */
+  [[538,806],[558,800],[558,804],[538,810],[538,830],[580,802],[592,802],[604,802],[592,822],[592,828],[585,844],[608,836],[583,846],[546,942],[539,898],[556,899],[590,926]].forEach(d=>{const q=X(d[0],d[1]);ctx.beginPath();ctx.arc(q[0],q[1],Math.max(1.2,.55*z),0,6.283);ctx.fillStyle=C.door;ctx.fill();});
+  [[571,774.5],[571,862.5],[525,818],[619,813],[571,872.5],[571,974],[525,935],[619,935]].forEach(d=>{const q=X(d[0],d[1]),r=Math.max(2.4,.9*z);ctx.beginPath();ctx.arc(q[0],q[1],r,0,6.283);ctx.fillStyle=C.walk;ctx.fill();ctx.lineWidth=Math.max(1,.3*z);ctx.strokeStyle=C.walkE;ctx.stroke();});
   /* labels */
-  lbl('College Hall',538,798,3.6);lbl('Student Union',558,795,4.6);lbl('Library',558,810,4.8);lbl('Science Center',538,818,4.8);lbl('Fine Arts',538,837,5);lbl('Athletic Center',548,854,4.8);lbl('College quad',557.5,832.5,5);lbl('College lot',547,781.5,5.2);
+  lbl('College Hall',538,798,3.6);lbl('Student Union',558,795,4.6);lbl('Library',558,810,4.8);lbl('Science Center',538,818,4.8);lbl('Fine Arts',538,837,5);lbl('College quad',557.5,832.5,5);lbl('College lot',547,781.5,5.2);lbl('College lot',548,854,5.4);
   lbl('Hutchinson High School',592,796,3.4);lbl('Cafeteria',592,818,5.2);lbl('Gym',585,849.5-6.5,4.6);lbl('Auditorium',608,844,4.8);lbl('Ag and Shop',583,851,5);lbl('Practice field',595,782,5);lbl('Bus loop',614.5,812,6.2);lbl('Student lot',609,859.7,5.4);lbl('Parking',586,859.7,5.4);lbl('Courtyard',592,808,6);
+  lbl('Cosmosphere',539,893,3.6);lbl('Rocket garden',539,911,5.2);lbl('Visitor lot',539,928,5.4);lbl('Gowans Stadium',587,872,3.4);lbl('Concessions',590,922,5.6);lbl('Athletic Center',550,949,4.6);lbl('Athletic lot',552,965,5.4);lbl('Stadium lot',595,942,5.4);lbl('Tennis courts',596,956,5.2);
   ctx.restore();
 }
 let focusPt=null;
@@ -899,7 +919,7 @@ function draw(){
   if(store.kwik&&!store.caves)places.filter(p=>p.kind==='kw').forEach(marker);
   const shownLm=places.filter(p=>p.kind==='lm'&&(!store.caves||(p.num===9&&store.level!==2)));
   shownLm.forEach(marker);
-  if(z>1.7)shownLm.forEach(l=>{if(z>=3.4&&(l.num===1||l.num===3)&&!store.caves)return;const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
+  if(z>1.7)shownLm.forEach(l=>{if(z>=3.4&&(l.num===1||l.num===3||l.num===2||l.num===4)&&!store.caves)return;const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
   pins.forEach(marker);if(temp)marker(temp);
   if(focusPt){const q=W2S(focusPt[0],focusPt[1]);ctx.beginPath();ctx.arc(q[0],q[1],13,0,6.283);ctx.lineWidth=3;ctx.strokeStyle=colors.pin;ctx.stroke();ctx.beginPath();ctx.arc(q[0],q[1],5,0,6.283);ctx.fillStyle=colors.pin;ctx.fill();}
   if(cur){[[from,'A'],[to,'B']].forEach(([pl,t])=>{const q=W2S(pl.x,pl.y);ctx.beginPath();ctx.arc(q[0],q[1]-27,10,0,6.283);ctx.fillStyle=t==='A'?colors.ink:colors.pin;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=colors.panel;ctx.stroke();ctx.fillStyle=t==='A'?colors.panel:'#fff';ctx.font='700 11px IBM Plex Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q[0],q[1]-26.5);});}
