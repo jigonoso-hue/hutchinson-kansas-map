@@ -1161,10 +1161,10 @@ $('tmCancel').onclick=()=>{$('timeModal').hidden=true;};
 $('timeForm').onsubmit=e=>{e.preventDefault();store.start=$('mT').value||'15:15';store.day=$('mD').value;save();$('startT').value=store.start;$('timeModal').hidden=true;updateTraffic();recompute(false);draw();};
 $('timeModal').addEventListener('keydown',e=>{if(e.key==='Escape'){$('timeModal').hidden=true;}});
 $('timeModal').addEventListener('mousedown',e=>{if(e.target===$('timeModal'))$('timeModal').hidden=true;});
-if(location.hash==='#test')window.__hm={campusPaths:()=>CAMPUS_PATHS,places,computeRoute,analyse,store,E,setView:(sc,wx,wy)=>{V={s:sc,x:cssW/2-wx*sc,y:cssH/2-wy*sc,init:true};draw();}};
+if(location.hash==='#test')window.__hm={getView:()=>({s:V.s,x:V.x,y:V.y}),campusPaths:()=>CAMPUS_PATHS,places,computeRoute,analyse,store,E,setView:(sc,wx,wy)=>{V={s:sc,x:cssW/2-wx*sc,y:cssH/2-wy*sc,init:true};draw();}};
 
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
-let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea'))e.preventDefault();lastTap=n;},{passive:false});
+let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea,button,.modal,.panel,.info'))e.preventDefault();lastTap=n;},{passive:false});
 document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!e.target.closest('canvas'))e.preventDefault();},{passive:false});
 /* ---------- bottom sheet (phones): peek / half / full, drag the handle ---------- */
 let sheetState='peek';
@@ -1180,9 +1180,9 @@ function setSheet(st){
   g.addEventListener('pointerdown',e=>{if(!isMob())return;id=e.pointerId;g.setPointerCapture(id);y0=e.clientY;h0=sheetPx;t0=performance.now();moved=false;pn.classList.add('drag');pn.classList.remove('peek');});
   g.addEventListener('pointermove',e=>{if(id!==e.pointerId)return;const dy=y0-e.clientY;if(Math.abs(dy)>5)moved=true;const sn=snaps(),h=Math.max(sn.hide,Math.min(sn.full,h0+dy));document.documentElement.style.setProperty('--sheet',h+'px');sheetPx=h;});
   const end=e=>{if(id!==e.pointerId)return;id=null;pn.classList.remove('drag');const sn=snaps();
-    if(!moved){setSheet(sheetState==='peek'||sheetState==='hide'?'half':'peek');if(sheetState!=='peek'&&sheetPx&&cur)fitRoute();return;}
+    if(!moved){setSheet(sheetState==='peek'||sheetState==='hide'?'half':'peek');return;}
     const v=(y0-e.clientY)/Math.max(60,performance.now()-t0),proj=sheetPx+v*160;let best='peek',bd=1e9;for(const k in sn){const d=Math.abs(sn[k]-proj);if(d<bd){bd=d;best=k;}}
-    setSheet(best);if(best!=='full'){if(cur)fitRoute();else if(best==='hide')animateTo(fitView());}};
+    setSheet(best);};
   g.addEventListener('pointerup',end);g.addEventListener('pointercancel',end);
   g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSheet(sheetState==='hide'?'peek':sheetState==='peek'?'half':sheetState==='half'?'full':'hide');}});
   ['fromIn','toIn','viaIn'].forEach(i=>{const el=$(i);if(el)el.addEventListener('focus',()=>{if(isMob()&&sheetState!=='full')setSheet('full');});});
