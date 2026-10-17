@@ -791,6 +791,50 @@ function drawCaves(){
     ctx.beginPath();ctx.ellipse(pq[0],pq[1],pr*1.5,pr*1.2,0,0,6.283);ctx.lineWidth=1.6;ctx.strokeStyle='#E2C6B0';ctx.stroke();}
   else{const g=ctx.createRadialGradient(pq[0],pq[1],2,pq[0],pq[1],pr*3);g.addColorStop(0,'rgba(230,226,255,.9)');g.addColorStop(1,'rgba(150,140,220,0)');ctx.fillStyle=g;ctx.fillRect(pq[0]-pr*3,pq[1]-pr*3,pr*6,pr*6);}
 }
+
+/* ---------- campus close-up: appears when you zoom in on the school block ---------- */
+const CAMPUS={x0:524,y0:773,x1:620,y1:864};
+function drawCampus(){
+  const z=V.s,a=Math.max(0,Math.min(1,(z-2.7)/1.3));if(a<=0)return;
+  const X=(x,y)=>W2S(x,y),R=(x0,y0,x1,y1)=>{const p=X(x0,y0),q=X(x1,y1);return[p[0],p[1],q[0]-p[0],q[1]-p[1]];};
+  const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const C=dark?{ground:'#243046',turf:'#2F5A45',turf2:'#2A4F3C',track:'#9A5B48',bldg:'#4B5A7C',bldg2:'#5D6E94',roof:'#33405E',lot:'#394761',line:'#E8ECF5',tree:'#2F6B4A',court:'#3E6A8F',ink:'#C9D3EA'}
+    :{ground:'#F3EEDD',turf:'#B9D79A',turf2:'#A9CB8A',track:'#D08B6E',bldg:'#CBB89B',bldg2:'#B9A482',roof:'#9C8764',lot:'#D9D2BC',line:'#FFFFFF',tree:'#8DB677',court:'#8FB7D6',ink:'#4A3F2C'};
+  ctx.save();ctx.globalAlpha=a;
+  const box=(x0,y0,x1,y1,fill,stroke,rad)=>{const r=R(x0,y0,x1,y1);ctx.beginPath();ctx.roundRect(r[0],r[1],r[2],r[3],rad==null?Math.max(1,.6*z):rad);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=Math.max(.8,.35*z);ctx.strokeStyle=stroke;ctx.stroke();}};
+  const lbl=(t,x,y,min)=>{if(z>=min){const q=X(x,y);halo(t,q[0],q[1],'600 '+Math.max(10,Math.min(14,2.1*z))+'px IBM Plex Sans,system-ui,sans-serif',C.ink);}};
+  /* ground */
+  box(CAMPUS.x0,CAMPUS.y0,CAMPUS.x1,CAMPUS.y1,C.ground,null,0);
+  /* college side (west): quad, halls, parking */
+  box(527,776,566,787,C.lot,null);for(let i=0;i<9;i++){const p=X(529+i*4,778),q=X(529+i*4,785);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.lineWidth=Math.max(.5,.18*z);ctx.strokeStyle=C.line;ctx.stroke();}
+  box(530,792,543,806,C.bldg,C.roof);box(547,792,560,799,C.bldg2,C.roof);box(547,803,560,815,C.bldg,C.roof);box(530,810,543,826,C.bldg2,C.roof);
+  box(534,830,566,845,C.turf,null,Math.max(2,2*z*.3));
+  ctx.beginPath();const q1=X(550,837.5);ctx.ellipse(q1[0],q1[1],12*z,5.6*z,0,0,6.283);ctx.strokeStyle=C.line;ctx.lineWidth=Math.max(.7,.25*z);ctx.stroke();
+  lbl('College Hall',536.5,799,3.6);lbl('Student Union',553.5,795.5,4.4);lbl('Library',553.5,809,4.4);lbl('Science Center',536.5,818,4.4);lbl('College quad',550,849,4.6);
+  /* high school (east): main building, gym, auditorium, shop, cafeteria */
+  box(568,794,606,806,C.bldg,C.roof);               /* main hall, long wing */
+  box(568,806,580,826,C.bldg,C.roof);               /* west classroom wing */
+  box(594,806,606,834,C.bldg2,C.roof);              /* east classroom wing */
+  box(580,818,594,826,C.bldg2,C.roof);              /* cafeteria */
+  box(572,832,592,850,C.bldg2,C.roof);              /* gymnasium */
+  ctx.beginPath();const g=X(582,841);ctx.ellipse(g[0],g[1],5.5*z,3.4*z,0,0,6.283);ctx.strokeStyle=C.line;ctx.lineWidth=Math.max(.6,.2*z);ctx.stroke();
+  box(594,838,612,852,C.bldg,C.roof);               /* auditorium */
+  box(608,794,618,806,C.bldg,C.roof);               /* shop and ag */
+  lbl('Hutchinson High School',587,800,3.4);lbl('Cafeteria',587,822,5);lbl('Gym',582,841.5,4.4);lbl('Auditorium',603,845.5,4.8);lbl('Shop',613,800,5.2);
+  /* courtyard, tennis courts, parking, bus loop */
+  box(581,808,592,816,C.turf2,null,2);
+  box(570,852,590,862,C.lot,null);for(let i=0;i<11;i++){const p=X(571+i*1.8,853),q=X(571+i*1.8,861);ctx.beginPath();ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.lineWidth=Math.max(.4,.15*z);ctx.strokeStyle=C.line;ctx.stroke();}
+  box(594,856,618,862,C.lot,null);
+  box(609,810,618,834,C.lot,null);ctx.beginPath();{const p=X(613.5,812),q=X(613.5,832);ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);ctx.setLineDash([Math.max(2,.8*z),Math.max(2,.8*z)]);ctx.lineWidth=Math.max(.6,.2*z);ctx.strokeStyle=C.line;ctx.stroke();ctx.setLineDash([]);}
+  lbl('Parking',580,857,5.4);lbl('Bus loop',613.5,836,5.6);lbl('Student lot',606,859,5.4);
+  /* practice field */
+  box(566,768+7,568,770,C.ground,null,0);
+  /* trees */
+  [[527,790],[564,790],[566,828],[568,848],[612,806],[596,803],[566,800],[577,830],[586,830],[600,836],[612,856],[528,850],[528,860],[620,845],[524,826]].forEach(t=>{const q=X(t[0],t[1]);ctx.beginPath();ctx.arc(q[0],q[1],Math.max(1.6,1.7*z),0,6.283);ctx.fillStyle=C.tree;ctx.fill();});
+  /* paths */
+  ctx.lineCap='round';ctx.strokeStyle=C.line;ctx.lineWidth=Math.max(1,.5*z);ctx.beginPath();[[566,808,568,808],[580,806,580,818],[593,806,593,830],[567,826,610,826],[567,848,593,848]].forEach(l=>{const p=X(l[0],l[1]),q=X(l[2],l[3]);ctx.moveTo(p[0],p[1]);ctx.lineTo(q[0],q[1]);});ctx.stroke();
+  ctx.restore();
+}
 let focusPt=null;
 function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cssW,cssH);
@@ -812,6 +856,7 @@ function draw(){
   p=W2S(170,1330);halo('SOUTH HUTCHINSON',p[0],p[1],'600 '+fs+'px Newsreader,Georgia,serif',colors.label);
   p=W2S(560,1470);halo('Arkansas River',p[0],p[1],'italic 500 '+fs+'px Newsreader,Georgia,serif','#3E7FA6',.84);
   [['61',790,795],['50',1262,1395]].forEach(([t,x,y])=>{const q=W2S(x,y);ctx.beginPath();ctx.roundRect(q[0]-9,q[1]-8,18,16,4);ctx.fillStyle=colors.panel;ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle=colors.ink;ctx.stroke();ctx.fillStyle=colors.ink;ctx.font='600 10px IBM Plex Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q[0],q[1]+.5);});
+  if(!store.caves&&!store.wealth)drawCampus();
   if(!store.caves)drawGated();
   if(store.wealth)drawWealthLabels();
   if(store.caves)drawCaves();
@@ -819,7 +864,7 @@ function draw(){
   if(store.kwik&&!store.caves)places.filter(p=>p.kind==='kw').forEach(marker);
   const shownLm=places.filter(p=>p.kind==='lm'&&(!store.caves||(p.num===9&&store.level!==2)));
   shownLm.forEach(marker);
-  if(z>1.7)shownLm.forEach(l=>{const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
+  if(z>1.7)shownLm.forEach(l=>{if(z>=3.4&&(l.num===1||l.num===3)&&!store.caves)return;const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
   pins.forEach(marker);if(temp)marker(temp);
   if(focusPt){const q=W2S(focusPt[0],focusPt[1]);ctx.beginPath();ctx.arc(q[0],q[1],13,0,6.283);ctx.lineWidth=3;ctx.strokeStyle=colors.pin;ctx.stroke();ctx.beginPath();ctx.arc(q[0],q[1],5,0,6.283);ctx.fillStyle=colors.pin;ctx.fill();}
   if(cur){[[from,'A'],[to,'B']].forEach(([pl,t])=>{const q=W2S(pl.x,pl.y);ctx.beginPath();ctx.arc(q[0],q[1]-27,10,0,6.283);ctx.fillStyle=t==='A'?colors.ink:colors.pin;ctx.fill();ctx.lineWidth=2;ctx.strokeStyle=colors.panel;ctx.stroke();ctx.fillStyle=t==='A'?colors.panel:'#fff';ctx.font='700 11px IBM Plex Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q[0],q[1]-26.5);});}
@@ -850,7 +895,7 @@ let anim=null;
 function animateTo(t){if(matchMedia('(prefers-reduced-motion:reduce)').matches){V=Object.assign({},t);draw();return;}
   const a={...V},t0=performance.now();cancelAnimationFrame(anim);
   const step=now=>{const k=Math.min(1,(now-t0)/380),e=1-Math.pow(1-k,3);V={s:a.s*Math.pow(t.s/a.s,e),x:a.x+(t.x-a.x)*e,y:a.y+(t.y-a.y)*e,init:true};draw();if(k<1)anim=requestAnimationFrame(step);};anim=requestAnimationFrame(step);}
-function zoomAt(f,cx,cy){const fit=fitView().s*0.8;const ns=Math.max(fit,Math.min(7,V.s*f));f=ns/V.s;V={s:ns,x:cx-(cx-V.x)*f,y:cy-(cy-V.y)*f,init:true};draw();}
+function zoomAt(f,cx,cy){const fit=fitView().s*0.8;const ns=Math.max(fit,Math.min(14,V.s*f));f=ns/V.s;V={s:ns,x:cx-(cx-V.x)*f,y:cy-(cy-V.y)*f,init:true};draw();}
 const ptrs=new Map();let drag=null,pinch=null;
 cv.addEventListener('pointerdown',e=>{const ae=document.activeElement;if(ae&&ae!==document.body&&ae.blur)ae.blur();cancelAnimationFrame(anim);cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect();ptrs.set(e.pointerId,{x:e.clientX-r.left,y:e.clientY-r.top});
   if(ptrs.size===1){drag={sx:e.clientX,sy:e.clientY,vx:V.x,vy:V.y,moved:false};}else if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch={d:Math.hypot(a.x-b.x,a.y-b.y),s:V.s};drag=null;}});
@@ -1061,7 +1106,7 @@ $('tmCancel').onclick=()=>{$('timeModal').hidden=true;};
 $('timeForm').onsubmit=e=>{e.preventDefault();store.start=$('mT').value||'15:15';store.day=$('mD').value;save();$('startT').value=store.start;$('timeModal').hidden=true;updateTraffic();recompute(false);draw();};
 $('timeModal').addEventListener('keydown',e=>{if(e.key==='Escape'){$('timeModal').hidden=true;}});
 $('timeModal').addEventListener('mousedown',e=>{if(e.target===$('timeModal'))$('timeModal').hidden=true;});
-if(location.hash==='#test')window.__hm={places,computeRoute,analyse,store,E};
+if(location.hash==='#test')window.__hm={places,computeRoute,analyse,store,E,setView:(sc,wx,wy)=>{V={s:sc,x:cssW/2-wx*sc,y:cssH/2-wy*sc,init:true};draw();}};
 
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
 let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea'))e.preventDefault();lastTap=n;},{passive:false});
