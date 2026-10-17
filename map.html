@@ -218,6 +218,27 @@ canvas.dragging{cursor:grabbing}
   .combo input,.modal input,.modal select,.timefld input{font-size:16px}
   .legend{bottom:64px}
 }
+
+/* Kwik Shop keypad */
+.kpad{align-items:center}
+.kpad .card{max-width:320px;align-items:stretch;background:linear-gradient(160deg,#2A3140,#161B26);color:#E8ECF5;border:1px solid #4A5468;border-radius:18px;padding:18px 18px 16px;gap:12px;position:relative}
+.kpad h2{font:600 18px/1.2 var(--font-display);color:#fff;margin:0;padding-right:36px}
+.kpad p{color:#9AA6BF;font-size:12.5px}
+.kpad .x{position:absolute;top:6px;right:8px;width:40px;height:40px;border:0;background:none;color:#9AA6BF;font-size:26px}
+.kdisp{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.kdisp i{height:46px;border-radius:8px;background:#0B0F17;border:1px solid #394458;display:grid;place-items:center;font:600 24px var(--font-mono);color:#7CF0A8;font-style:normal;box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
+.kdisp i.on{border-color:#7CF0A8}
+.kled{display:flex;align-items:center;gap:8px;font-size:12px;color:#9AA6BF;min-height:18px}
+.kled b{width:10px;height:10px;border-radius:50%;background:#C0392B;box-shadow:0 0 8px #C0392B}
+.kled.bad b{animation:kblink .5s 2}
+@keyframes kblink{50%{opacity:.2}}
+.kkeys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.kkeys button{height:58px;border-radius:12px;border:1px solid #4A5468;background:linear-gradient(#3A4357,#262D3D);color:#fff;font:600 24px var(--font-mono);box-shadow:0 3px 0 #11151D;touch-action:manipulation}
+.kkeys button:active{transform:translateY(2px);box-shadow:0 1px 0 #11151D}
+.kkeys .fn{font:600 14px var(--font-body);color:#C9D3EA}
+.kkeys .go{background:linear-gradient(#2F7D55,#1F5A3C);border-color:#3FA06F}
+.kpad .card.shake{animation:kshake .35s}
+@keyframes kshake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 /* ---------- phone layout: full-screen map, floating chips, draggable bottom sheet ---------- */
 :root{--sheet:276px}
@@ -326,6 +347,15 @@ canvas.dragging{cursor:grabbing}
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
+</div>
+<div class="modal kpad" id="kpad" role="dialog" aria-modal="true" aria-labelledby="kpT" hidden>
+  <div class="card" id="kpCard">
+    <button class="x" id="kpX" type="button" aria-label="Close">&times;</button>
+    <h2 id="kpT">Locked door</h2><p id="kpS">Enter the door code.</p>
+    <div class="kdisp" id="kpD" aria-live="polite"></div>
+    <div class="kled" id="kpL"><b></b><span id="kpM">Locked</span></div>
+    <div class="kkeys" id="kpK"></div>
+  </div>
 </div>
 <div class="modal" id="timeModal" role="dialog" aria-modal="true" aria-labelledby="tmH" hidden>
   <form class="card" id="timeForm">
@@ -890,6 +920,104 @@ function drawCampus(){
   lbl('Cosmosphere',539,893,3.6);lbl('Rocket garden',539,911,5.2);lbl('Visitor lot',539,928,5.4);lbl('Gowans Stadium',587,872,3.4);lbl('Concessions',590,922,5.6);lbl('Athletic Center',550,949,4.6);lbl('Athletic lot',552,965,5.4);lbl('Stadium lot',595,942,5.4);lbl('Tennis courts',596,956,5.2);
   ctx.restore();
 }
+
+/* ---------- Kwik Shop close-ups: two building shapes plus a movable set of assets ---------- */
+const KWIK_PINS={};   /* door key ("kw3:store") -> code. Left empty on purpose: no door has a valid code yet. */
+const KW_B={store:{w:12,h:7},annex:{w:6,h:5}};     /* the same two building shapes at every shop */
+const KW_LOT={w:30,h:22};
+/* each template places the two buildings and the assets; [asset, x, y, rotation, option] in lot units */
+const KW_TEMPLATES=[
+ {store:[-14,-10],annex:[8,-10],assets:[['canopy',-1,3],['pumps',-1,3],['parking',-13,9,0,4],['sign',13,8],['dumpster',12,-3],['counter',-8,-2.6]]},
+ {store:[2,-10],annex:[-13,-10],assets:[['canopy',-6,4],['pumps',-6,4],['parking',2,9,0,5],['payphone',-14,-3],['sign',-14,9],['counter',8,-2.6]]},
+ {store:[-14,-1],annex:[-14,-10],assets:[['canopy',6,-4],['pumps',6,-4],['parking',-12,9,0,3],['kiosk',9,6],['sign',13,-10],['dumpster',-2,-9],['counter',-2,2.6,0,'side']]},
+ {store:[-6,2],annex:[8,3],assets:[['canopy',-8,-5],['pumps',-8,-5],['parking',-14,-10,0,4],['payphone',4,0],['sign',-14,8],['kiosk',13,-5],['counter',0,1.2]]}
+];
+/* which template, mirrored how, and which extra assets each of the 10 shops gets */
+const KW_SHOPS=[
+ {t:0,fx:1,fy:1,add:['kiosk']},{t:1,fx:1,fy:1,add:['payphone2']},{t:2,fx:-1,fy:1,add:[]},{t:3,fx:1,fy:-1,add:['kiosk2']},{t:0,fx:-1,fy:-1,add:['payphone2']},
+ {t:1,fx:-1,fy:1,add:['kiosk']},{t:2,fx:1,fy:-1,add:['payphone2']},{t:3,fx:-1,fy:1,add:[]},{t:0,fx:1,fy:-1,add:['kiosk2']},{t:2,fx:-1,fy:-1,add:['payphone2']}
+];
+const KW_EXTRA={kiosk:['kiosk',10,-3],kiosk2:['kiosk',-3,9],payphone2:['payphone',-14,9]};
+const kwUnlocked=new Set();
+function kwLayout(i){const sh=KW_SHOPS[i%KW_SHOPS.length],t=KW_TEMPLATES[sh.t];const as=t.assets.slice();sh.add.forEach(k=>as.push(KW_EXTRA[k]));return{sh,t,as};}
+function kwToWorld(i,lx,ly){const k=D.kw[i],sh=KW_SHOPS[i%KW_SHOPS.length];return[k[0]+sh.fx*lx,k[1]+sh.fy*ly];}
+function kwDoor(i,which){const {t}=kwLayout(i),b=t[which],d=KW_B[which];return kwToWorld(i,b[0]+d.w/2,b[1]+d.h+.4);}
+function drawKwik(){
+  const z=V.s,a=Math.max(0,Math.min(1,(z-2.5)/1.0));if(a<=0||!D.kw)return;
+  const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const C=dark?{lot:'#3B4A66',curb:'#202B40',line:'#E8ECF5',bld:'#52618A',roof:'#2F3B58',pump:'#C0392B',pumpB:'#D5DEF2',canopy:'rgba(120,140,190,.45)',kiosk:'#B9782E',um:'#E8B34D',phone:'#3E6A8F',car:'#8E9BB8',dump:'#3C7E58',sign:'#F0C96A',fog1:'#0C1220',fog2:'#1D2740',ink:'#D5DEF2',shade:'rgba(0,0,0,.35)'}
+    :{lot:'#D4CDB4',curb:'#9C927A',line:'#FFFFFF',bld:'#D6C4A4',roof:'#8F7A57',pump:'#C0392B',pumpB:'#F4EFE0',canopy:'rgba(200,60,50,.28)',kiosk:'#B9782E',um:'#E8B34D',phone:'#3E6A8F',car:'#9C927A',dump:'#6FA05C',sign:'#C0392B',fog1:'#1A2236',fog2:'#3A4663',ink:'#43391F',shade:'rgba(60,45,20,.22)'};
+  ctx.save();ctx.globalAlpha=a;
+  D.kw.forEach((k,i)=>{
+    const q=W2S(k[0],k[1]);if(q[0]<-200||q[1]<-200||q[0]>cssW+200||q[1]>cssH+200)return;
+    const {sh,t,as}=kwLayout(i);
+    ctx.save();ctx.translate(q[0],q[1]);ctx.scale(z*sh.fx,z*sh.fy);
+    const px=1/z;
+    /* lot */
+    ctx.beginPath();ctx.roundRect(-KW_LOT.w/2,-KW_LOT.h/2,KW_LOT.w,KW_LOT.h,1.2);ctx.fillStyle=C.lot;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px*1.2);ctx.strokeStyle=C.curb;ctx.stroke();
+    /* assets under buildings */
+    as.forEach(A=>kwAsset(A,C,px,false));
+    /* buildings */
+    ['store','annex'].forEach(w=>{const b=t[w],d=KW_B[w],key='kw'+(i+1)+':'+w,open=kwUnlocked.has(key);
+      ctx.beginPath();ctx.roundRect(b[0]+.5,b[1]+.6,d.w,d.h,.5);ctx.fillStyle=C.shade;ctx.fill();
+      ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);
+      if(open){ctx.fillStyle=C.bld;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();ctx.lineWidth=.18;ctx.strokeStyle=C.roof;for(let r=1;r<3;r++){ctx.beginPath();ctx.moveTo(b[0]+1,b[1]+d.h*r/3);ctx.lineTo(b[0]+d.w-1,b[1]+d.h*r/3);ctx.stroke();}}
+      else{const g=ctx.createRadialGradient(b[0]+d.w/2,b[1]+d.h/2,.3,b[0]+d.w/2,b[1]+d.h/2,d.w*.62);g.addColorStop(0,C.fog2);g.addColorStop(1,C.fog1);ctx.fillStyle=g;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();
+        ctx.save();ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);ctx.clip();
+        for(let n=0;n<7;n++){const u=(i*13+n*29)%97/97,v=(i*7+n*17)%89/89;ctx.beginPath();ctx.ellipse(b[0]+u*d.w,b[1]+v*d.h,d.w*.22,d.h*.2,0,0,6.283);ctx.fillStyle='rgba(140,155,200,.16)';ctx.fill();}
+        ctx.restore();}
+    });
+    /* canopies and signs on top */
+    as.forEach(A=>kwAsset(A,C,px,true));
+    ctx.restore();
+    /* doors, drawn unmirrored so the lock icon always reads */
+    ['store','annex'].forEach(w=>{const key='kw'+(i+1)+':'+w,open=kwUnlocked.has(key),dw=kwDoor(i,w),dq=W2S(dw[0],dw[1]);
+      const r=Math.max(5,1.05*z);ctx.beginPath();ctx.roundRect(dq[0]-r*.8,dq[1]-r*.55,r*1.6,r*1.1,2);ctx.fillStyle=open?'#2F7D55':'#7A2A24';ctx.fill();ctx.lineWidth=1.6;ctx.strokeStyle=open?'#7CF0A8':'#E8B34D';ctx.stroke();
+      /* padlock */
+      ctx.fillStyle='#F0C96A';const lw=r*.55,lh=r*.4;ctx.fillRect(dq[0]-lw/2,dq[1]-lh*.1,lw,lh);ctx.beginPath();ctx.arc(dq[0],dq[1]-lh*.1,lw*.32,Math.PI,0);ctx.lineWidth=Math.max(1,r*.12);ctx.strokeStyle='#F0C96A';ctx.stroke();});
+    if(z>=4.6)halo('Kwik Shop '+(i+1),q[0],q[1]+(KW_LOT.h/2+2)*z,'700 '+Math.max(11,Math.min(15,2.1*z))+'px IBM Plex Sans,system-ui,sans-serif',C.ink);
+  });
+  ctx.restore();
+}
+function kwAsset(A,C,px,top){
+  const [n,x,y,rot,opt]=A,lw=Math.max(.5,1.2*px);
+  const isTop=(n==='canopy'||n==='sign');if(isTop!==top)return;
+  ctx.save();ctx.translate(x,y);if(rot)ctx.rotate(rot*Math.PI/180);
+  if(n==='pumps'){ctx.beginPath();ctx.roundRect(-4.2,-1.2,8.4,2.4,.8);ctx.fillStyle=C.lot;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.curb;ctx.stroke();[-2.4,2.4].forEach(dx=>{ctx.fillStyle=C.pump;ctx.fillRect(dx-.7,-.9,1.4,1.8);ctx.fillStyle=C.pumpB;ctx.fillRect(dx-.4,-.6,.8,.7);});}
+  else if(n==='canopy'){ctx.beginPath();ctx.roundRect(-6.5,-3.4,13,6.8,.8);ctx.fillStyle=C.canopy;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.pump;ctx.setLineDash([1.4,.9]);ctx.stroke();ctx.setLineDash([]);}
+  else if(n==='parking'){const c=opt||4;for(let i=0;i<c;i++){ctx.beginPath();ctx.moveTo(i*2.8,0);ctx.lineTo(i*2.8,4.6);ctx.lineWidth=Math.max(.4,.9*px);ctx.strokeStyle=C.line;ctx.stroke();}ctx.beginPath();ctx.moveTo(0,4.6);ctx.lineTo(c*2.8,4.6);ctx.stroke();ctx.beginPath();ctx.roundRect(.4+2.8*((c-1)%2),.9,2,3.1,.5);ctx.fillStyle=C.car;ctx.fill();}
+  else if(n==='kiosk'){ctx.beginPath();ctx.roundRect(-1.7,-1.2,3.4,2.4,.4);ctx.fillStyle=C.kiosk;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.roof;ctx.stroke();ctx.beginPath();ctx.arc(0,-.2,2.3,0,6.283);ctx.fillStyle=C.um;ctx.globalAlpha*=.8;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.moveTo(-2.3,-.2);ctx.lineTo(2.3,-.2);ctx.moveTo(0,-2.5);ctx.lineTo(0,2.1);ctx.lineWidth=Math.max(.4,.8*px);ctx.strokeStyle=C.roof;ctx.stroke();}
+  else if(n==='payphone'){ctx.beginPath();ctx.roundRect(-.8,-1,1.6,2,.3);ctx.fillStyle=C.phone;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.curb;ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(-.5,-.7,1,.7);}
+  else if(n==='counter'){ctx.beginPath();ctx.roundRect(-1.8,-.6,3.6,1.2,.3);ctx.fillStyle=C.kiosk;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.roof;ctx.stroke();ctx.beginPath();ctx.moveTo(-1.8,.9);ctx.lineTo(1.8,.9);ctx.lineWidth=Math.max(.5,1.6*px);ctx.strokeStyle=C.pump;ctx.stroke();}
+  else if(n==='dumpster'){ctx.beginPath();ctx.roundRect(-1.2,-.9,2.4,1.8,.2);ctx.fillStyle=C.dump;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.curb;ctx.stroke();}
+  else if(n==='sign'){ctx.beginPath();ctx.arc(0,0,.5,0,6.283);ctx.fillStyle=C.curb;ctx.fill();ctx.beginPath();ctx.roundRect(-1.1,-2.4,2.2,2.4,.3);ctx.fillStyle=C.sign;ctx.fill();ctx.lineWidth=lw;ctx.strokeStyle=C.curb;ctx.stroke();}
+  ctx.restore();
+}
+function kwHitDoor(sx,sy){
+  if(V.s<3.1||!D.kw)return null;
+  for(let i=0;i<D.kw.length;i++){for(const w of ['store','annex']){const d=kwDoor(i,w),q=W2S(d[0],d[1]);if(Math.hypot(q[0]-sx,q[1]-sy)<=Math.max(16,1.7*V.s))return{i,w};}}
+  return null;
+}
+/* keypad */
+let KP=null;
+(function(){
+  const keys=['1','2','3','4','5','6','7','8','9','Clear','0','Enter'],K=document.getElementById('kpK'),D_=document.getElementById('kpD'),L=document.getElementById('kpL'),M=document.getElementById('kpM'),M2=document.getElementById('kpad'),card=document.getElementById('kpCard');
+  K.innerHTML=keys.map(k=>'<button type="button" data-k="'+k+'" class="'+(k==='Clear'?'fn':k==='Enter'?'fn go':'')+'">'+(k==='Clear'?'Clear':k==='Enter'?'Enter':k)+'</button>').join('');
+  const paint=()=>{D_.innerHTML=Array.from({length:6},(_,i)=>'<i class="'+(KP&&KP.v[i]?'on':'')+'">'+(KP&&KP.v[i]||'')+'</i>').join('');};
+  const say=(t,bad)=>{M.textContent=t;L.classList.toggle('bad',!!bad);if(bad){void L.offsetWidth;}};
+  window.openKeypad=(i,w)=>{KP={i,w,v:''};document.getElementById('kpT').textContent='Kwik Shop '+(i+1)+' | '+(w==='store'?'Store door':'Back building');document.getElementById('kpS').textContent='Locked. Enter the door code.';say('Locked');paint();M2.hidden=false;};
+  const close=()=>{M2.hidden=true;KP=null;};
+  const press=k=>{if(!KP)return;
+    if(k==='Clear'){KP.v='';say('Locked');}
+    else if(k==='Enter'){const key='kw'+(KP.i+1)+':'+KP.w,want=KWIK_PINS[key];
+      if(want!=null&&want===KP.v){kwUnlocked.add(key);say('Unlocked');draw();setTimeout(close,600);return;}
+      say('Access denied',true);card.classList.remove('shake');void card.offsetWidth;card.classList.add('shake');KP.v='';}
+    else if(KP.v.length<6){KP.v+=k;say('Locked');}
+    paint();};
+  K.addEventListener('click',e=>{const b=e.target.closest('button');if(b)press(b.dataset.k);});
+  document.getElementById('kpX').onclick=close;M2.addEventListener('mousedown',e=>{if(e.target===M2)close();});
+  document.addEventListener('keydown',e=>{if(M2.hidden)return;if(e.key==='Escape')close();else if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key==='Backspace'){KP.v=KP.v.slice(0,-1);paint();}else if(e.key==='Enter')press('Enter');});
+})();
 let focusPt=null;
 function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cssW,cssH);
@@ -911,12 +1039,12 @@ function draw(){
   p=W2S(170,1330);halo('SOUTH HUTCHINSON',p[0],p[1],'600 '+fs+'px Newsreader,Georgia,serif',colors.label);
   p=W2S(560,1470);halo('Arkansas River',p[0],p[1],'italic 500 '+fs+'px Newsreader,Georgia,serif','#3E7FA6',.84);
   [['61',790,795],['50',1262,1395]].forEach(([t,x,y])=>{const q=W2S(x,y);ctx.beginPath();ctx.roundRect(q[0]-9,q[1]-8,18,16,4);ctx.fillStyle=colors.panel;ctx.fill();ctx.lineWidth=1.4;ctx.strokeStyle=colors.ink;ctx.stroke();ctx.fillStyle=colors.ink;ctx.font='600 10px IBM Plex Sans,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(t,q[0],q[1]+.5);});
-  if(!store.caves&&!store.wealth)drawCampus();
+  if(!store.caves&&!store.wealth){drawCampus();drawKwik();}
   if(!store.caves)drawGated();
   if(store.wealth)drawWealthLabels();
   if(store.caves)drawCaves();
   drawRoute();
-  if(store.kwik&&!store.caves)places.filter(p=>p.kind==='kw').forEach(marker);
+  if(store.kwik&&!store.caves&&z<2.9)places.filter(p=>p.kind==='kw').forEach(marker);
   const shownLm=places.filter(p=>p.kind==='lm'&&(!store.caves||(p.num===9&&store.level!==2)));
   shownLm.forEach(marker);
   if(z>1.7)shownLm.forEach(l=>{if(z>=2.5&&(l.num===1||l.num===3||l.num===2||l.num===4)&&!store.caves)return;const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
@@ -964,9 +1092,9 @@ cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endP
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*0.0016),e.clientX-r.left,e.clientY-r.top);},{passive:false});
 $('zin').onclick=()=>zoomAt(1.5,cssW/2,cssH/2);$('zout').onclick=()=>zoomAt(1/1.5,cssW/2,cssH/2);$('zfit').onclick=()=>animateTo(fitView());
 
-function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind==='lm'),...pins,...(temp?[temp]:[]),...(store.kwik?places.filter(p=>p.kind==='kw'):[])];
+function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind==='lm'),...pins,...(temp?[temp]:[]),...(store.kwik&&V.s<2.9?places.filter(p=>p.kind==='kw'):[])];
   cand.forEach(p=>{const q=W2S(p.x,p.y);const oy=p.kind==='pin'||p.kind==='temp'?-12:0;const d=Math.hypot(q[0]-sx,q[1]+oy-sy);if(d<16&&d<bd){bd=d;best=p;}});return best;}
-function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);return;}
+function onTap(sx,sy){const kd=kwHitDoor(sx,sy);if(kd){openKeypad(kd.i,kd.w);return;}const h=hit(sx,sy);if(h){select(h,false);return;}
   const wx=(sx-V.x)/V.s,wy=(sy-V.y)/V.s;if(wx<0||wy<0||wx>D.W||wy>D.H)return;
   temp={id:'temp',kind:'temp',name:'Dropped pin',x:wx,y:wy,detail:''};select(temp,false);}
 
@@ -1161,10 +1289,10 @@ $('tmCancel').onclick=()=>{$('timeModal').hidden=true;};
 $('timeForm').onsubmit=e=>{e.preventDefault();store.start=$('mT').value||'15:15';store.day=$('mD').value;save();$('startT').value=store.start;$('timeModal').hidden=true;updateTraffic();recompute(false);draw();};
 $('timeModal').addEventListener('keydown',e=>{if(e.key==='Escape'){$('timeModal').hidden=true;}});
 $('timeModal').addEventListener('mousedown',e=>{if(e.target===$('timeModal'))$('timeModal').hidden=true;});
-if(location.hash==='#test')window.__hm={campusPaths:()=>CAMPUS_PATHS,places,computeRoute,analyse,store,E,setView:(sc,wx,wy)=>{V={s:sc,x:cssW/2-wx*sc,y:cssH/2-wy*sc,init:true};draw();}};
+if(location.hash==='#test')window.__hm={doorScreen:(i,w)=>{const d=kwDoor(i,w);return W2S(d[0],d[1]);},campusPaths:()=>CAMPUS_PATHS,places,computeRoute,analyse,store,E,setView:(sc,wx,wy)=>{V={s:sc,x:cssW/2-wx*sc,y:cssH/2-wy*sc,init:true};draw();}};
 
 ['gesturestart','gesturechange','gestureend'].forEach(t=>document.addEventListener(t,e=>e.preventDefault()));
-let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea'))e.preventDefault();lastTap=n;},{passive:false});
+let lastTap=0;document.addEventListener('touchend',e=>{const n=Date.now();if(n-lastTap<320&&!e.target.closest('input,select,textarea,button,.modal,.panel,.info'))e.preventDefault();lastTap=n;},{passive:false});
 document.addEventListener('touchmove',e=>{if(e.touches.length>1&&!e.target.closest('canvas'))e.preventDefault();},{passive:false});
 /* ---------- bottom sheet (phones): peek / half / full, drag the handle ---------- */
 let sheetState='peek';
