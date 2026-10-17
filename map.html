@@ -925,6 +925,7 @@ function drawCampus(){
 const KWIK_PINS={};   /* door key ("kw3:store") -> code. Left empty on purpose: no door has a valid code yet. */
 const KW_B={store:{w:12,h:7},annex:{w:6,h:5}};     /* the same two building shapes at every shop */
 const KW_LOT={w:30,h:22};
+const KW_S=.6,KW_Z=5.8;   /* shops are drawn at 60% size and only appear when zoomed well in */
 /* each template places the two buildings and the assets; [asset, x, y, rotation, option] in lot units */
 const KW_TEMPLATES=[
  {store:[-14,-10],annex:[8,-10],assets:[['canopy',-1,3],['pumps',-1,3],['parking',-13,9,0,4],['sign',13,8],['dumpster',12,-3],['counter',-8,-2.6]]},
@@ -940,10 +941,10 @@ const KW_SHOPS=[
 const KW_EXTRA={kiosk:['kiosk',10,-3],kiosk2:['kiosk',-3,9],payphone2:['payphone',-14,9]};
 const kwUnlocked=new Set();
 function kwLayout(i){const sh=KW_SHOPS[i%KW_SHOPS.length],t=KW_TEMPLATES[sh.t];const as=t.assets.slice();sh.add.forEach(k=>as.push(KW_EXTRA[k]));return{sh,t,as};}
-function kwToWorld(i,lx,ly){const k=D.kw[i],sh=KW_SHOPS[i%KW_SHOPS.length];return[k[0]+sh.fx*lx,k[1]+sh.fy*ly];}
-function kwDoor(i,which){const {t}=kwLayout(i),b=t[which],d=KW_B[which];return kwToWorld(i,b[0]+d.w/2,b[1]+d.h+.4);}
+function kwToWorld(i,lx,ly){const k=D.kw[i],sh=KW_SHOPS[i%KW_SHOPS.length];return[k[0]+sh.fx*lx*KW_S,k[1]+sh.fy*ly*KW_S];}
+function kwDoor(i,which){const {t}=kwLayout(i),b=t[which],d=KW_B[which];return kwToWorld(i,b[0]+d.w*.775,b[1]+d.h+.4);}
 function drawKwik(){
-  const z=V.s,a=Math.max(0,Math.min(1,(z-2.5)/1.0));if(a<=0||!D.kw)return;
+  const z=V.s,a=Math.max(0,Math.min(1,(z-KW_Z)/1.2));if(a<=0||!D.kw)return;
   const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
   const C=dark?{lot:'#3B4A66',curb:'#202B40',line:'#E8ECF5',bld:'#52618A',roof:'#2F3B58',pump:'#C0392B',pumpB:'#D5DEF2',canopy:'rgba(120,140,190,.45)',kiosk:'#B9782E',um:'#E8B34D',phone:'#3E6A8F',car:'#8E9BB8',dump:'#3C7E58',sign:'#F0C96A',fog1:'#0C1220',fog2:'#1D2740',ink:'#D5DEF2',shade:'rgba(0,0,0,.35)'}
     :{lot:'#D4CDB4',curb:'#9C927A',line:'#FFFFFF',bld:'#D6C4A4',roof:'#8F7A57',pump:'#C0392B',pumpB:'#F4EFE0',canopy:'rgba(200,60,50,.28)',kiosk:'#B9782E',um:'#E8B34D',phone:'#3E6A8F',car:'#9C927A',dump:'#6FA05C',sign:'#C0392B',fog1:'#1A2236',fog2:'#3A4663',ink:'#43391F',shade:'rgba(60,45,20,.22)'};
@@ -951,8 +952,8 @@ function drawKwik(){
   D.kw.forEach((k,i)=>{
     const q=W2S(k[0],k[1]);if(q[0]<-200||q[1]<-200||q[0]>cssW+200||q[1]>cssH+200)return;
     const {sh,t,as}=kwLayout(i);
-    ctx.save();ctx.translate(q[0],q[1]);ctx.scale(z*sh.fx,z*sh.fy);
-    const px=1/z;
+    ctx.save();ctx.translate(q[0],q[1]);ctx.scale(z*KW_S*sh.fx,z*KW_S*sh.fy);
+    const px=1/(z*KW_S);
     /* lot */
     ctx.beginPath();ctx.roundRect(-KW_LOT.w/2,-KW_LOT.h/2,KW_LOT.w,KW_LOT.h,1.2);ctx.fillStyle=C.lot;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px*1.2);ctx.strokeStyle=C.curb;ctx.stroke();
     /* assets under buildings */
@@ -960,22 +961,30 @@ function drawKwik(){
     /* buildings */
     ['store','annex'].forEach(w=>{const b=t[w],d=KW_B[w],key='kw'+(i+1)+':'+w,open=kwUnlocked.has(key);
       ctx.beginPath();ctx.roundRect(b[0]+.5,b[1]+.6,d.w,d.h,.5);ctx.fillStyle=C.shade;ctx.fill();
-      ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);
-      if(open){ctx.fillStyle=C.bld;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();ctx.lineWidth=.18;ctx.strokeStyle=C.roof;for(let r=1;r<3;r++){ctx.beginPath();ctx.moveTo(b[0]+1,b[1]+d.h*r/3);ctx.lineTo(b[0]+d.w-1,b[1]+d.h*r/3);ctx.stroke();}}
-      else{const g=ctx.createRadialGradient(b[0]+d.w/2,b[1]+d.h/2,.3,b[0]+d.w/2,b[1]+d.h/2,d.w*.62);g.addColorStop(0,C.fog2);g.addColorStop(1,C.fog1);ctx.fillStyle=g;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();
-        ctx.save();ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);ctx.clip();
-        for(let n=0;n<7;n++){const u=(i*13+n*29)%97/97,v=(i*7+n*17)%89/89;ctx.beginPath();ctx.ellipse(b[0]+u*d.w,b[1]+v*d.h,d.w*.22,d.h*.2,0,0,6.283);ctx.fillStyle='rgba(140,155,200,.16)';ctx.fill();}
+      /* the building itself: roof, with shelf and counter lines in the open front section */
+      ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);ctx.fillStyle=C.bld;ctx.fill();ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();
+      const fw=d.w*.55;ctx.lineWidth=.18;ctx.strokeStyle=C.roof;ctx.globalAlpha=a*.55;
+      for(let r=1;r<3;r++){ctx.beginPath();ctx.moveTo(b[0]+.8,b[1]+d.h*r/3);ctx.lineTo(b[0]+fw-.8,b[1]+d.h*r/3);ctx.stroke();}
+      ctx.globalAlpha=a;
+      /* the locked section: a fogged room that is part of the building */
+      const rx=b[0]+fw,rw=d.w-fw;
+      if(open){ctx.beginPath();ctx.rect(rx,b[1],rw,d.h);ctx.fillStyle=C.bld;ctx.fill();ctx.lineWidth=.18;ctx.strokeStyle=C.roof;ctx.globalAlpha=a*.55;ctx.beginPath();ctx.moveTo(rx+.8,b[1]+d.h/2);ctx.lineTo(rx+rw-.8,b[1]+d.h/2);ctx.stroke();ctx.globalAlpha=a;}
+      else{ctx.save();ctx.beginPath();ctx.roundRect(rx,b[1],rw,d.h,[0,.5,.5,0]);ctx.clip();
+        const g=ctx.createRadialGradient(rx+rw/2,b[1]+d.h/2,.2,rx+rw/2,b[1]+d.h/2,rw*.9);g.addColorStop(0,C.fog2);g.addColorStop(1,C.fog1);ctx.fillStyle=g;ctx.fillRect(rx,b[1],rw,d.h);
+        for(let n=0;n<5;n++){const u=(i*13+n*29)%97/97,v=(i*7+n*17)%89/89;ctx.beginPath();ctx.ellipse(rx+u*rw,b[1]+v*d.h,rw*.35,d.h*.22,0,0,6.283);ctx.fillStyle='rgba(150,165,210,.18)';ctx.fill();}
         ctx.restore();}
+      ctx.beginPath();ctx.moveTo(rx,b[1]);ctx.lineTo(rx,b[1]+d.h);ctx.lineWidth=Math.max(.5,1.8*px);ctx.strokeStyle=C.roof;ctx.stroke();
+      ctx.beginPath();ctx.roundRect(b[0],b[1],d.w,d.h,.5);ctx.lineWidth=Math.max(.5,1.4*px);ctx.strokeStyle=C.roof;ctx.stroke();
     });
     /* canopies and signs on top */
     as.forEach(A=>kwAsset(A,C,px,true));
     ctx.restore();
     /* doors, drawn unmirrored so the lock icon always reads */
     ['store','annex'].forEach(w=>{const key='kw'+(i+1)+':'+w,open=kwUnlocked.has(key),dw=kwDoor(i,w),dq=W2S(dw[0],dw[1]);
-      const r=Math.max(5,1.05*z);ctx.beginPath();ctx.roundRect(dq[0]-r*.8,dq[1]-r*.55,r*1.6,r*1.1,2);ctx.fillStyle=open?'#2F7D55':'#7A2A24';ctx.fill();ctx.lineWidth=1.6;ctx.strokeStyle=open?'#7CF0A8':'#E8B34D';ctx.stroke();
+      const r=Math.max(6,.62*z);ctx.beginPath();ctx.roundRect(dq[0]-r*.8,dq[1]-r*.55,r*1.6,r*1.1,2);ctx.fillStyle=open?'#2F7D55':'#7A2A24';ctx.fill();ctx.lineWidth=1.6;ctx.strokeStyle=open?'#7CF0A8':'#E8B34D';ctx.stroke();
       /* padlock */
       ctx.fillStyle='#F0C96A';const lw=r*.55,lh=r*.4;ctx.fillRect(dq[0]-lw/2,dq[1]-lh*.1,lw,lh);ctx.beginPath();ctx.arc(dq[0],dq[1]-lh*.1,lw*.32,Math.PI,0);ctx.lineWidth=Math.max(1,r*.12);ctx.strokeStyle='#F0C96A';ctx.stroke();});
-    if(z>=4.6)halo('Kwik Shop '+(i+1),q[0],q[1]+(KW_LOT.h/2+2)*z,'700 '+Math.max(11,Math.min(15,2.1*z))+'px IBM Plex Sans,system-ui,sans-serif',C.ink);
+    if(z>=KW_Z+1.6)halo('Kwik Shop '+(i+1),q[0],q[1]+(KW_LOT.h/2*KW_S+1.4)*z,'700 '+Math.max(11,Math.min(15,2.1*z))+'px IBM Plex Sans,system-ui,sans-serif',C.ink);
   });
   ctx.restore();
 }
@@ -994,8 +1003,8 @@ function kwAsset(A,C,px,top){
   ctx.restore();
 }
 function kwHitDoor(sx,sy){
-  if(V.s<3.1||!D.kw)return null;
-  for(let i=0;i<D.kw.length;i++){for(const w of ['store','annex']){const d=kwDoor(i,w),q=W2S(d[0],d[1]);if(Math.hypot(q[0]-sx,q[1]-sy)<=Math.max(16,1.7*V.s))return{i,w};}}
+  if(V.s<KW_Z+.5||!D.kw)return null;
+  for(let i=0;i<D.kw.length;i++){for(const w of ['store','annex']){const d=kwDoor(i,w),q=W2S(d[0],d[1]);if(Math.hypot(q[0]-sx,q[1]-sy)<=Math.max(18,1.2*V.s))return{i,w};}}
   return null;
 }
 /* keypad */
@@ -1044,7 +1053,7 @@ function draw(){
   if(store.wealth)drawWealthLabels();
   if(store.caves)drawCaves();
   drawRoute();
-  if(store.kwik&&!store.caves&&z<2.9)places.filter(p=>p.kind==='kw').forEach(marker);
+  if(store.kwik&&!store.caves&&z<KW_Z)places.filter(p=>p.kind==='kw').forEach(marker);
   const shownLm=places.filter(p=>p.kind==='lm'&&(!store.caves||(p.num===9&&store.level!==2)));
   shownLm.forEach(marker);
   if(z>1.7)shownLm.forEach(l=>{if(z>=2.5&&(l.num===1||l.num===3||l.num===2||l.num===4)&&!store.caves)return;const q=W2S(l.x,l.y);halo(l.name,q[0],q[1]+19,'500 12px IBM Plex Sans,system-ui,sans-serif',colors.label);});
@@ -1092,7 +1101,7 @@ cv.addEventListener('pointerup',endPtr);cv.addEventListener('pointercancel',endP
 cv.addEventListener('wheel',e=>{e.preventDefault();const r=cv.getBoundingClientRect();zoomAt(Math.exp(-e.deltaY*0.0016),e.clientX-r.left,e.clientY-r.top);},{passive:false});
 $('zin').onclick=()=>zoomAt(1.5,cssW/2,cssH/2);$('zout').onclick=()=>zoomAt(1/1.5,cssW/2,cssH/2);$('zfit').onclick=()=>animateTo(fitView());
 
-function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind==='lm'),...pins,...(temp?[temp]:[]),...(store.kwik&&V.s<2.9?places.filter(p=>p.kind==='kw'):[])];
+function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind==='lm'),...pins,...(temp?[temp]:[]),...(store.kwik&&V.s<KW_Z?places.filter(p=>p.kind==='kw'):[])];
   cand.forEach(p=>{const q=W2S(p.x,p.y);const oy=p.kind==='pin'||p.kind==='temp'?-12:0;const d=Math.hypot(q[0]-sx,q[1]+oy-sy);if(d<16&&d<bd){bd=d;best=p;}});return best;}
 function onTap(sx,sy){const kd=kwHitDoor(sx,sy);if(kd){openKeypad(kd.i,kd.w);return;}const h=hit(sx,sy);if(h){select(h,false);return;}
   const wx=(sx-V.x)/V.s,wy=(sy-V.y)/V.s;if(wx<0||wy<0||wx>D.W||wy>D.H)return;
