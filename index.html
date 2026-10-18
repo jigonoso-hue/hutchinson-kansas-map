@@ -109,6 +109,8 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .calinfo b{display:block;font:700 12px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-dk);margin-bottom:6px}
 .calinfo strong{font-size:17px;color:var(--navy)}
 /* glitch effect: Sept 25 date cell and the Incursion Day banner */
+.mon td button .gbar{display:none}
+.mon td button.gl .gbar{display:block}
 .mon td button.gl,.calinfo.glitch{--c:#19e0e6;--r:#ff2433;--bg:#d9ecec;--ink:#031416}
 .mon td button.gl{position:relative;display:flex;align-items:center;justify-content:center;overflow:visible;color:var(--ink);font-weight:800;background:repeating-linear-gradient(0deg,rgba(25,224,230,.55) 0 1px,transparent 1px 3px),var(--bg);box-shadow:inset 0 0 0 1px rgba(3,20,22,.25)}
 .mon td button.gl::before,.mon td button.gl::after,.calinfo.glitch strong::before,.calinfo.glitch strong::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;mix-blend-mode:multiply;pointer-events:none}
@@ -527,7 +529,7 @@ for(let i=0;i<9;i++){const y=i<4?2004:2005,m=(8+i)%12;
  for(let c=0;c<first;c++)t+="<td></td>";
  for(let d=1;d<=days;d++){const k=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"),e=M[k],dow=(first+d-1)%7;
   let cls=e?e[2]:"";if(!e&&(dow===0||dow===6))cls="we";
-  t+="<td class='"+cls+"'>"+(e?"<button type='button' data-k='"+k+"'"+(k==="2004-09-25"?" class='gl' data-t='"+d+"'":"")+" aria-label='"+names[m]+" "+d+": "+e[1].replace(/'/g,"&#39;")+"'>"+d+(k==="2004-09-25"?CELL:"")+"</button>":"<span>"+d+"</span>")+"</td>";
+  t+="<td class='"+cls+"'>"+(e?"<button type='button' data-k='"+k+"'"+(k==="2004-09-25"?" data-t='"+d+"'":"")+" aria-label='"+names[m]+" "+d+": "+e[1].replace(/'/g,"&#39;")+"'>"+d+(k==="2004-09-25"?CELL:"")+"</button>":"<span>"+d+"</span>")+"</td>";
   if(dow===6&&d<days)t+="</tr><tr>"}
  html+=t+"</tr></table></div>"}
 box.innerHTML=html;
@@ -535,7 +537,7 @@ const info=document.getElementById("calinfo");
 let stage=0;
 box.addEventListener("click",ev=>{const b=ev.target.closest("button[data-k]");if(!b)return;
  const k=b.dataset.k,again=b.classList.contains("sel");
- box.querySelectorAll("button.sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");
+ box.querySelectorAll("button.sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");box.querySelectorAll("button.gl").forEach(x=>x.classList.remove("gl"));if(b.dataset.k==="2004-09-25")b.classList.add("gl");
  const e=M[k],d=new Date(k+"T12:00"),hot=k==="2004-09-25";
  stage=hot&&again?1-stage:0;
  info.classList.toggle("glitch",hot&&stage===1);
