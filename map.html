@@ -1007,10 +1007,16 @@ const GOLF_HOLES=HSPEC.map((sp,idx)=>{
 /* cart paths and club sidewalks, kept as data for future walking routes */
 const GOLF_PATHS=(()=>{const N=[],E=[],add=(p)=>{N.push(p);return N.length-1;};
   const gateN=add([1199,460]),gateS=add([1199,556]);
-  const A=[],B=[],M=[];GOLF_HOLES.forEach(h=>{const f=h.fw,m=f[17];A.push(add([h.tee[0]+h.w/2*.58+1.8,h.tee[1]]));M.push(add([m[0]+m[2]+1.8,m[1]]));const g=f[f.length-1];B.push(add([h.green[0]+h.gs+1.5,h.green[1]]));});
-  GOLF_HOLES.forEach((h,i)=>{E.push([A[i],M[i]],[M[i],B[i]]);if(i<17&&i!==8)E.push([B[i],A[i+1]]);});
-  const m1=add([1301,452]),m2=add([1199,452]);E.push([B[8],m1],[m1,m2],[m2,gateN]);
-  const m3=add([1199,564]);E.push([gateS,m3],[m3,A[9]]);
+  /* cart roads: a road along each strip boundary, joined by a road along the top and bottom of each nine */
+  const nine=(x0,w,yTop,yBot,extraBot,extraTop)=>{const cols=[];for(let j=0;j<=9;j++)cols.push(x0+w*j);
+    const topX=cols.slice(),botX=cols.slice();if(extraTop!=null)topX.push(extraTop);if(extraBot!=null)botX.push(extraBot);topX.sort((p,q)=>p-q);botX.sort((p,q)=>p-q);
+    const top=topX.map(x=>add([x,yTop])),bot=botX.map(x=>add([x,yBot]));
+    for(let i=0;i<top.length-1;i++)E.push([top[i],top[i+1]]);for(let i=0;i<bot.length-1;i++)E.push([bot[i],bot[i+1]]);
+    cols.forEach(x=>E.push([top[topX.indexOf(x)],bot[botX.indexOf(x)]]));
+    return{top,bot,topX,botX};};
+  const nN=nine(1150,17,353.5,454,1199,null),nS=nine(1150,18.5,561.5,658,null,1199);
+  E.push([gateN,nN.bot[nN.botX.indexOf(1199)]]);E.push([gateS,nS.top[nS.topX.indexOf(1199)]]);
+  GOLF_HOLES.forEach((h,i)=>{h.road=h.x+(h.b==='N'?8.5:9.25);});
   const cA=add([1149,461]),cB=add([1253,461]),cC=add([1253,555]),cD=add([1149,555]),st1=add([1149,529]),st2=add([1253,529]),circ=add([1199,476]),hub=add([1199,495]),pk=add([1199,505]),st3=add([1199,529]),pool=add([1172,470]),ten=add([1226,470]),prac=add([1176,490]),barn=add([1241,486]),ball=add([1229,495]);
   E.push([cA,gateN],[gateN,cB],[cB,st2],[st2,cC],[cC,gateS],[gateS,cD],[cD,st1],[st1,cA],[st1,st3],[st3,st2],[gateN,circ],[circ,hub],[hub,pk],[pk,st3],[st3,gateS],[circ,pool],[circ,ten],[hub,prac],[hub,ball],[ball,barn]);
   return{nodes:N,edges:E};})();
