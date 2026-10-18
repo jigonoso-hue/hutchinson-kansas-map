@@ -84,6 +84,25 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .av{width:34px;height:34px;background:#fff;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;font-weight:800;flex:none}
 /* documents */
 .docs{padding:54px 0 20px}
+.when{display:block;margin:14px 16px -2px;font:700 12px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#8a6a00}
+.cal{padding:54px 0 20px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 18px;font-size:13px;color:#444}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.mon{border:1px solid var(--line);border-top:4px solid var(--blue);background:#fff;padding:12px 12px 10px;border-radius:3px}
+.mon h3{font:700 16px/1 "Playfair Display",Georgia,serif;margin:0 0 8px;color:var(--navy)}
+.mon table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px;text-align:center}
+.mon th{font-weight:600;color:var(--muted);font-size:11px;padding-bottom:4px}
+.mon td{height:32px;padding:1px}
+.mon td span{display:block;line-height:30px;border-radius:4px;color:var(--ink)}
+.mon td.we span{color:#aaa}
+.mon td.off span{background:#f4d9d9;color:#8a1f1f;font-weight:600}
+.mon td.ev span{background:var(--gold);color:#000;font-weight:700}
+.mon td.mile span{background:var(--navy);color:#fff;font-weight:700}
+.mon td.today span{outline:2px solid var(--blue)}
+.cal-list{margin:26px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px 28px}
+.cal-list li{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
+.cal-list b{min-width:92px;color:var(--blue-dk);font-weight:700}
 .docgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px}
 .doc{text-decoration:none;border:1px solid var(--line);border-top:4px solid var(--gold);background:#fff;padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;font:inherit;color:inherit;cursor:pointer;border-radius:3px}
 .doc:hover{box-shadow:0 6px 18px rgba(0,60,110,.18)}
@@ -211,7 +230,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
 <header class="top">
   <nav class="util" aria-label="Quick links">
-    <a href="map.html">Town Map</a><a href="#documents">Student Documents</a><a href="#cliques">The Crowds</a><a href="#landmarks">Around Town</a>
+    <a href="map.html">Town Map</a><a href="#calendar">Calendar</a><a href="#documents">Student Documents</a><a href="#cliques">The Crowds</a><a href="#landmarks">Around Town</a>
   </nav>
   <div class="head">
     <a class="brand" href="index.html" aria-label="Hutchinson High School home">
@@ -238,6 +257,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
     <a href="pdfs/Hutchinson_Class_of_2005.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M8 14l16 12 16-12"/><rect x="6" y="10" width="36" height="28" rx="2"/></svg>Welcome letter</a>
     <a href="pdfs/Hutchinson_Clique_Brochure.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M6 10h16v28H6zM26 10h16v28H26z"/><path d="M12 18h6M12 24h6M32 18h6M32 24h6"/></svg>Clique brochure</a>
     <a href="#cliques"><svg viewBox="0 0 48 48"><circle cx="16" cy="16" r="6"/><circle cx="34" cy="18" r="5"/><path d="M4 40c0-9 6-14 12-14s12 5 12 14M28 40c0-7 4-11 9-11s8 4 8 11"/></svg>The crowds</a>
+    <a href="#calendar"><svg viewBox="0 0 48 48"><rect x="6" y="10" width="36" height="32" rx="2"/><path d="M6 20h36M16 6v8M32 6v8M14 28h4M22 28h4M30 28h4M14 35h4M22 35h4"/></svg>Calendar</a>
     <a href="map.html"><svg viewBox="0 0 48 48"><path d="M6 12l12-4 12 4 12-4v28l-12 4-12-4-12 4z"/><path d="M18 8v28M30 12v28"/></svg>Town map</a>
     <a href="pdfs/Hutchinson_Academic_Check.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><rect x="8" y="6" width="32" height="36" rx="2"/><path d="M15 16h18M15 24h18"/><path d="M16 36l4 4 8-9" /></svg>Grades</a>
     <a href="pdfs/Hutchinson_Clique_Leaders_Player_Guide.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 48 48"><path d="M24 6l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z"/></svg>Clique leaders</a>
@@ -248,10 +268,11 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <div>
         <h2 class="sec">News</h2>
         <div class="cards">
-          <a class="card" href="map.html#lm2"><div class="pic">Homecoming<img src="assets/mascot.png" alt=""></div><h3>Do not miss Homecoming</h3><p>The band will be warming up and Student Council has big plans for the gym. Plan to come early, stay late, and help stack chairs when it is over.</p></a>
-          <a class="card" href="#documents"><div class="pic" style="background:linear-gradient(135deg,#1c2a4a,#3b2a3f 60%,#c79a36);color:#fff">St. Louis<img src="assets/mascot.png" alt=""></div><h3>Senior trip to St. Louis</h3><p>In the spring, the Class of 2005 will board the buses for St. Louis. The Gateway Arch will be waiting on the riverbank, a curve of silver steel that looks less like a monument than a door. Chaperones will ask everyone to stay with their group and count heads twice. The seniors will ride to the top, look west over the river, and wonder what the road ahead holds. Some doors only open once. Pack warm, and plan to walk through it together.</p></a>
-          <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#1f5a3a,#0b2a1c)">Theatre Dept. &middot; Winter<img src="assets/mascot.png" alt=""></div><h3>Winter show: Brigadoon</h3><p>By Staff Reporter. This winter the theatre department will stage Brigadoon, the story of a Scottish village that is on no map and wakes for just one day every hundred years. Two lost travelers will stumble into it, and one of them will have to decide whether love is worth the world he left behind. Expect a story about hidden places, belonging, and what you owe the people who stay.</p></a>
-          <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#3a2a5a,#150f2a)">Theatre Dept. &middot; Spring<img src="assets/mascot.png" alt=""></div><h3>Spring show: Into the Woods</h3><p>By Staff Reporter. This spring the theatre department will take on Into the Woods. A baker and his wife will head into the forest to lift a curse, and half the fairy tale cast will wander in after wishes of their own. The first act will be bright and funny. The second will show what the wishes cost, and the room will likely go quiet. Expect a story about what we go looking for, and the promise that nobody walks out of the woods alone.</p></a>
+          <a class="card" href="#calendar"><div class="pic" style="background:linear-gradient(135deg,#2a3f5a,#14284b)">Career Day<img src="assets/mascot.png" alt=""></div><span class="when">Thursday, October 14</span><h3>Career Day is the day before Homecoming</h3><p>Guest speakers from around Reno County will fill the gym and the hallways. Seniors will rotate through short sessions, ask real questions, and find out what comes after June. Dress nicely, and plan to be back the next day for Homecoming.</p></a>
+          <a class="card" href="map.html#lm2"><div class="pic">Homecoming<img src="assets/mascot.png" alt=""></div><span class="when">Friday, October 15</span><h3>Do not miss Homecoming</h3><p>The band will be warming up and Student Council has big plans for the gym. Plan to come early, stay late, and help stack chairs when it is over.</p></a>
+          <a class="card" href="#documents"><div class="pic" style="background:linear-gradient(135deg,#1c2a4a,#3b2a3f 60%,#c79a36);color:#fff">St. Louis<img src="assets/mascot.png" alt=""></div><span class="when">Friday, April 8</span><h3>Senior trip to St. Louis</h3><p>In the spring, the Class of 2005 will board the buses for St. Louis. The Gateway Arch will be waiting on the riverbank, a curve of silver steel that looks less like a monument than a door. Chaperones will ask everyone to stay with their group and count heads twice. The seniors will ride to the top, look west over the river, and wonder what the road ahead holds. Some doors only open once. Pack warm, and plan to walk through it together.</p></a>
+          <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#1f5a3a,#0b2a1c)">Theatre Dept. &middot; Winter<img src="assets/mascot.png" alt=""></div><span class="when">January 28 &amp; 29</span><h3>Winter show: Brigadoon</h3><p>By Staff Reporter. This winter the theatre department will stage Brigadoon, the story of a Scottish village that is on no map and wakes for just one day every hundred years. Two lost travelers will stumble into it, and one of them will have to decide whether love is worth the world he left behind. Expect a story about hidden places, belonging, and what you owe the people who stay.</p></a>
+          <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#3a2a5a,#150f2a)">Theatre Dept. &middot; Spring<img src="assets/mascot.png" alt=""></div><span class="when">April 22 &amp; 23</span><h3>Spring show: Into the Woods</h3><p>By Staff Reporter. This spring the theatre department will take on Into the Woods. A baker and his wife will head into the forest to lift a curse, and half the fairy tale cast will wander in after wishes of their own. The first act will be bright and funny. The second will show what the wishes cost, and the room will likely go quiet. Expect a story about what we go looking for, and the promise that nobody walks out of the woods alone.</p></a>
         </div>
         <h2 class="sec" style="font-size:22px;margin-top:38px">More headlines</h2>
         <div class="heads" style="margin-top:0">
@@ -297,6 +318,14 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
     <p style="margin-top:-8px;max-width:46em">Handouts for the Class of 2005. Each one opens as a PDF in a new tab.</p>
     <div class="docgrid" id="docgrid"></div>
     <p class="note" id="docnote"></p>
+  </section>
+
+  <section class="cal wrap" id="calendar" aria-labelledby="calh">
+    <h2 class="sec" id="calh">School calendar 2004&ndash;05</h2>
+    <p style="margin-top:-8px;max-width:46em">First bell is Wednesday, August 18. Breaks and holidays are marked in red, and school events in gold.</p>
+    <div class="legend"><span><i style="background:#f4d9d9"></i>No school</span><span><i style="background:var(--gold)"></i>Event</span><span><i style="background:var(--navy)"></i>Big day</span></div>
+    <div class="months" id="months"></div>
+    <ul class="cal-list" id="callist"></ul>
   </section>
 
   <section class="wrap" id="landmarks" style="padding-top:34px" aria-labelledby="lh">
@@ -386,12 +415,63 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
 })();
 </script>
 
+<script>
+/* School calendar. type: off = no school, ev = event, mile = big day. To add one: add a line here. */
+(function(){
+const R=(a,b)=>{const o=[];for(let d=a;d<=b;d++)o.push(d);return o};
+const EV=[
+ ["2004-08-18","First day of school","mile"],
+ ["2004-09-06","Labor Day, no school","off"],
+ ["2004-10-14","Career Day","ev"],
+ ["2004-10-15","Homecoming game and crowning","mile"],
+ ["2004-10-16","Homecoming dance","ev"],
+ ["2004-11-02","Election Day, staff in-service, no school","off"],
+ ["2004-11-24","Thanksgiving break, Nov 24 to 26","off"],["2004-11-25","Thanksgiving break","off"],["2004-11-26","Thanksgiving break","off"],
+ ["2004-12-10","Battle of the Bands","ev"],
+ ["2004-12-17","Last day before winter break, end of first semester","mile"],
+ ["2005-01-03","Classes resume","mile"],
+ ["2005-01-17","Martin Luther King Jr. Day, no school","off"],
+ ["2005-01-28","Brigadoon, opening night","ev"],["2005-01-29","Brigadoon, final night","ev"],
+ ["2005-02-21","Presidents Day, no school","off"],
+ ["2005-03-25","Good Friday, no school","off"],
+ ["2005-04-08","Senior trip to St. Louis","mile"],
+ ["2005-04-22","Into the Woods, opening night","ev"],["2005-04-23","Into the Woods, final night","ev"],
+ ["2005-04-30","Prom","ev"],
+ ["2005-05-15","Graduation","mile"],
+ ["2005-05-20","Last day of school","mile"],
+ ["2005-05-30","Memorial Day","off"]];
+/* ranges of no-school days (inclusive) */
+[["2004-12-20","2005-01-02","Winter break"],["2005-03-14","2005-03-18","Spring break"]].forEach(([a,b,n])=>{
+ for(let t=new Date(a+"T12:00");t<=new Date(b+"T12:00");t.setDate(t.getDate()+1)){const k=t.toISOString().slice(0,10);if(!EV.some(e=>e[0]===k))EV.push([k,n,"off"])}});
+const M={};EV.forEach(e=>M[e[0]]=e);
+const names=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const box=document.getElementById("months");let html="";
+for(let i=0;i<10;i++){const y=i<5?2004:2005,m=(7+i)%12;
+ const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+ let t="<div class='mon'><h3>"+names[m]+" "+y+"</h3><table><tr>"+wd.map(d=>"<th>"+d[0]+"</th>").join("")+"</tr><tr>";
+ for(let c=0;c<first;c++)t+="<td></td>";
+ for(let d=1;d<=days;d++){const k=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"),e=M[k],dow=(first+d-1)%7;
+  let cls=e?e[2]:"";if(!e&&(dow===0||dow===6))cls="we";
+  t+="<td class='"+cls+"'><span"+(e?" title='"+e[1].replace(/'/g,"&#39;")+"'":"")+">"+d+"</span></td>";
+  if(dow===6&&d<days)t+="</tr><tr>"}
+ html+=t+"</tr></table></div>"}
+box.innerHTML=html;
+/* skip the range fillers in the list, keep one line per break */
+const L=[];EV.sort((a,b)=>a[0]<b[0]?-1:1).forEach(e=>{
+ if(/break$/.test(e[1])&&/Winter|Spring/.test(e[1])){if(L.some(x=>x[1]===e[1]))return;
+  L.push(e);return}L.push(e)});
+const fmt=k=>{const d=new Date(k+"T12:00");return wd[d.getDay()]+", "+names[d.getMonth()].slice(0,3)+" "+d.getDate()};
+document.getElementById("callist").innerHTML=L.filter(e=>e[1]!=="Thanksgiving break").map(e=>"<li><b>"+fmt(e[0])+"</b><span>"+(e[1]==="Winter break"?"Winter break, Dec 20 to Jan 2":e[1]==="Spring break"?"Spring break, Mar 14 to 18":e[1])+"</span></li>").join("");
+})();
+</script>
+
 <div class="mp" id="mp">
   <div class="mp-info" id="mpInfo" hidden role="dialog" aria-label="About the music">
     <button class="x" id="mpX" type="button" aria-label="Close">&times;</button>
-    <span class="tag">Coming in December</span>
+    <span class="tag">Friday, December 10</span>
     <h3>Battle of the Bands</h3>
-    <p>The annual <b>Battle of the Bands</b> is set for December, in the Hutchinson High gym. Sign-ups open soon. Ask around in the band room.</p>
+    <p>The annual <b>Battle of the Bands</b> is set for Friday, December 10, in the Hutchinson High gym. Sign-ups open soon. Ask around in the band room.</p>
   </div>
   <div class="mp-bar">
     <button class="mp-play" id="mpPlay" type="button" aria-label="Play music"><svg id="mpIc" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>
