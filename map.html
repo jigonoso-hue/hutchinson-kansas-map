@@ -417,6 +417,11 @@ const ZONE_DRAW=[];
   const sl=add([1259.5,561.5]);ze.push([le[3],sl],[sl,st]);
   const cA=add([1149,461]),cB=add([1253,461]),cC=add([1253,555]),cD=add([1149,555]),st1=add([1149,529]),st2=add([1253,529]),circ=add([1199,476]),hub=add([1199,495]),pk=add([1199,505]),st3=add([1199,529]);
   ze.push([cA,gateN],[gateN,cB],[cB,gateE],[gateE,st2],[st2,cC],[cC,gateS],[gateS,cD],[cD,st1],[st1,cA],[st1,st3],[st3,st2],[gateN,circ],[circ,hub],[hub,pk],[pk,st3],[st3,gateS]);
+  /* more junctions so the sections, the club and the outside roads join cleanly at several points */
+  ze.push([ln[3],cA],[cB,le[0]],[cD,ls[0]],[cC,le[3]],[ln[2],le[1]],[le[2],ls[1]]);
+  const loopCorners=[...ln,...ls,...le];
+  const outerLinks=[];
+  loopCorners.forEach(ci=>{const P=zn[ci];let best=null;D.nodes.forEach((n,i)=>{if(inZ(n)||!D.edges.some(e=>e[0]===i||e[1]===i))return;const d=Math.hypot(n[0]-P[0],n[1]-P[1]);if(d<75&&(!best||d<best.d))best={d,i};});if(best)outerLinks.push([best.i,ci]);});
   /* tie every old road that used to enter the zone to the nearest point of the new network */
   const conn=[];
   entry.forEach(ni=>{const P=D.nodes[ni];let best=null;
@@ -428,6 +433,7 @@ const ZONE_DRAW=[];
   const push=(a,b)=>{const A=D.nodes[a],B=D.nodes[b];D.edges.push([a,b,0,[A[0],A[1],B[0],B[1]]]);ZONE_DRAW.push([[A[0],A[1]],[B[0],B[1]]]);};
   ze.forEach(e=>push(base+e[0],base+e[1]));
   conn.forEach(c=>push(c[0],base+c[1]));
+  outerLinks.forEach(c=>push(c[0],base+c[1]));
 })();
 
 /* ---------- road graph ---------- */
