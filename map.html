@@ -1049,7 +1049,7 @@ function golfTrees(){
   GOLF_TREES=T;return T;
 }
 function drawGolf(){
-  const z=V.s,a=Math.max(0,Math.min(1,(z-1.9)/1.1));if(a<=0)return;
+  const z=V.s,a=Math.max(0,Math.min(1,(z-.2)/.3));if(a<=0)return;  /* the course shows at every zoom level */
   const X=(x,y)=>W2S(x,y),R=(x0,y0,x1,y1)=>{const p=X(x0,y0),q=X(x1,y1);return[Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.abs(q[0]-p[0]),Math.abs(q[1]-p[1])];};
   const dark=document.documentElement.dataset.theme==='dark'||(!document.documentElement.dataset.theme&&matchMedia('(prefers-color-scheme: dark)').matches);
   const C=dark?{rough:'#264636',cut:'#2F5A44',fw:'#3A6B51',green:'#53936B',fringe:'#41795A',tee:'#3F7A58',sand:'#A39367',water:'#3F6F96',lawn:'#2D5240',lawn2:'#27493A',bldg:'#52618A',bldg2:'#63749D',roof:'#2F3B58',lot:'#3B4A66',line:'#E8ECF5',tree:'#2F6B4A',tree2:'#3C7E58',walk:'#8E9BB8',walkE:'#202B40',ink:'#D5DEF2',shade:'rgba(0,0,0,.35)',flag:'#F0C96A',court:'#3E6A8F',pool:'#4F86C6',wood:'#8A6A48',hedge:'#1F4A38',gold:'#F0C96A'}
@@ -1149,7 +1149,7 @@ function drawGolf(){
 }
 /* the real roads and water go back on top of the close-ups, so they always line up with the base map */
 function drawRealRoads(){
-  const z=V.s,a=Math.max(0,Math.min(1,(z-1.9)/1.1));if(a<=0)return;
+  const z=V.s,a=Math.max(0,Math.min(1,(z-.2)/.3));if(a<=0)return;
   ctx.save();ctx.globalAlpha=a;
   poly(D.water,true);ctx.fillStyle=colors.water;ctx.fill('evenodd');ctx.lineWidth=.8;ctx.strokeStyle=colors['water-edge'];ctx.stroke();
   const wmaj=Math.max(2.8,Math.min(10,6.5*z)),whw=Math.max(5,Math.min(14,10.5*z));
