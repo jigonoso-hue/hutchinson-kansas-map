@@ -99,7 +99,15 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .mon td.off span{background:#f4d9d9;color:#8a1f1f;font-weight:600}
 .mon td.ev span{background:var(--gold);color:#000;font-weight:700}
 .mon td.mile span{background:var(--navy);color:#fff;font-weight:700}
-.mon td.today span{outline:2px solid var(--blue)}
+.mon td button{display:block;width:100%;font:inherit;line-height:30px;border:0;border-radius:4px;cursor:pointer;padding:0;background:inherit;color:inherit}
+.mon td.off button{background:#f4d9d9;color:#8a1f1f;font-weight:600}
+.mon td.ev button{background:var(--gold);color:#000;font-weight:700}
+.mon td.mile button{background:var(--navy);color:#fff;font-weight:700}
+.mon td button:hover{filter:brightness(.92)}
+.mon td button.sel{outline:2px solid var(--blue);outline-offset:1px}
+.calinfo{margin:0 0 18px;padding:12px 16px;border-left:4px solid var(--gold);background:var(--ice);font-size:15px;min-height:48px}
+.calinfo b{display:block;font:700 12px/1 Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-dk);margin-bottom:6px}
+.calinfo strong{font-size:17px;color:var(--navy)}
 .cal-list{margin:26px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px 28px}
 .cal-list li{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:15px}
 .cal-list b{min-width:92px;color:var(--blue-dk);font-weight:700}
@@ -324,6 +332,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
     <h2 class="sec" id="calh">School calendar 2004&ndash;05</h2>
     <p style="margin-top:-8px;max-width:46em">First bell is Tuesday, September 7, right after Labor Day. Breaks and holidays are marked in red, and school events in gold.</p>
     <div class="legend"><span><i style="background:#f4d9d9"></i>No school</span><span><i style="background:var(--gold)"></i>Event</span><span><i style="background:var(--navy)"></i>Big day</span></div>
+    <div class="calinfo" id="calinfo" aria-live="polite">Tap any colored date to see what it is.</div>
     <div class="months" id="months"></div>
     <ul class="cal-list" id="callist"></ul>
   </section>
@@ -443,6 +452,31 @@ const EV=[
 /* ranges of no-school days (inclusive) */
 [["2004-12-20","2005-01-02","Winter break"],["2005-03-14","2005-03-18","Spring break"]].forEach(([a,b,n])=>{
  for(let t=new Date(a+"T12:00");t<=new Date(b+"T12:00");t.setDate(t.getDate()+1)){const k=t.toISOString().slice(0,10);if(!EV.some(e=>e[0]===k))EV.push([k,n,"off"])}});
+const DESC={
+ "2004-09-06":"Labor Day. Classes are out for the holiday, the last easy day before the year starts.",
+ "2004-09-07":"First bell for the Class of 2005. Senior year starts today.",
+ "2004-09-23":"Career Day. Guest speakers from around Reno County fill the gym and hallways, and seniors rotate through short sessions.",
+ "2004-09-24":"Homecoming. The pep rally, the game at Gowans Stadium and the crowning, with the band warming up and Student Council in charge of the gym.",
+ "2004-09-25":"The Homecoming dance in the gym.",
+ "2004-11-02":"Election Day. Staff in-service, so no classes.",
+ "2004-11-24":"Thanksgiving break. No school Wednesday through Friday.",
+ "2004-11-25":"Thanksgiving break. No school.","2004-11-26":"Thanksgiving break. No school.",
+ "2004-12-10":"The annual Battle of the Bands in the Hutchinson High gym. Ask around in the band room.",
+ "2004-12-17":"The last day before winter break, and the end of the first semester.",
+ "2005-01-03":"Classes resume after winter break.",
+ "2005-01-17":"Martin Luther King Jr. Day. No school.",
+ "2005-01-28":"Opening night of Brigadoon, the theatre department's winter show.",
+ "2005-01-29":"Final night of Brigadoon.",
+ "2005-02-21":"Presidents Day. No school.",
+ "2005-03-25":"Good Friday. No school.",
+ "2005-04-08":"The senior trip to St. Louis. The buses leave early, and the Gateway Arch is the main stop.",
+ "2005-04-22":"Opening night of Into the Woods, the theatre department's spring show.",
+ "2005-04-23":"Final night of Into the Woods.",
+ "2005-04-30":"Prom.",
+ "2005-05-15":"Graduation for the Class of 2005.",
+ "2005-05-20":"The last day of school for underclassmen.",
+ "2005-05-30":"Memorial Day. No school."};
+const rangeDesc={"Winter break":"Winter break. No school from December 20 through January 2.","Spring break":"Spring break. No school from March 14 through March 18."};
 const M={};EV.forEach(e=>M[e[0]]=e);
 const names=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -453,10 +487,15 @@ for(let i=0;i<9;i++){const y=i<4?2004:2005,m=(8+i)%12;
  for(let c=0;c<first;c++)t+="<td></td>";
  for(let d=1;d<=days;d++){const k=y+"-"+String(m+1).padStart(2,"0")+"-"+String(d).padStart(2,"0"),e=M[k],dow=(first+d-1)%7;
   let cls=e?e[2]:"";if(!e&&(dow===0||dow===6))cls="we";
-  t+="<td class='"+cls+"'><span"+(e?" title='"+e[1].replace(/'/g,"&#39;")+"'":"")+">"+d+"</span></td>";
+  t+="<td class='"+cls+"'>"+(e?"<button type='button' data-k='"+k+"' aria-label='"+names[m]+" "+d+": "+e[1].replace(/'/g,"&#39;")+"'>"+d+"</button>":"<span>"+d+"</span>")+"</td>";
   if(dow===6&&d<days)t+="</tr><tr>"}
  html+=t+"</tr></table></div>"}
 box.innerHTML=html;
+const info=document.getElementById("calinfo");
+box.addEventListener("click",ev=>{const b=ev.target.closest("button[data-k]");if(!b)return;
+ box.querySelectorAll("button.sel").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");
+ const e=M[b.dataset.k],d=new Date(b.dataset.k+"T12:00");
+ info.innerHTML="<b>"+wd[d.getDay()]+", "+names[d.getMonth()]+" "+d.getDate()+", "+d.getFullYear()+"</b><strong>"+(rangeDesc[e[1]]?e[1]:e[1].replace(/, no school$/,""))+"</strong><br>"+(DESC[b.dataset.k]||rangeDesc[e[1]]||"")});
 /* skip the range fillers in the list, keep one line per break */
 const L=[];EV.sort((a,b)=>a[0]<b[0]?-1:1).forEach(e=>{
  if(/break$/.test(e[1])&&/Winter|Spring/.test(e[1])){if(L.some(x=>x[1]===e[1]))return;
