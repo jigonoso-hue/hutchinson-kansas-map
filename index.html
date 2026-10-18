@@ -141,7 +141,7 @@ h2.sec{font:900 30px/1.1 "Playfair Display",Georgia,serif;text-transform:upperca
 .gbar{position:absolute;pointer-events:none;z-index:5;left:var(--l);top:var(--t);width:var(--w);height:var(--h);background:linear-gradient(var(--dir,90deg),var(--col) 0,var(--col) 55%,transparent);mix-blend-mode:multiply;animation:gl-bar3 var(--d,1.4s) steps(1) infinite;animation-delay:var(--dl,0s)}
 @keyframes gl-bar3{0%{transform:translateX(0) scaleX(1);opacity:1}18%{transform:translateX(-18px) scaleX(1.25);opacity:.9}34%{transform:translateX(10px) scaleX(.6);opacity:.35}52%{transform:translateX(26px) scaleX(1.1);opacity:1}71%{transform:translateX(-8px) scaleX(.8);opacity:.7}86%{transform:translateX(14px) scaleX(1.4);opacity:1}}
 @keyframes gl-bar2{0%{opacity:1;transform:none}30%{opacity:.15;transform:translateX(30px)}45%{opacity:1;transform:translateX(-40px)}70%{opacity:1;transform:translateX(24px)}85%{opacity:.2;transform:none}}
-.calinfo{position:relative}
+.calinfo{position:sticky;top:8px;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .calinfo .gbar{mix-blend-mode:normal;height:calc(var(--h)*1.3)}
 .cal{overflow-x:clip}
 .calinfo.glitch strong u{position:absolute;left:0;top:0;width:100%;height:100%;text-decoration:none;pointer-events:none}
