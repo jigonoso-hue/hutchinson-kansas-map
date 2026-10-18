@@ -68,6 +68,18 @@ button{cursor:pointer}
 .modal label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted)}
 .modal .go{background:var(--accent);color:var(--on-accent);border:0;border-radius:10px;padding:11px;font-weight:600}
 .alert.info{background:var(--chip);border:1px solid var(--gold)}
+.kp{align-items:center;text-align:center}
+.kp .kpd{display:flex;gap:12px;justify-content:center;margin:2px 0 4px}
+.kp .kpd i{width:14px;height:14px;border-radius:50%;border:2px solid var(--muted);display:block}
+.kp .kpd i.on{background:var(--accent);border-color:var(--accent)}
+.kp .kpm{min-height:20px;font-size:13px;font-weight:600;color:var(--muted);margin:0}
+.kp .kpm.bad{color:var(--kwik)}
+.kp .kpg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:260px}
+.kp .kpg button{touch-action:manipulation;background:var(--field);border:1px solid var(--line);border-radius:12px;height:56px;font:600 22px/1 var(--font-display);color:var(--ink)}
+.kp .kpg button:active{background:var(--accent);color:var(--on-accent)}
+.kp .kpg button.fn{font-size:14px;font-family:inherit;color:var(--muted)}
+.kp.shake .kpd{animation:kpshake .35s}
+@keyframes kpshake{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
 .modal .linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;padding:4px;font-size:13px}
 .alert .linkbtn{align-self:flex-start;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:5px 10px;font-size:12.5px}
 .theme-btn{margin-left:auto;border:1px solid var(--line);background:var(--field);border-radius:8px;padding:5px 9px;font-size:12px;color:var(--muted)}
@@ -326,6 +338,16 @@ canvas.dragging{cursor:grabbing}
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
+</div>
+<div class="modal" id="kpModal" role="dialog" aria-modal="true" aria-labelledby="kpH" hidden>
+  <div class="card kp">
+    <h2 id="kpH">Kwik Shop</h2>
+    <p>Staff only. Enter the PIN.</p>
+    <div class="kpd" id="kpDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <p class="kpm" id="kpMsg" aria-live="polite"></p>
+    <div class="kpg" id="kpGrid"></div>
+    <button class="linkbtn" type="button" id="kpClose">Close</button>
+  </div>
 </div>
 <div class="modal" id="timeModal" role="dialog" aria-modal="true" aria-labelledby="tmH" hidden>
   <form class="card" id="timeForm">
@@ -1284,7 +1306,7 @@ $('zin').onclick=()=>zoomAt(1.5,cssW/2,cssH/2);$('zout').onclick=()=>zoomAt(1/1.
 
 function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind==='lm'),...pins,...(temp?[temp]:[]),...(store.kwik?places.filter(p=>p.kind==='kw'):[])];
   cand.forEach(p=>{const q=W2S(p.x,p.y);const oy=p.kind==='pin'||p.kind==='temp'?-12:0;const d=Math.hypot(q[0]-sx,q[1]+oy-sy);if(d<16&&d<bd){bd=d;best=p;}});return best;}
-function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);return;}
+function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);if(h.kind==='kw')openKeypad(h);return;}
   const wx=(sx-V.x)/V.s,wy=(sy-V.y)/V.s;if(wx<0||wy<0||wx>D.W||wy>D.H)return;
   temp={id:'temp',kind:'temp',name:'Dropped pin',x:wx,y:wy,detail:''};select(temp,false);}
 
@@ -1472,6 +1494,21 @@ new MutationObserver(()=>{readColors();draw();}).observe(document.documentElemen
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();draw();});
 new ResizeObserver(resize).observe(wrap);
 
+/* Kwik Shop staff keypad. No PIN has been set, so every entry is refused. */
+let kpBuf='';
+function kpPaint(){document.querySelectorAll('#kpDots i').forEach((d,i)=>d.classList.toggle('on',i<kpBuf.length));}
+function openKeypad(p){kpBuf='';kpPaint();$('kpH').textContent=p.name;$('kpMsg').textContent='';$('kpMsg').className='kpm';$('kpModal').hidden=false;}
+function kpPress(k){const m=$('kpMsg'),c=$('kpModal').querySelector('.card');
+  if(k==='C'){kpBuf='';m.textContent='';m.className='kpm';}
+  else if(k==='<'){kpBuf=kpBuf.slice(0,-1);}
+  else if(kpBuf.length<4){kpBuf+=k;}
+  kpPaint();
+  if(kpBuf.length===4||(k==='OK'&&kpBuf.length)){kpBuf='';setTimeout(()=>{kpPaint();m.textContent='Incorrect PIN';m.className='kpm bad';c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');},120);}}
+$('kpGrid').innerHTML=['1','2','3','4','5','6','7','8','9','C','0','<'].map(k=>'<button type="button" data-k="'+k+'"'+(k==='C'||k==='<'?' class="fn" aria-label="'+(k==='C'?'Clear':'Backspace')+'"':'')+'>'+(k==='<'?'&#9003;':k==='C'?'Clear':k)+'</button>').join('');
+$('kpGrid').addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(b)kpPress(b.dataset.k);});
+$('kpClose').onclick=()=>{$('kpModal').hidden=true;};
+$('kpModal').addEventListener('mousedown',e=>{if(e.target===$('kpModal'))$('kpModal').hidden=true;});
+document.addEventListener('keydown',e=>{if($('kpModal').hidden)return;if(e.key==='Escape')$('kpModal').hidden=true;else if(/^\d$/.test(e.key))kpPress(e.key);else if(e.key==='Backspace')kpPress('<');});
 function openTime(){$('mT').value=store.start||'15:15';$('mD').value=store.day||'weekday';$('timeModal').hidden=false;setTimeout(()=>$('mT').focus(),30);}
 $('tchip').onclick=openTime;
 $('keyBtn').onclick=()=>{const l=$('legend');l.hidden=!l.hidden;$('keyBtn').setAttribute('aria-expanded',String(!l.hidden));};
