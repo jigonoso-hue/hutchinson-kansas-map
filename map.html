@@ -969,24 +969,27 @@ const GOLF_N={x0:1148,y0:352,x1:1305,y1:456},GOLF_A={x0:1148,y0:460,x1:1254,y1:5
 /* 18 holes, each a free-form path from tee to green: some straight par 3s, several smooth curves, and 90-degree doglegs.
    m: 'curve' (smooth) or 'ang' (sharp 90-degree turn). bk = bunkers [t, side, size]. */
 const HSPEC=[
- {b:'N',m:'curve',p:[[1161,356],[1165,378],[1156,402],[1161,424],[1161,446]],w:11,gs:5.4,gt:'kidney',bk:[[.96,-1,1.8],[.96,1,1.8],[.6,1,1.6]]},
- {b:'N',m:'ang',p:[[1183,357],[1183,430],[1206,432]],w:10.5,gs:5.4,gt:'round',bk:[[.45,-1,1.8],[.97,-1,1.7],[.97,1,1.7],[.7,1,1.5]]},
- {b:'N',m:'curve',p:[[1205,357],[1205,375],[1205,394]],w:8,gs:6,gt:'island',bk:[[.9,-1,1.8],[.9,1,1.8]],wt:{k:'island'},ex:[{k:'pond',x:1205,y:412,rx:7,ry:5}]},
- {b:'N',m:'curve',p:[[1227,357],[1219,378],[1218,408],[1224,430],[1229,446]],w:10.5,gs:4.8,gt:'round',bk:[[.55,1,2.2],[.97,-1,1.6],[.97,1,1.6]],wt:{k:'creek',t:.3}},
- {b:'N',m:'ang',p:[[1249,357],[1249,430],[1274,434]],w:10.5,gs:5.2,gt:'kidney',bk:[[.4,-1,1.8],[.97,-1,1.7],[.97,1,1.7]],ex:[{k:'waste',x:1264,y:410,rx:6,ry:4}]},
- {b:'N',m:'curve',p:[[1270,357],[1270,374],[1270,392]],w:8,gs:6,gt:'island',bk:[[.9,-1,1.8],[.9,1,1.8]],wt:{k:'island'}},
- {b:'N',m:'curve',p:[[1292,356],[1286,380],[1298,406],[1292,430],[1292,447]],w:11,gs:5.4,gt:'wide',bk:[[.96,-1,1.7],[.96,1,1.7],[.55,1,1.8]],wt:{k:'pond',t:.3,side:-1,rx:3.2,ry:5.5}},
+ /* north */
+ {b:'N',m:'curve',p:[[1154,360],[1175,356],[1200,366],[1226,364]],w:10.5,gs:5.4,gt:'kidney',bk:[[.97,-1,1.8],[.97,1,1.7],[.5,1,1.6]],wt:{k:'pond',t:.58,side:1,rx:3.6,ry:3}},
+ {b:'N',m:'curve',p:[[1153,386],[1165,405],[1180,422],[1190,446]],w:10,gs:5,gt:'round',bk:[[.5,1,1.8],[.97,-1,1.7],[.97,1,1.7]],wt:{k:'creek',t:.3}},
+ {b:'N',m:'curve',p:[[1205,451],[1215,430],[1212,397]],w:8,gs:5.8,gt:'kidney',bk:[[.97,-1,1.7],[.97,1,1.7],[1.05,0,1.8]]},
+ {b:'N',m:'curve',p:[[1240,450],[1242,430],[1244,410]],w:8,gs:5.6,gt:'island',bk:[[.9,-1,1.7],[.9,1,1.7]],wt:{k:'island'}},
+ {b:'N',m:'ang',p:[[1226,389],[1264,389],[1264,436]],w:10,gs:5.2,gt:'round',bk:[[.35,-1,1.8],[.97,-1,1.7],[.97,1,1.7]],ex:[{k:'waste',x:1275,y:414,rx:5.5,ry:4}]},
+ {b:'N',m:'curve',p:[[1296,386],[1289,408],[1297,430],[1291,448]],w:10.5,gs:5.4,gt:'wide',bk:[[.96,-1,1.7],[.96,1,1.7],[.55,1,1.8]],wt:{k:'pond',t:.3,side:-1,rx:3,ry:5}},
+ {b:'N',m:'curve',p:[[1300,360],[1280,356],[1262,365],[1244,367]],w:9,gs:5.4,gt:'wide',bk:[[.97,-1,1.7],[.97,1,1.7],[.55,-1,1.5]]},
+ /* east */
  {b:'E',m:'ang',p:[[1265,469],[1301,469],[1301,489]],w:8.5,gs:5.4,gt:'kidney',bk:[[.5,-1,1.6],[.97,-1,1.6],[.97,1,1.6]]},
  {b:'E',m:'curve',p:[[1311,512],[1297,506],[1283,514],[1268,506]],w:8.5,gs:5.4,gt:'round',bk:[[.5,1,1.6],[.97,-1,1.6],[1.05,0,1.7]]},
  {b:'E',m:'ang',p:[[1312,524],[1286,524],[1286,538]],w:8,gs:5.2,gt:'wide',bk:[[.97,-1,1.7],[.97,1,1.7]],wt:{k:'island'}},
  {b:'E',m:'curve',p:[[1264,550],[1280,551],[1296,550],[1308,551]],w:8,gs:5.4,gt:'round',bk:[[.4,-1,1.5],[.97,-1,1.6],[.97,1,1.6]],ex:[{k:'pond',x:1296,y:541,rx:4,ry:2.6}]},
- {b:'S',m:'curve',p:[[1162,565],[1170,590],[1170,622],[1162,652]],w:11.5,gs:5.4,gt:'round',bk:[[.5,1,1.8],[.97,-1,1.6],[.97,1,1.6]]},
- {b:'S',m:'ang',p:[[1186,566],[1186,640],[1211,644]],w:10.5,gs:5,gt:'kidney',bk:[[.4,1,1.8],[.97,-1,1.6],[.97,1,1.6]],wt:{k:'creek',t:.4}},
- {b:'S',m:'curve',p:[[1211,567],[1211,587],[1211,607]],w:8,gs:6,gt:'wide',bk:[[.97,-1,1.8],[.97,1,1.8],[1.05,0,1.8]],wt:{k:'pond',t:.5,side:1,rx:3.4,ry:5},ex:[{k:'pond',x:1222,y:630,rx:4,ry:6}]},
- {b:'S',m:'curve',p:[[1234,566],[1228,590],[1240,620],[1234,653]],w:10.5,gs:5.2,gt:'round',bk:[[.55,1,2.2],[.55,-1,2.2],[.97,1,1.7]]},
- {b:'S',m:'ang',p:[[1258,567],[1258,624],[1283,628]],w:10.5,gs:5.2,gt:'kidney',bk:[[.4,-1,1.8],[.97,-1,1.7],[.97,1,1.7]]},
- {b:'S',m:'curve',p:[[1282,567],[1282,585],[1282,604]],w:8,gs:6.2,gt:'island',bk:[[.9,-1,1.8],[.9,1,1.8]],wt:{k:'island'},ex:[{k:'waste',x:1284,y:644,rx:8,ry:5}]},
- {b:'S',m:'curve',p:[[1305,566],[1311,590],[1311,620],[1304,652]],w:11,gs:5.4,gt:'kidney',bk:[[.4,-1,1.8],[.7,1,1.8],[.97,-1,1.7]],wt:{k:'creek',t:.5}}
+ /* south */
+ {b:'S',m:'curve',p:[[1156,567],[1167,590],[1161,612],[1168,634]],w:11,gs:5,gt:'round',bk:[[.5,1,1.8],[.97,-1,1.6],[.97,1,1.6]],ex:[{k:'pond',x:1183,y:606,rx:3.5,ry:5}]},
+ {b:'S',m:'curve',p:[[1190,567],[1200,585],[1212,602],[1218,628]],w:10.5,gs:5,gt:'kidney',bk:[[.4,-1,1.8],[.97,-1,1.6],[.97,1,1.6]],wt:{k:'creek',t:.4}},
+ {b:'S',m:'ang',p:[[1238,567],[1238,612],[1264,618]],w:10.5,gs:5.2,gt:'round',bk:[[.4,-1,1.8],[.97,-1,1.7],[.97,1,1.7]]},
+ {b:'S',m:'curve',p:[[1260,567],[1260,582],[1260,597]],w:8,gs:6,gt:'island',bk:[[.9,-1,1.8],[.9,1,1.8]],wt:{k:'island'}},
+ {b:'S',m:'curve',p:[[1287,567],[1294,590],[1286,612],[1292,632]],w:10.5,gs:5.2,gt:'kidney',bk:[[.55,1,1.8],[.97,-1,1.7],[.97,1,1.7]],wt:{k:'pond',t:.35,side:-1,rx:3.2,ry:5}},
+ {b:'S',m:'curve',p:[[1310,567],[1313,583],[1308,600]],w:8,gs:5.6,gt:'wide',bk:[[.97,-1,1.7],[.97,1,1.7],[1.05,0,1.7]]},
+ {b:'S',m:'curve',p:[[1312,651],[1275,654],[1236,647],[1196,654],[1158,649]],w:9.5,gs:5.6,gt:'wide',bk:[[.3,-1,1.9],[.55,1,1.9],[.97,-1,1.8],[.97,1,1.8]],ex:[{k:'waste',x:1250,y:636,rx:5,ry:3}]}
 ];
 const BLK={N:{road:[353.5,454]},S:{road:[561.5,658]},E:{road:[1259.5,1316.5]}};
 /* turn waypoints into a dense path: smooth curve or rounded 90-degree corner, then resample by arc length */
@@ -1011,7 +1014,7 @@ const GOLF_HOLES=HSPEC.map((sp,idx)=>{
   const bunk=sp.bk.map(([t,sd,r])=>{let p,m;if(t>1){p=green;m=tanN;const k=sp.gs*1.1+r*.6;return[p[0]+m[2]*k,p[1]+m[3]*k,r];}const q=at(t),mm=nrm(q[2]);const off=sd*(t>=.9?sp.gs*1.2+r*.5:hw(t)+r*.6);return[q[0]+mm[0]*off,q[1]+mm[1]*off,r];});
   let water=null;
   if(sp.wt&&sp.wt.k==='pond'){const q=at(sp.wt.t),mm=nrm(q[2]),ext=Math.hypot(sp.wt.rx*mm[0],sp.wt.ry*mm[1]),d=sp.wt.side*(hw(sp.wt.t)+ext+.3);water={k:'pond',x:q[0]+mm[0]*d,y:q[1]+mm[1]*d,rx:sp.wt.rx,ry:sp.wt.ry};}
-  else if(sp.wt&&sp.wt.k==='creek'){const q=at(sp.wt.t),mm=nrm(q[2]);water={k:'creek',x:q[0],y:q[1],nx:mm[0],ny:mm[1],half:10};}
+  else if(sp.wt&&sp.wt.k==='creek'){const q=at(sp.wt.t),mm=nrm(q[2]);water={k:'creek',x:q[0],y:q[1],nx:mm[0],ny:mm[1],half:8};}
   else if(sp.wt&&sp.wt.k==='island')water={k:'island'};
   const ex=(sp.ex||[]).map(e=>({k:e.k,x:e.x,y:e.y,rx:e.rx,ry:e.ry}));
   return{n,par,yds:Math.round(len*4.7/5)*5,tee,green,bunk,water,ex,fw,gs:sp.gs,gt:sp.gt,hz:Math.abs(tan0[2])>Math.abs(tan0[3]),gz:Math.abs(tanN[2])>Math.abs(tanN[3]),tn:tan0,gn:tanN,w:sp.w,b:sp.b,len,down:tan0[3]>0||tan0[2]>0,sp};
@@ -1019,25 +1022,19 @@ const GOLF_HOLES=HSPEC.map((sp,idx)=>{
 /* cart paths and club sidewalks, kept as data for future walking routes: each hole has its own path along its fairway, joined to the nearest road at both ends */
 const GOLF_PATHS=(()=>{const N=[],E=[],add=(p)=>{N.push(p);return N.length-1;};
   const gateN=add([1199,460]),gateS=add([1199,556]),gateE=add([1253,496]);
-  const roads={Nt:[],Nb:[],St:[],Sb:[],Ew:[],Ee:[]};
-  GOLF_HOLES.forEach(h=>{const ids=[],L=h.fw.length-1;[0,.2,.4,.6,.8,1].forEach(t=>{const f=h.fw[Math.min(L,Math.round(t*L))],d=f[2]+1.8;ids.push(add([f[0]+f[3]*d,f[1]+f[4]*d]));});
-    for(let i=0;i<ids.length-1;i++)E.push([ids[i],ids[i+1]]);
-    [ids[0],ids[ids.length-1]].forEach(id=>{const p=N[id],B=BLK[h.b];let best=null;
-      if(h.b==='E'){B.road.forEach((x,i)=>{const d=Math.abs(p[0]-x);if(!best||d<best.d)best={d,key:i?'Ee':'Ew',pos:p[1],pt:[x,p[1]]};});}
-      else{B.road.forEach((y,i)=>{const d=Math.abs(p[1]-y);if(!best||d<best.d)best={d,key:h.b+(i?'b':'t'),pos:p[0],pt:[p[0],y]};});}
-      const rid=add(best.pt);E.push([id,rid]);roads[best.key].push({pos:best.pos,id:rid});});});
-  const road=(key,pos,id)=>roads[key].push({pos,id});
-  const nb=add([1199,454]);road('Nb',1199,nb);E.push([gateN,nb]);
-  const st=add([1199,561.5]);road('St',1199,st);E.push([gateS,st]);
-  const ew=add([1259.5,496]);road('Ew',496,ew);E.push([gateE,ew]);
-  const lk=add([1259.5,561.5]);road('St',1259.5,lk);const ewb=add([1259.5,558]);road('Ew',558,ewb);E.push([ewb,lk]);
-  Object.values(roads).forEach(arr=>{arr.sort((p,q)=>p.pos-q.pos);for(let i=0;i<arr.length-1;i++)E.push([arr[i].id,arr[i+1].id]);});
+  /* no paths along the individual holes: one road loops around each nine-hole section and links to the clubhouse gates */
+  const loop=(x0,y0,x1,y1)=>{const q=[add([x0,y0]),add([x1,y0]),add([x1,y1]),add([x0,y1])];E.push([q[0],q[1]],[q[1],q[2]],[q[2],q[3]],[q[3],q[0]]);return q;};
+  const ln=loop(1149.5,353.5,1303.5,454),ls=loop(1149.5,561.5,1316.5,658),le=loop(1259.5,462,1316.5,558);
+  const nb=add([1199,454]);E.push([ln[3],nb],[nb,ln[2]],[gateN,nb]);
+  const st=add([1199,561.5]);E.push([ls[0],st],[st,ls[1]],[gateS,st]);
+  const ew=add([1259.5,496]);E.push([le[0],ew],[ew,le[3]],[gateE,ew]);
+  const sl=add([1259.5,561.5]);E.push([le[3],sl],[sl,st]);
   const cA=add([1149,461]),cB=add([1253,461]),cC=add([1253,555]),cD=add([1149,555]),st1=add([1149,529]),st2=add([1253,529]),circ=add([1199,476]),hub=add([1199,495]),pk=add([1199,505]),st3=add([1199,529]),pool=add([1172,470]),ten=add([1226,470]),prac=add([1176,490]),barn=add([1241,486]),ball=add([1229,495]);
   E.push([cA,gateN],[gateN,cB],[cB,gateE],[gateE,st2],[st2,cC],[cC,gateS],[gateS,cD],[cD,st1],[st1,cA],[st1,st3],[st3,st2],[gateN,circ],[circ,hub],[hub,pk],[pk,st3],[st3,gateS],[circ,pool],[circ,ten],[hub,prac],[hub,ball],[ball,barn],[ball,gateE]);
   return{nodes:N,edges:E};})();
 const MANSIONS=[
- {st:'L',roof:'#6B7794',pool:'kidney',ex:'fountain'},{st:'T',roof:'#B5654A',pool:'rect',ex:'gazebo'},{st:'U',roof:'#8F6A4A',pool:'kidney',ex:'tennis'},{st:'R',roof:'#5F7F63',pool:'rect',ex:'fountain'},
- {st:'T',roof:'#7A5C86',pool:'kidney',ex:'gazebo'},{st:'R',roof:'#A5584B',pool:'rect',ex:'tennis'},{st:'L',roof:'#4F6B8C',pool:'kidney',ex:'gazebo'},{st:'U',roof:'#7C7A5E',pool:'rect',ex:'fountain'}
+ {st:'L',roof:'#6B7794',pool:'kidney',ex:'fountain',mir:0},{st:'T',roof:'#B5654A',pool:'rect',ex:'gazebo',mir:1},{st:'U',roof:'#8F6A4A',pool:'kidney',ex:'tennis',mir:1},{st:'R',roof:'#5F7F63',pool:'rect',ex:'fountain',mir:0},
+ {st:'T',roof:'#7A5C86',pool:'kidney',ex:'gazebo',mir:1},{st:'R',roof:'#A5584B',pool:'rect',ex:'tennis',mir:0},{st:'L',roof:'#4F6B8C',pool:'kidney',ex:'gazebo',mir:0},{st:'U',roof:'#7C7A5E',pool:'rect',ex:'fountain',mir:1}
 ];
 let GOLF_TREES=null;
 function golfRects(){return [[1150,462,1172,476],[1190,462,1208,478],[1226,462,1252,478],[1160,478,1240,502],[1150,478,1176,504],[1240,478,1252,498],[1160,502,1240,508],[1150,510,1250,525],[1150,534,1250,549]];}
@@ -1098,7 +1095,7 @@ function drawGolf(){
   box(1150,462,1172,476,C.lot,null,rr);box(1152,464,1168,474,C.pool,C.roof,Math.max(3,3.4*z*.3));oval(1160,469,3,2,C.water,null,0);   /* pool with deck */
   /* McMansion lots */
   const lot=(x,y,north,sp)=>{
-    const W=(u,v)=>[x+u,north?y+v:y+15-v],RC=(u0,v0,u1,v1)=>{const p=W(u0,v0),q=W(u1,v1);return[Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.max(p[0],q[0]),Math.max(p[1],q[1])];};
+    const W=(u,v)=>[x+(sp.mir?20-u:u),north?y+v:y+15-v],RC=(u0,v0,u1,v1)=>{const p=W(u0,v0),q=W(u1,v1);return[Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.max(p[0],q[0]),Math.max(p[1],q[1])];};
     const rect=(u0,v0,u1,v1,fill,st,sd)=>{const r=RC(u0,v0,u1,v1);return box(r[0],r[1],r[2],r[3],fill,st,rr,sd);};
     rect(0,0,20,15,C.lawn2,null);
     {const r=RC(.4,.4,19.6,14.6),p=X(r[0],r[1]),q=X(r[2],r[3]);ctx.beginPath();ctx.roundRect(p[0],p[1],q[0]-p[0],q[1]-p[1],rr);ctx.lineWidth=Math.max(.8,.35*z);ctx.strokeStyle=C.hedge;ctx.stroke();}   /* hedge wall */
@@ -1130,7 +1127,7 @@ function drawGolf(){
   [1155,1160,1165].forEach((x,i)=>box(x,465,x+3,468,['#E8B34D','#C0392B','#4F86C6'][i],C.roof,.5,true));     /* pool cabanas */
   /* McMansion buildings */
   for(let row=0;row<2;row++)for(let i=0;i<4;i++){const sp=MANSIONS[row*4+i],x=1150+i*26,y=row?534:510,north=row===1;
-    const W=(u,v)=>[x+u,north?y+v:y+15-v],RC=(u0,v0,u1,v1)=>{const p=W(u0,v0),q=W(u1,v1);return[Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.max(p[0],q[0]),Math.max(p[1],q[1])];};
+    const W=(u,v)=>[x+(sp.mir?20-u:u),north?y+v:y+15-v],RC=(u0,v0,u1,v1)=>{const p=W(u0,v0),q=W(u1,v1);return[Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.max(p[0],q[0]),Math.max(p[1],q[1])];};
     const house=(u0,v0,u1,v1,col)=>{const r=RC(u0,v0,u1,v1);box(r[0],r[1],r[2],r[3],col,C.roof,rr,true);const ridgeV=(v0+v1)/2,p=W(u0,ridgeV),q=W(u1,ridgeV);line(p[0],p[1],q[0],q[1],.12,C.roof,.5);};
     const turret=(u,v,rad,col)=>{const c=W(u,v),q=X(c[0],c[1]);ctx.beginPath();ctx.arc(q[0]+sh*.6,q[1]+sh*.6,rad*z,0,6.283);ctx.fillStyle=C.shade;ctx.fill();ctx.beginPath();ctx.arc(q[0],q[1],rad*z,0,6.283);ctx.fillStyle=col;ctx.fill();ctx.lineWidth=Math.max(.6,.2*z);ctx.strokeStyle=C.roof;ctx.stroke();ctx.beginPath();for(let k=0;k<6;k++){const t=k/6*6.283;ctx.moveTo(q[0],q[1]);ctx.lineTo(q[0]+Math.cos(t)*rad*z,q[1]+Math.sin(t)*rad*z);}ctx.lineWidth=Math.max(.4,.1*z);ctx.stroke();};
     const r1=sp.roof;
