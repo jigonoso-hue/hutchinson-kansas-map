@@ -276,6 +276,52 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 .mp-info .tag{display:inline-block;background:#0f2a47;color:#fff;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
 .mp-info .x{position:absolute;top:2px;right:6px;border:0;background:none;font-size:22px;width:36px;height:36px;cursor:pointer;color:#555}
 @media (max-width:520px){.mp-vol{display:none}}
+
+/* ---------- polish ---------- */
+::selection{background:var(--gold);color:#000}
+h2.sec::after{content:"";display:block;width:54px;height:4px;border-radius:2px;background:var(--gold);margin-top:10px}
+.card{border-radius:12px;overflow:hidden;border-bottom:0;box-shadow:0 1px 3px rgba(0,40,80,.12),0 6px 18px rgba(0,60,110,.08);transition:transform .2s ease,box-shadow .2s ease}
+.card:hover{transform:translateY(-4px);box-shadow:0 4px 10px rgba(0,40,80,.14),0 14px 30px rgba(0,60,110,.16)}
+.card .pic{border-radius:0}
+.card .pic::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.35));pointer-events:none}
+.card .pic>*{position:relative}
+.card .pic img{position:absolute}
+.when{display:inline-block;align-self:flex-start;margin:14px 16px 0;padding:5px 10px;border-radius:999px;background:#fff3cf;color:#6d5200;font-size:11.5px}
+.card h3{margin-top:10px}
+.card p{line-height:1.55}
+@media (min-width:901px){
+  .cards .card:first-child{grid-column:1/-1;display:grid;grid-template-columns:42% 1fr;grid-template-rows:auto auto 1fr;align-content:start}
+  .cards .card:first-child .pic{grid-column:1;grid-row:1/4;aspect-ratio:auto;min-height:240px}
+  .cards .card:first-child .when{grid-column:2;margin:28px 28px 0}
+  .cards .card:first-child h3{grid-column:2;margin:10px 28px 8px;font-size:26px}
+  .cards .card:first-child p{grid-column:2;margin:0 28px 24px;font-size:16px}
+}
+.cards .card:first-child{position:relative}
+.heads a{transition:transform .15s}
+.heads a:hover{transform:translateX(3px)}
+.heads span.t{border-radius:6px}
+.docgrid{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.doc{border-radius:12px;border-top-width:5px;box-shadow:0 1px 3px rgba(0,40,80,.1);transition:transform .2s ease,box-shadow .2s ease}
+.doc:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(0,60,110,.18)}
+.doc .open::after{content:" \2192"}
+@media (min-width:701px){.ctabs{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.ctab{text-align:center;padding:9px 8px}}
+.ctab{transition:background .15s,border-color .15s,color .15s}
+.months{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.months{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:600px){.months{grid-template-columns:1fr}}
+.mon{border-radius:12px;box-shadow:0 1px 3px rgba(0,40,80,.1);border-top-width:5px}
+.mon td button{transition:transform .12s}
+.mon td button:hover{transform:scale(1.08)}
+.calinfo{border-radius:0 10px 10px 0}
+.cal-list li{transition:background .15s}
+.cal-list li:hover{background:var(--ice)}
+.quick a{transition:background .2s}
+.quick svg{transition:transform .2s}
+.quick a:hover svg{transform:translateY(-3px)}
+@media (max-width:700px){.quick a:last-child:nth-child(odd){grid-column:1/-1}}
+.hero .btn.big{box-shadow:0 8px 22px rgba(0,0,0,.28);transition:transform .15s,box-shadow .15s}
+.hero .btn.big:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,0,0,.34)}
+@media (prefers-reduced-motion:reduce){.card,.doc,.heads a,.quick svg,.mon td button,.hero .btn.big{transition:none}.card:hover,.doc:hover,.heads a:hover,.quick a:hover svg,.hero .btn.big:hover,.mon td button:hover{transform:none}}
 </style>
 </head>
 <body>
