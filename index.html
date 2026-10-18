@@ -268,8 +268,8 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
       <div>
         <h2 class="sec">News</h2>
         <div class="cards">
-          <a class="card" href="#calendar"><div class="pic" style="background:linear-gradient(135deg,#2a3f5a,#14284b)">Career Day<img src="assets/mascot.png" alt=""></div><span class="when">Thursday, October 14</span><h3>Career Day is the day before Homecoming</h3><p>Guest speakers from around Reno County will fill the gym and the hallways. Seniors will rotate through short sessions, ask real questions, and find out what comes after June. Dress nicely, and plan to be back the next day for Homecoming.</p></a>
-          <a class="card" href="map.html#lm2"><div class="pic">Homecoming<img src="assets/mascot.png" alt=""></div><span class="when">Friday, October 15</span><h3>Do not miss Homecoming</h3><p>The band will be warming up and Student Council has big plans for the gym. Plan to come early, stay late, and help stack chairs when it is over.</p></a>
+          <a class="card" href="#calendar"><div class="pic" style="background:linear-gradient(135deg,#2a3f5a,#14284b)">Career Day<img src="assets/mascot.png" alt=""></div><span class="when">Thursday, September 23</span><h3>Career Day is the day before Homecoming</h3><p>Guest speakers from around Reno County will fill the gym and the hallways. Seniors will rotate through short sessions, ask real questions, and find out what comes after June. Dress nicely, and plan to be back the next day for Homecoming.</p></a>
+          <a class="card" href="map.html#lm2"><div class="pic">Homecoming<img src="assets/mascot.png" alt=""></div><span class="when">Friday, September 24</span><h3>Do not miss Homecoming</h3><p>The band will be warming up and Student Council has big plans for the gym. Plan to come early, stay late, and help stack chairs when it is over.</p></a>
           <a class="card" href="#documents"><div class="pic" style="background:linear-gradient(135deg,#1c2a4a,#3b2a3f 60%,#c79a36);color:#fff">St. Louis<img src="assets/mascot.png" alt=""></div><span class="when">Friday, April 8</span><h3>Senior trip to St. Louis</h3><p>In the spring, the Class of 2005 will board the buses for St. Louis. The Gateway Arch will be waiting on the riverbank, a curve of silver steel that looks less like a monument than a door. Chaperones will ask everyone to stay with their group and count heads twice. The seniors will ride to the top, look west over the river, and wonder what the road ahead holds. Some doors only open once. Pack warm, and plan to walk through it together.</p></a>
           <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#1f5a3a,#0b2a1c)">Theatre Dept. &middot; Winter<img src="assets/mascot.png" alt=""></div><span class="when">January 28 &amp; 29</span><h3>Winter show: Brigadoon</h3><p>By Staff Reporter. This winter the theatre department will stage Brigadoon, the story of a Scottish village that is on no map and wakes for just one day every hundred years. Two lost travelers will stumble into it, and one of them will have to decide whether love is worth the world he left behind. Expect a story about hidden places, belonging, and what you owe the people who stay.</p></a>
           <a class="card" href="#cliques"><div class="pic" style="background:linear-gradient(135deg,#3a2a5a,#150f2a)">Theatre Dept. &middot; Spring<img src="assets/mascot.png" alt=""></div><span class="when">April 22 &amp; 23</span><h3>Spring show: Into the Woods</h3><p>By Staff Reporter. This spring the theatre department will take on Into the Woods. A baker and his wife will head into the forest to lift a curse, and half the fairy tale cast will wander in after wishes of their own. The first act will be bright and funny. The second will show what the wishes cost, and the room will likely go quiet. Expect a story about what we go looking for, and the promise that nobody walks out of the woods alone.</p></a>
@@ -322,7 +322,7 @@ footer small{display:block;grid-column:1/-1;opacity:.8;font-size:12.5px;border-t
 
   <section class="cal wrap" id="calendar" aria-labelledby="calh">
     <h2 class="sec" id="calh">School calendar 2004&ndash;05</h2>
-    <p style="margin-top:-8px;max-width:46em">First bell is Wednesday, August 18. Breaks and holidays are marked in red, and school events in gold.</p>
+    <p style="margin-top:-8px;max-width:46em">First bell is Tuesday, September 7, right after Labor Day. Breaks and holidays are marked in red, and school events in gold.</p>
     <div class="legend"><span><i style="background:#f4d9d9"></i>No school</span><span><i style="background:var(--gold)"></i>Event</span><span><i style="background:var(--navy)"></i>Big day</span></div>
     <div class="months" id="months"></div>
     <ul class="cal-list" id="callist"></ul>
@@ -420,11 +420,11 @@ $('lmgrid').innerHTML=LANDMARKS.map((n,i)=>'<a href="map.html#lm'+(i+1)+'"><i>'+
 (function(){
 const R=(a,b)=>{const o=[];for(let d=a;d<=b;d++)o.push(d);return o};
 const EV=[
- ["2004-08-18","First day of school","mile"],
+ ["2004-09-07","First day of school","mile"],
  ["2004-09-06","Labor Day, no school","off"],
- ["2004-10-14","Career Day","ev"],
- ["2004-10-15","Homecoming game and crowning","mile"],
- ["2004-10-16","Homecoming dance","ev"],
+ ["2004-09-23","Career Day","ev"],
+ ["2004-09-24","Homecoming game and crowning","mile"],
+ ["2004-09-25","Homecoming dance","ev"],
  ["2004-11-02","Election Day, staff in-service, no school","off"],
  ["2004-11-24","Thanksgiving break, Nov 24 to 26","off"],["2004-11-25","Thanksgiving break","off"],["2004-11-26","Thanksgiving break","off"],
  ["2004-12-10","Battle of the Bands","ev"],
@@ -447,7 +447,7 @@ const M={};EV.forEach(e=>M[e[0]]=e);
 const names=["January","February","March","April","May","June","July","August","September","October","November","December"];
 const wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const box=document.getElementById("months");let html="";
-for(let i=0;i<10;i++){const y=i<5?2004:2005,m=(7+i)%12;
+for(let i=0;i<9;i++){const y=i<4?2004:2005,m=(8+i)%12;
  const first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
  let t="<div class='mon'><h3>"+names[m]+" "+y+"</h3><table><tr>"+wd.map(d=>"<th>"+d[0]+"</th>").join("")+"</tr><tr>";
  for(let c=0;c<first;c++)t+="<td></td>";
