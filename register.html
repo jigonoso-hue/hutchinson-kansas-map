@@ -34,6 +34,35 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
 .pts{font-weight:700;color:var(--navy);padding:6px 10px;background:var(--ice);border-radius:6px}
 .pts.bad{background:#f8e3de;color:#a02335}
 .pts.ok{background:#e2f0e6;color:#1d6b3a}
+
+/* ---- progress card ---- */
+.prog{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 18px 12px;margin:0 0 18px;box-shadow:0 2px 10px rgba(0,60,110,.08);transition:border-color .2s,background .2s}
+.prog-top{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.prog h2{margin:0;font:900 22px/1.15 "Playfair Display",Georgia,serif;color:var(--navy)}
+.prog-txt p{margin:3px 0 0;color:var(--muted);font-size:14px}
+.btn.dl{padding:12px 22px;font-size:15px}
+.btn.dl:disabled{background:#d9dee6;color:#7b8794;cursor:not-allowed}
+.meter{height:8px;border-radius:99px;background:#e6ebf2;margin:14px 0 12px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:99px;background:var(--blue);transition:width .3s ease,background .3s}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.steps button{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:8px 14px 8px 10px;font:600 14px Inter,sans-serif;cursor:pointer;min-height:40px}
+.steps button .ck{width:18px;height:18px;border-radius:50%;border:1.5px solid #b7bfce;display:grid;place-items:center;flex:none}
+.steps button.done{border-color:#bfe0c9;background:#f1faf4;color:#1d6b3a}
+.steps button.done .ck{background:#1d8a4a;border-color:#1d8a4a}
+.steps button.done .ck::after{content:"";width:8px;height:4px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.prog .status{display:block;margin:4px 0 0;font-size:13px;color:var(--muted)}
+.hint{margin:12px 0 0;font-size:14px;color:#556}
+.more{margin-top:10px;font-size:13px;color:var(--muted)}
+.more summary{cursor:pointer;padding:6px 0;list-style:none;text-decoration:underline;text-underline-offset:3px}
+.more summary::-webkit-details-marker{display:none}
+.more-in{display:flex;gap:8px;flex-wrap:wrap;padding:6px 0 4px}
+.btn.sm{min-height:38px;padding:7px 14px;font-size:14px}
+.prog.ready{border-color:#9fd3b0;background:#f6fcf8}
+.prog.ready .meter i{background:#1d8a4a}
+.prog.ready .btn.dl{background:var(--gold);color:#000;box-shadow:0 6px 16px rgba(254,180,3,.45)}
+.doneBar{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;margin:22px 0 0;padding:16px;border-radius:14px;background:#f6fcf8;border:1px solid #9fd3b0;color:#1d6b3a}
+.doneBar[hidden]{display:none}
+@media (max-width:760px){.prog{padding:16px 14px 10px}.prog-top{align-items:stretch}.btn.dl{width:100%}.steps button{flex:1 1 calc(50% - 8px);justify-content:flex-start}}
 /* sheet (desktop overlay) */
 .sheet{position:relative;width:100%;max-width:850px;margin:0 auto;aspect-ratio:612/792;background:var(--cream) url("assets/register-form.png") center/100% 100% no-repeat;box-shadow:0 6px 24px rgba(0,40,90,.25);--pt:1.39px;font-family:"Times New Roman",Times,serif}
 .sheet input[type=text]{position:absolute;background:transparent;border:0;border-radius:2px;padding:0 2px;margin:0;color:#0b2a6b;font-family:inherit;font-size:calc(var(--pt)*9.8);width:auto}
@@ -96,17 +125,25 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
 <header class="top"><div class="in"><img src="assets/logo-h.png" alt=""><b>Hutchinson High School</b><nav><a href="index.html">Home</a><a href="index.html#documents">Documents</a><a href="index.html#cliques">The crowds</a></nav></div></header>
 <main class="wrap">
   <h1>Student Register</h1>
-  <p class="lead">Fill out your senior's register right here. Type on the form, pick your crowd, spend your six standing points and add a student photo. Your work saves on this device as you go. When you are done, download the finished PDF.</p>
-  <div class="bar" role="toolbar" aria-label="Register actions">
-    <button class="btn gold" type="button" id="photoBtn">Add student photo</button>
-    <button class="btn alt" type="button" id="adjBtn" disabled>Adjust photo crop</button>
-    <button class="btn" type="button" id="pdfBtn">Download PDF</button>
-    <button class="btn alt" type="button" id="saveBtn">Save to file</button>
-    <button class="btn alt" type="button" id="openBtn">Open saved file</button>
-    <button class="btn alt" type="button" id="clearBtn">Start over</button>
-    <span class="pts" id="pts" role="status" aria-live="polite">Points spent: 0 of 6</span>
-    <span class="status" id="status" aria-live="polite">Not saved yet</span>
-  </div>
+  <p class="lead">Fill in the register below. Your work saves on this device as you go. When every step is checked off, your download unlocks.</p>
+  <section class="prog" id="prog" aria-labelledby="progT">
+    <div class="prog-top">
+      <div class="prog-txt"><h2 id="progT">Finish your register</h2><p id="progS">0 of 6 steps done</p></div>
+      <button class="btn dl" type="button" id="pdfBtn" disabled>Download my register</button>
+    </div>
+    <div class="meter" aria-hidden="true"><i id="meterFill"></i></div>
+    <ul class="steps" id="steps"></ul>
+    <p class="hint" id="hint" role="status" aria-live="polite"></p>
+    <details class="more"><summary>Save a copy, open a saved one, or start over</summary>
+      <div class="more-in">
+        <button class="btn alt sm" type="button" id="saveBtn">Save to file</button>
+        <button class="btn alt sm" type="button" id="openBtn">Open saved file</button>
+        <button class="btn alt sm" type="button" id="clearBtn">Start over</button>
+      </div>
+    </details>
+    <span class="pts" id="pts" hidden></span>
+    <p class="status" id="status" aria-live="polite"></p>
+  </section>
   <input type="file" id="photoIn" accept="image/*" hidden>
   <div class="modal" id="cropModal" role="dialog" aria-modal="true" aria-labelledby="cropT" hidden>
     <div class="card">
@@ -121,6 +158,7 @@ h1{font:900 clamp(26px,4vw,38px)/1.1 "Playfair Display",Georgia,serif;margin:6px
 
   <div class="sheet" id="sheet" aria-label="Student register, page 1"></div>
   <form class="stack" id="stack" onsubmit="return false" aria-label="Student register form"></form>
+  <div class="doneBar" id="doneBar" hidden><b>You are all set.</b><button class="btn gold" type="button" id="pdfBtn2">Download my register</button></div>
   <p class="note">Your information stays in this browser and is only used to fill in the PDF you download. Need the full rules? <a href="pdfs/Hutchinson_Student_Register.pdf" target="_blank" rel="noopener">Open the Student Register and rules (PDF)</a>.</p>
 </main>
 
@@ -158,7 +196,7 @@ const pct=(v,t)=>(v/t*100)+"%";
 const place=(el,x,y,w,h)=>{el.style.left=pct(x,PW);el.style.top=pct(y,PH);el.style.width=pct(w,PW);el.style.height=pct(h,PH);};
 const points=()=>{let n=0,any=false;for(const k of ["grades","fin","pop"]){const g=RADIOS[k],i=st[k];if(i!==null&&i!==undefined){n+=g.opts[i][1];any=true;}}return n;};
 let saveTimer=null;
-function save(msg){try{localStorage.setItem(KEY,JSON.stringify(st));$("status").textContent=msg||"Saved on this device";}catch(e){$("status").textContent="Could not save here (storage full or blocked). Use Save to file.";}}
+function save(msg){try{localStorage.setItem(KEY,JSON.stringify(st));$("status").textContent=msg||"";}catch(e){$("status").textContent="Could not save here (storage full or blocked). Use Save to file.";}}
 function changed(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>save(),250);refresh();}
 function refresh(){
   const n=points(),p=$("pts");p.textContent="Points spent: "+n+" of 6";
@@ -168,15 +206,40 @@ function refresh(){
   document.querySelectorAll("[data-radio]").forEach(b=>{const k=b.dataset.radio,i=+b.dataset.i,on=st[k]===i;b.setAttribute("aria-checked",String(on));const dis=!on&&!canPick(k,i);b.setAttribute("aria-disabled",String(dis));b.title=dis?"Costs "+RADIOS[k].opts[i][1]+" points; you only have "+(CAP-others(k))+" left for this row":"";});
   document.querySelectorAll("[data-clique]").forEach(b=>b.setAttribute("aria-checked",String(st.clique===+b.dataset.clique)));
   document.querySelectorAll("[data-text]").forEach(i=>{if(i!==document.activeElement&&i.value!==(st.text[i.dataset.text]||""))i.value=st.text[i.dataset.text]||"";});
-  $("adjBtn").disabled=!st.photo;const ab2=$("adjBtn2");if(ab2)ab2.disabled=!st.photo;
+  const ab2=$("adjBtn2");if(ab2)ab2.hidden=!st.photo;const pb2=$("photoBtn2");if(pb2)pb2.textContent=st.photo?"Change photo":"Add a photo";
+  progress();
   const ph=$("photoSheet");if(ph)ph.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"";
   const pv=$("photoStack");if(pv)pv.innerHTML=st.photo?'<img alt="Student photo" src="'+st.photo+'">':"No photo yet";
+}
+const T=k=>(st.text[k]||"").trim();
+const STEPS=[
+ ["photo","Photo",()=>!!st.photo,()=>$("photoIn").click()],
+ ["name","Name",()=>!!T("name"),()=>focusField("name")],
+ ["cls","Class",()=>!!T("cls"),()=>focusField("cls")],
+ ["bday","Birthday",()=>!!T("bday"),()=>focusField("bday")],
+ ["clique","Choose a crowd",()=>st.clique!==null,()=>jumpTo("[data-clique]")],
+ ["stand","Spend 6 points",()=>["grades","fin","pop"].every(k=>st[k]!==null&&st[k]!==undefined)&&points()===CAP,()=>jumpTo("[data-radio]")]];
+const vis=sel=>[...document.querySelectorAll(sel)].find(e=>e.offsetParent!==null);
+function focusField(id){const e=vis('[data-text="'+id+'"]');if(e){e.scrollIntoView({block:"center",behavior:"smooth"});setTimeout(()=>e.focus({preventScroll:true}),300);}}
+function jumpTo(sel){const e=vis(sel);if(e)e.scrollIntoView({block:"center",behavior:"smooth"});}
+$("steps").innerHTML=STEPS.map(s=>'<li><button type="button" data-step="'+s[0]+'"><span class="ck"></span>'+s[1]+'</button></li>').join("");
+$("steps").addEventListener("click",e=>{const b=e.target.closest("[data-step]");if(!b)return;STEPS.find(s=>s[0]===b.dataset.step)[3]();});
+function progress(){
+  const d=STEPS.filter(s=>s[2]()).length,all=d===STEPS.length,left=STEPS.filter(s=>!s[2]());
+  document.querySelectorAll("[data-step]").forEach(b=>b.classList.toggle("done",STEPS.find(s=>s[0]===b.dataset.step)[2]()));
+  $("meterFill").style.width=(d/STEPS.length*100)+"%";
+  $("prog").classList.toggle("ready",all);
+  $("progT").textContent=all?"Your register is ready":"Finish your register";
+  $("progS").textContent=all?"Every step is done. Download your sheet.":d+" of "+STEPS.length+" steps done";
+  $("pdfBtn").disabled=!all;$("doneBar").hidden=!all;
+  const pts=points();
+  $("hint").textContent=all?"Everything is filled in and saved on this device.":(left.length===1?"One step left: "+left[0][1].toLowerCase()+".":"Still to do: "+left.map(s=>s[1].toLowerCase()).join(", ")+".")+(pts>0&&pts<CAP&&!all?" You have "+(CAP-pts)+" point"+(CAP-pts===1?"":"s")+" left to spend.":"");
 }
 function pickClique(i){st.clique=st.clique===i?null:i;changed();}
 const CAP=6;
 const others=k=>{let n=0;for(const j of ["grades","fin","pop"]){if(j===k)continue;const i=st[j];if(i!==null&&i!==undefined)n+=RADIOS[j].opts[i][1];}return n;};
 const canPick=(k,i)=>others(k)+RADIOS[k].opts[i][1]<=CAP;
-function warn(msg){const p=$("pts");$("status").textContent=msg;p.classList.add("bad");setTimeout(()=>refresh(),1400);}
+function warn(msg){$("hint").textContent=msg;setTimeout(()=>refresh(),2600);}
 function pickRadio(k,i){
   if(st[k]===i){st[k]=null;changed();return;}
   if(!canPick(k,i)){const left=CAP-others(k),cost=RADIOS[k].opts[i][1];warn("Not enough points. "+RADIOS[k].opts[i][0]+" costs "+cost+" and you only have "+left+" to spend on "+RADIOS[k].label+". Lower another standing first.");return;}
@@ -195,7 +258,7 @@ addEventListener("resize",scale);scale();
 /* ---- phone form ---- */
 const stack=$("stack");
 (function(){
-  let h='<fieldset><legend>Student photo</legend><div class="photoBox"><div class="pv" id="photoStack">No photo yet</div><div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="btn gold" id="photoBtn2">Take or choose a photo</button><button type="button" class="btn alt" id="adjBtn2" disabled>Adjust crop</button></div></div></fieldset>';
+  let h='<fieldset><legend>Student photo</legend><div class="photoBox"><div class="pv" id="photoStack">No photo yet</div><div style="display:flex;flex-direction:column;gap:8px"><button type="button" class="btn gold" id="photoBtn2">Add a photo</button><button type="button" class="btn alt sm" id="adjBtn2" hidden>Adjust crop</button></div></div></fieldset>';
   const secs=[];TEXT.forEach(f=>{let s=secs.find(x=>x[0]===f.sec);if(!s){s=[f.sec,[]];secs.push(s);}s[1].push(f);});
   secs.forEach(s=>{h+='<fieldset><legend>'+s[0]+'</legend>';
     s[1].forEach(f=>{h+='<label class="f">'+f.label+'<input type="text" data-text="'+f.id+'" maxlength="120" autocomplete="off"></label>';});
@@ -212,12 +275,10 @@ const stack=$("stack");
   $("adjBtn2").addEventListener("click",()=>openCrop(st.photo));
 })();
 /* ---- photo ---- */
-$("photoBtn").addEventListener("click",()=>$("photoIn").click());
 $("photoIn").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0];if(!f)return;
   const url=URL.createObjectURL(f);openCrop(url,()=>URL.revokeObjectURL(url));e.target.value="";
 });
-$("adjBtn").addEventListener("click",()=>openCrop(st.photo));
 /* ---- crop dialog: drag to move, slider or wheel or pinch to zoom; the square is exactly what is kept ---- */
 const cm=$("cropModal"),cv=$("cropCv"),cx2=cv.getContext("2d"),cview=$("cropView"),czoom=$("cropZoom");
 let ci=null,ccx=0,ccy=0,cz=1,cdone=null;const cptr=new Map();let pinch0=0,pz0=1;
@@ -285,10 +346,11 @@ $("pdfBtn").addEventListener("click",async()=>{
     if(st.photo){const img=await doc.embedJpg(st.photo);const x=PHOTO[0]+1.2,w=PHOTO[2]-PHOTO[0]-2.4,y=yy(PHOTO[3])+1.2,h=PHOTO[3]-PHOTO[1]-2.4;page.drawImage(img,{x,y,width:w,height:h});}
     doc.setTitle("Student Register: "+(st.text.name||"Student"));
     const out=await doc.save();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([out],{type:"application/pdf"}));a.download=slug(st.text.name||"student")+"-student-register.pdf";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
-    $("status").textContent="PDF downloaded";
+    $("hint").textContent="PDF downloaded. Check your downloads.";
   }catch(err){$("status").textContent=err.message||"Could not make the PDF.";}
-  btn.disabled=false;btn.textContent=old;
+  btn.disabled=false;btn.textContent=old;progress();
 });
+$("pdfBtn2").addEventListener("click",()=>$("pdfBtn").click());
 capReset=fixCap();refresh();if(capReset){save("Your standings were over the 6-point cap, so they were cleared. Pick them again.");}
 </script>
 </body>
