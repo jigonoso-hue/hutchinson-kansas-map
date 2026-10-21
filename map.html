@@ -190,6 +190,8 @@ button{cursor:pointer}
 .wleg span{display:inline-flex;align-items:center;gap:6px}
 .wleg i{display:inline-block;width:14px;height:10px;border-radius:2px;flex:none}
 .wleg b{color:var(--ink);font-weight:600}
+.tier{display:flex;align-items:center;gap:7px;margin:2px 0 6px!important;font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+.tier i{width:12px;height:12px;border-radius:3px;display:inline-block}
 .wleg em{font-style:normal}
 @media (max-width:820px){.wleg{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:4px 12px;left:12px;right:12px;padding:6px 10px;font-size:12px}.wleg em{display:none}}
 .mapwrap{position:relative;min-width:0;min-height:0;background:var(--land)}
@@ -341,7 +343,7 @@ canvas.dragging{cursor:grabbing}
     <div class="chips" id="chips" role="group" aria-label="Map overlays"><button class="chip" id="lyrWealth" type="button" aria-pressed="false">Wealth zones</button><button class="chip" id="lyrCave" type="button" aria-pressed="false">Salt caves</button><span class="lvlgrp" id="lvlRow" hidden><button class="chip" id="lvl1" type="button" aria-pressed="true">Level 1</button><button class="chip" id="lvl2" type="button" aria-pressed="false">Level 2</button></span></div>
     <div class="zoom"><button id="zin" type="button" aria-label="Zoom in">+</button><button id="zout" type="button" aria-label="Zoom out">&minus;</button><button id="zfit" type="button" aria-label="Center the map" style="font-size:11px">Center</button></div>
     <div class="info" id="info" hidden></div>
-    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i><b>Poor</b><em>: hand-me-downs, bike, a job to buy anything</em></span><span><i style="background:#D8A93C"></i><b>Middle</b><em>: new clothes, an old phone, a beater car</em></span><span><i style="background:#7A5BD8"></i><b>Rich</b><em>: new car, new phone, more of everything</em></span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i><b>Golf course</b></span></div>
+    <div class="wleg" id="wleg" hidden><span><i style="background:#C8553D"></i><b>Poor</b><em>: a job to buy anything</em></span><span><i style="background:#E0873A"></i><b>Working</b><em>: hand-me-downs, long shifts</em></span><span><i style="background:#D8C23C"></i><b>Middle</b><em>: new clothes, an old phone</em></span><span><i style="background:#4FA39B"></i><b>Comfortable</b><em>: a decent car, spare cash</em></span><span><i style="background:#7A5BD8"></i><b>Rich</b><em>: more of everything</em></span><span><i style="background:none;width:14px;text-align:center;font-style:normal;line-height:10px">&#9873;</i><b>Golf</b></span></div>
     <button class="keybtn" id="keyBtn" type="button" aria-expanded="false">Key</button>
     <div class="legend" id="legend" hidden><span><i style="background:var(--hwy)"></i>Highway</span><span><i style="background:var(--road-maj);border:1px solid var(--road-case)"></i>Main road</span><span><i style="background:var(--road-min)"></i>Street</span><span><i style="background:var(--bldg)"></i>Built-up block</span><span><i style="background:#E8A33D"></i>Slow traffic</span><span><i style="background:var(--route)"></i>Route</span><span><i class="f"></i>On foot after parking</span></div>
   </main>
@@ -746,26 +748,43 @@ function marker(p){
 /* ---------- overlays: gated community, wealth zones, salt caves ---------- */
 const GATED=[[772,452],[800,444],[832,428],[838,376],[872,376],[880,420],[906,440],[912,472],[896,492],[888,552],[800,552],[782,500]];
 const GATE=[846,552];
-const WZ={poor:'#C8553D',mid:'#D8A93C',rich:'#7A5BD8'};
-/* every road-bounded block joins exactly one zone (weighted nearest seed: x, y, reach, tier), so zones follow the street grid and never overlap */
-const WSEEDS=[
- [845,462,55,'rich'],[1255,505,95,'rich'],[190,600,60,'rich'],[300,575,32,'rich'],[240,520,40,'rich'],
- [400,640,115,'mid'],[180,735,75,'mid'],[705,742,75,'mid'],[640,540,70,'mid'],[270,430,95,'mid'],
- [60,850,115,'poor'],[230,1480,190,'poor'],[300,1330,120,'poor'],[850,985,95,'poor'],[880,1070,65,'poor'],
- [560,950,230,'mid'],[850,800,150,'mid'],[480,1160,150,'mid'],[330,900,120,'mid'],[1000,640,110,'mid'],[1100,900,100,'mid']
+const WZ={poor:'#C8553D',work:'#E0873A',mid:'#D8C23C',comf:'#4FA39B',rich:'#7A5BD8'};
+const WZN={poor:'Poor',work:'Working',mid:'Middle',comf:'Comfortable',rich:'Rich'};
+/* named districts: each is one or more seeds [x, y, reach]; every road-bounded block joins the nearest seed, so districts follow the street grid and never overlap */
+const DISTRICTS=[
+ {n:'Salt Meadow Estates',t:'rich',s:[[845,462,55]],b:'Gated and quiet. Wrought-iron fences, a guard shack, and lawns trimmed to the inch, with nothing but prairie past the back wall.'},
+ {n:'Prairie Dunes',t:'rich',s:[[1255,505,95]],b:'Country club living on the dunes. Fairways roll off to the horizon, and the clubhouse lights stay on all night.'},
+ {n:'Country Club Hills',t:'rich',s:[[190,600,60],[300,575,32],[240,520,40]],b:'Old money behind the club. Big brick houses, mature oaks, and driveways long enough to lose a car in.'},
+ {n:'Northridge',t:'comf',s:[[640,540,70]],b:'Newer split-levels and wide lawns on the north side. Quiet cul-de-sacs that end where the wheat begins.'},
+ {n:'Dillon Prairie',t:'comf',s:[[1000,640,110]],b:'Big yards at the edge of town. The horizon sits on every side and the sky feels endless. You can see a storm an hour before it arrives.'},
+ {n:'Northwest Heights',t:'comf',s:[[270,430,95]],b:'Tidy new subdivisions at the north edge. Sprinklers tick at dusk, and the fields beyond go on for what feels like forever.'},
+ {n:'Old Hutch',t:'mid',s:[[560,950,230]],b:'The old grid. Brick bungalows, porches and church steeples, where everyone knows everyone\'s business.'},
+ {n:'Fairview',t:'mid',s:[[400,640,115]],b:'Quiet blocks beside the fairgrounds. Fair season fills the streets with noise and the smell of funnel cake.'},
+ {n:'Salthawk Park',t:'mid',s:[[850,800,150]],b:'Ranch houses and basketball hoops near the school. The Friday night lights hum over the rooftops.'},
+ {n:'Poplar Street',t:'mid',s:[[705,742,75]],b:'Kids on bikes, sprinklers and garage sales. A friendly street that goes quiet when the sirens test.'},
+ {n:'Westside',t:'work',s:[[330,900,120]],b:'Small frame houses and chain-link fences. Pickups in the driveways and a shift whistle at three.'},
+ {n:'Riverside',t:'work',s:[[480,1160,150]],b:'Low ground by the Arkansas. Older houses, basements that smell of river, and sandbags every spring.'},
+ {n:'Runway Row',t:'work',s:[[1100,900,100]],b:'Rental homes under the flight path. The planes are loud, the rent is cheap, and the prairie starts at the fence.'},
+ {n:'West End',t:'work',s:[[180,735,75]],b:'Rows of faded duplexes at the western edge. The last streetlight gives way to open prairie.'},
+ {n:'Prairie Rose',t:'poor',s:[[60,850,115]],b:'Apartment blocks with shared laundry and flickering stairwell lights. Past the parking lot there is nothing but dark prairie.'},
+ {n:'Warehouse District',t:'poor',s:[[850,985,95],[880,1070,65]],b:'Trucks, rail yards and cheap motels. Shift workers sleep by day, and the streetlights are always out.'},
+ {n:'South Hutchinson',t:'poor',s:[[230,1480,190],[300,1330,120]],b:'Run-down and forgotten. Cracked sidewalks, boarded porches, junkyard dogs, and a smell of diesel and salt.'}
 ];
-const WLAB=[[845,415,'RICH','rich'],[1255,470,'RICH','rich'],[185,640,'RICH','rich'],[60,810,'POOR','poor'],[260,1440,'POOR','poor'],[850,1015,'POOR','poor'],[600,1020,'MIDDLE','mid']];
+const WSEEDS=[];DISTRICTS.forEach((d,k)=>d.s.forEach(p=>WSEEDS.push([p[0],p[1],p[2],d.t,k])));
+const CLUBBLK=[1149,461,1253,555];
 const GOLF=[[1255,545,'Prairie Dunes golf'],[262,610,'Country Club']];
 let wzCv=null;
 function inPoly(x,y,p){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi)c=!c;}return c;}
-function seedTier(wx,wy){let best=1e18,bt='mid',bs=null,bd=0;for(const sd of WSEEDS){const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bt=sd[3];bs=sd;bd=Math.hypot(dx,dy);}}return bt==='rich'&&bd>bs[2]*1.3?'mid':bt;}
+function seedHit(wx,wy){let best=1e18,bs=null,bd=0;for(const sd of WSEEDS){const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bs=sd;bd=Math.hypot(dx,dy);}}
+  if(bs[3]==='rich'&&bd>bs[2]*1.3){best=1e18;for(const sd of WSEEDS){if(sd[3]==='rich')continue;const dx=wx-sd[0],dy=wy-sd[1],v=dx*dx+dy*dy-sd[2]*sd[2];if(v<best){best=v;bs=sd;}}}return bs;}
+function seedTier(wx,wy){return seedHit(wx,wy)[3];}
 function buildWealth(){
   buildGrid();if(!grid||wzCv)return;
   const n=GW*GH,comp=grid.comp,nc=grid.nc,CI=grid.CI,sx=new Float64Array(nc),sy=new Float64Array(nc);
   for(let i=0;i<n;i++){const c=comp[i];if(c>=0){sx[c]+=(i%GW);sy[c]+=((i/GW)|0);}}
   const tier=new Array(nc);
   for(let c=0;c<nc;c++){const ci=CI[c];if(!ci)continue;const [cnt,park,edge]=ci;if(cnt<8||cnt>1200||edge||park/cnt>=.3)continue;tier[c]=seedTier(sx[c]/cnt*G,sy[c]/cnt*G);}
-  const col={poor:[200,85,61],mid:[216,169,60],rich:[122,91,216]};
+  const col={poor:[200,85,61],work:[224,135,58],mid:[216,194,60],comf:[79,163,155],rich:[122,91,216]};
   wzCv=document.createElement('canvas');wzCv.width=GW;wzCv.height=GH;const cx=wzCv.getContext('2d');const img=cx.createImageData(GW,GH);
   for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const i=y*GW+x,c=comp[i];if(c<0)continue;let t=tier[c];const wx=x*G,wy=y*G;
     if(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)&&!grid.blk[i]||(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED)&&CI[c]&&CI[c][0]<=1200))t='rich';
@@ -777,7 +796,8 @@ function drawWealth(){
   ctx.imageSmoothingEnabled=true;ctx.drawImage(wzCv,V.x,V.y,GW*G*V.s,GH*G*V.s);
 }
 function drawWealthLabels(){
-  const fs=Math.max(11,Math.min(17,12*Math.max(V.s,.9)));
+  {const a=W2S(CLUBBLK[0],CLUBBLK[1]),b=W2S(CLUBBLK[2],CLUBBLK[3]);ctx.save();ctx.globalAlpha=.68;ctx.fillStyle=WZ.rich;ctx.beginPath();ctx.roundRect(a[0],a[1],b[0]-a[0],b[1]-a[1],6);ctx.fill();ctx.restore();}
+  if(V.s>=.7){const fs=Math.max(10,Math.min(14,10.5*V.s));DISTRICTS.forEach(d=>{const q=W2S(d.s[0][0],d.s[0][1]);halo(d.n.toUpperCase(),q[0],q[1],'700 '+fs+'px IBM Plex Sans,system-ui,sans-serif',colors.ink);});}
   GOLF.forEach(g=>{const q=W2S(g[0],g[1]);ctx.beginPath();ctx.moveTo(q[0],q[1]+9);ctx.lineTo(q[0],q[1]-9);ctx.lineWidth=1.6;ctx.strokeStyle='#2E5E3A';ctx.stroke();ctx.beginPath();ctx.moveTo(q[0],q[1]-9);ctx.lineTo(q[0]+9,q[1]-5.5);ctx.lineTo(q[0],q[1]-2);ctx.closePath();ctx.fillStyle='#D8453C';ctx.fill();});
 }
 function drawGated(){
@@ -1320,7 +1340,14 @@ function hit(sx,sy){let best=null,bd=1e9;const cand=[...places.filter(p=>p.kind=
   cand.forEach(p=>{const q=W2S(p.x,p.y);const oy=p.kind==='pin'||p.kind==='temp'?-12:0;const d=Math.hypot(q[0]-sx,q[1]+oy-sy);if(d<16&&d<bd){bd=d;best=p;}});return best;}
 function onTap(sx,sy){const h=hit(sx,sy);if(h){select(h,false);if(h.kind==='kw')openKeypad(h);return;}
   const wx=(sx-V.x)/V.s,wy=(sy-V.y)/V.s;if(wx<0||wy<0||wx>D.W||wy>D.H)return;
-  temp={id:'temp',kind:'temp',name:'Dropped pin',x:wx,y:wy,detail:''};select(temp,false);}
+  const dz=store.wealth?districtAt(wx,wy):null;
+  temp={id:'temp',kind:'temp',name:dz?dz.n:'Dropped pin',x:wx,y:wy,detail:'',district:dz||null};select(temp,false);}
+function districtAt(wx,wy){
+  if(wx>=CLUBBLK[0]&&wx<=CLUBBLK[2]&&wy>=CLUBBLK[1]&&wy<=CLUBBLK[3])return Object.assign({k:1},DISTRICTS[1]);
+  if(!wzCv)return null;const gx=Math.floor(wx/G),gy=Math.floor(wy/G);if(gx<0||gy<0||gx>=GW||gy>=GH)return null;
+  const px=wzCv.getContext('2d').getImageData(gx,gy,1,1).data;if(!px[3])return null;
+  if(wx>760&&wx<920&&wy>360&&wy<560&&inPoly(wx,wy,GATED))return DISTRICTS[0];
+  return DISTRICTS[seedHit(wx,wy)[4]];}
 
 /* ---------- landmark photos: real images pulled live from Wikipedia / Wikimedia Commons ---------- */
 const PHOTO_TITLES={2:["Gowans Stadium"],3:["Hutchinson Community College"],4:["Cosmosphere"],5:["Fox Theater (Hutchinson, Kansas)"],6:["Kansas State Fair"],7:["Hutchinson Regional Airport"],8:["Hutchinson Zoo","Carey Park (Hutchinson, Kansas)"],9:["Strataca"],10:["Prairie Dunes Country Club"],11:["Sand Hills State Park"],12:["Dillon Nature Center"],13:["Hutchinson Public Library"],25:["Hutchinson Regional Medical Center"]};
@@ -1380,9 +1407,9 @@ function select(p,pan){selected=p;renderInfo();draw();
 const HANGOUT={25:'Valedictorians (volunteers), Student Council',1:'Band, Bullies (east stairwell), Burnouts (back lot), Hall Monitors, Student Council, Theater',2:'Jocks, Band, Bullies',3:'Valedictorians',4:'Robotics',5:'Theater',6:'Ag / FFA',8:'Popular Kids',13:'Goths, Valedictorians',14:'Burnouts',15:'Robotics',16:'Jocks, Burnouts, Popular Kids, Theater',17:'Goths',18:'Hall Monitors',19:'Student Council, Valedictorians',20:'Bullies, Burnouts',21:'Band, Goths, Valedictorians',22:'Burnouts, Bullies',23:'Popular Kids, Jocks, Burnouts, Band',24:'Popular Kids, Jocks'};
 function loreHtml(p){const L=p.kind==='lm'&&LORE[p.num];if(!L)return'';return '<div class="lore"><p class="fact">'+esc(L[0])+'</p><p class="game">'+esc(L[1])+'</p>'+(HANGOUT[p.num]?'<p class="hang">Hangout for: '+esc(HANGOUT[p.num])+'</p>':'')+'</div>';}
 function renderInfo(){const el=$('info');if(selected&&selected.kind==='lm'&&!photoReq)loadPhotos().then(()=>{if(selected&&selected.kind==='lm')renderInfo();});document.body.classList.toggle('info-open',!!selected);if(!selected){el.hidden=true;return;}const p=selected;el.hidden=false;
-  let sub=p.detail;if(p.kind==='kw'&&store.caves)sub+=' A trapdoor in the stockroom drops into a salt cave.';if(p.kind==='temp'){const n=nearest(p);sub=n?'About '+fmtDist(n.m)+' from '+n.p.name+'.':'';}
+  let sub=p.detail;if(p.kind==='kw'&&store.caves)sub+=' A trapdoor in the stockroom drops into a salt cave.';if(p.kind==='temp'){const n=nearest(p);sub=p.district?p.district.b:(n?'About '+fmtDist(n.m)+' from '+n.p.name+'.':'');}
   const saved=p.kind==='pin';
-  el.innerHTML='<button class="x" id="ix" type="button" aria-label="Close">&times;</button><h3>'+esc(p.name)+'</h3>'+photoHtml(p)+(sub?'<p>'+esc(sub)+'</p>':'')+loreHtml(p)+
+  el.innerHTML='<button class="x" id="ix" type="button" aria-label="Close">&times;</button><h3>'+esc(p.name)+'</h3>'+(p.district?'<p class="tier"><i style="background:'+WZ[p.district.t]+'"></i>'+WZN[p.district.t]+' neighborhood</p>':'')+photoHtml(p)+(sub?'<p>'+esc(sub)+'</p>':'')+loreHtml(p)+
    '<div class="acts"><button class="ghost pri" data-a="to" type="button">Directions here</button><button class="ghost" data-a="from" type="button">Start here</button>'+
    (p.kind==='temp'?'<button class="ghost" data-a="save" type="button">Save pin</button>':'')+(saved?'<button class="ghost" data-a="del" type="button">Remove pin</button>':'')+'</div>';
   $('ix').onclick=()=>{selected=null;if(temp&&temp===p&&!pins.includes(p))temp=null;renderInfo();draw();};
