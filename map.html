@@ -1280,6 +1280,7 @@ function draw(){
   ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,cssW,cssH);
   ctx.fillStyle=colors.land;ctx.fillRect(0,0,cssW,cssH);
   const z=V.s;
+  const wmin=Math.max(.8,Math.min(5,2.0*z)),wmaj=Math.max(2.8,Math.min(10,6.5*z)),whw=Math.max(5,Math.min(14,10.5*z));
   withoutGolfZone(()=>{
   poly(D.urban,true);ctx.fillStyle=colors.urban;ctx.fill('evenodd');
   poly(D.park,true);ctx.fillStyle=colors.park;ctx.fill('evenodd');
@@ -1287,7 +1288,6 @@ function draw(){
   if(store.bldg){buildGrid();if(maskCv){ctx.imageSmoothingEnabled=false;ctx.drawImage(maskCv,V.x,V.y,GW*G*V.s,GH*G*V.s);ctx.imageSmoothingEnabled=true;}}
   if(store.wealth)drawWealth();
   if(store.hood)drawHoods();
-  const wmin=Math.max(.8,Math.min(5,2.0*z)),wmaj=Math.max(2.8,Math.min(10,6.5*z)),whw=Math.max(5,Math.min(14,10.5*z));
   strokeEdges(0,0,wmin,null,colors['road-min']);
   strokeEdges(1,wmaj+1.8,wmaj,colors['road-case'],colors['road-maj']);
   strokeEdges(2,whw+2.4,whw*.66,colors['hwy-case'],colors.hwy);
