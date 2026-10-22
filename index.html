@@ -687,7 +687,7 @@ document.getElementById('tX').onclick=close;
 m.addEventListener('mousedown',e=>{if(e.target===m)close();});
 document.addEventListener('keydown',e=>{if(!m.hidden&&e.key==='Escape')close();});
 async function open1(file,pass){
-  const buf=new Uint8Array(await fetch(file+'?v=3').then(r=>{if(!r.ok)throw new Error('Could not load the guides.');return r.arrayBuffer();}));
+  const buf=new Uint8Array(await fetch(file+'?v=4').then(r=>{if(!r.ok)throw new Error('Could not load the guides.');return r.arrayBuffer();}));
   const salt=buf.slice(0,16),iv=buf.slice(16,28),ct=buf.slice(28);
   const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
   const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:300000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
