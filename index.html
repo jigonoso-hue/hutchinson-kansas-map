@@ -326,7 +326,7 @@ h2.sec::after{content:"";display:block;width:54px;height:4px;border-radius:2px;b
 /* ---------- teachers login ---------- */
 .tmodal{position:fixed;inset:0;z-index:90;background:rgba(10,20,40,.72);display:grid;place-items:center;padding:16px}
 .tmodal[hidden]{display:none}
-.tbox{background:#fff;border-radius:14px;max-width:380px;width:100%;padding:24px 22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.4);position:relative}
+.tbox{max-height:92vh;overflow-y:auto;background:#fff;border-radius:14px;max-width:380px;width:100%;padding:24px 22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.4);position:relative}
 .tbox h2{margin:0 0 4px;font:900 22px/1.15 "Playfair Display",Georgia,serif;color:var(--navy)}
 .tbox p{margin:0 0 14px;color:#556;font-size:14px}
 .tbox label{display:block;font-weight:600;font-size:13px;color:var(--navy);margin-bottom:6px}
@@ -473,9 +473,8 @@ h2.sec::after{content:"";display:block;width:54px;height:4px;border-radius:2px;b
     </form>
     <div class="tok">
       <h2>Unlocked</h2>
-      <p>The guide is ready.</p>
-      <a class="tbtn gold" id="tOpen" target="_blank" rel="noopener">Open the guide (PDF)</a>
-      <a class="tbtn" id="tSave" download="Hutchinson_Incursions_Teachers_Only.pdf">Download the PDF</a>
+      <p>Two guides are ready.</p>
+      <div id="tList"></div>
     </div>
   </div>
 </div>
@@ -676,27 +675,31 @@ document.getElementById("callist").innerHTML=L.filter(e=>e[1]!=="Thanksgiving br
   if(want){a.play().catch(()=>{const go=()=>{a.play().catch(()=>{});['pointerdown','keydown','touchstart'].forEach(t=>removeEventListener(t,go,true));};['pointerdown','keydown','touchstart'].forEach(t=>addEventListener(t,go,true));});}
 })();
 
-/* Teachers login: the guide is stored encrypted (AES-GCM, key from PBKDF2) and only opens with the right password. */
+/* Teachers login: each guide is stored encrypted (AES-GCM, key from PBKDF2) and only opens with the right password. */
 (function(){
-const m=document.getElementById('tModal'),f=document.getElementById('tForm'),pw=document.getElementById('tPw'),err=document.getElementById('tErr'),go=document.getElementById('tGo'),box=document.getElementById('tBox');
-let url=null;
-const close=()=>{m.hidden=true;box.classList.remove('open');pw.value='';err.textContent='';if(url){URL.revokeObjectURL(url);url=null;}};
+const FILES=[['teachers/guide.bin','The Incursions','Hutchinson_Incursions_Teachers_Only.pdf'],['teachers/clues.bin','The Engineer\'s Trail','Hutchinson_Engineers_Trail_Teachers_Only.pdf']];
+const m=document.getElementById('tModal'),f=document.getElementById('tForm'),pw=document.getElementById('tPw'),err=document.getElementById('tErr'),go=document.getElementById('tGo'),box=document.getElementById('tBox'),list=document.getElementById('tList');
+let urls=[];
+const clear=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[];list.innerHTML='';};
+const close=()=>{m.hidden=true;box.classList.remove('open');pw.value='';err.textContent='';clear();};
 document.querySelectorAll('[data-teachers]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();m.hidden=false;setTimeout(()=>pw.focus(),30);}));
 document.getElementById('tX').onclick=close;
 m.addEventListener('mousedown',e=>{if(e.target===m)close();});
 document.addEventListener('keydown',e=>{if(!m.hidden&&e.key==='Escape')close();});
-f.addEventListener('submit',async e=>{e.preventDefault();err.textContent='';go.disabled=true;go.textContent='Checking...';
- try{
-  if(!(window.crypto&&crypto.subtle))throw new Error('This browser cannot unlock the guide. Try a current Chrome, Safari or Firefox.');
-  const buf=new Uint8Array(await fetch('teachers/guide.bin?v=1').then(r=>{if(!r.ok)throw new Error('Could not load the guide.');return r.arrayBuffer();}));
+async function open1(file,pass){
+  const buf=new Uint8Array(await fetch(file+'?v=2').then(r=>{if(!r.ok)throw new Error('Could not load the guides.');return r.arrayBuffer();}));
   const salt=buf.slice(0,16),iv=buf.slice(16,28),ct=buf.slice(28);
-  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw.value),'PBKDF2',false,['deriveKey']);
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
   const key=await crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:300000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
-  let plain;try{plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);}catch(_){throw new Error('That password did not work.');}
-  url=URL.createObjectURL(new Blob([plain],{type:'application/pdf'}));
-  document.getElementById('tOpen').href=url;document.getElementById('tSave').href=url;
+  try{return await crypto.subtle.decrypt({name:'AES-GCM',iv},key,ct);}catch(_){throw new Error('That password did not work.');}
+}
+f.addEventListener('submit',async e=>{e.preventDefault();err.textContent='';go.disabled=true;go.textContent='Checking...';clear();
+ try{
+  if(!(window.crypto&&crypto.subtle))throw new Error('This browser cannot unlock the guides. Try a current Chrome, Safari or Firefox.');
+  const out=[];for(const fl of FILES){const plain=await open1(fl[0],pw.value);out.push([fl,URL.createObjectURL(new Blob([plain],{type:'application/pdf'}))]);}
+  out.forEach(([fl,u])=>{urls.push(u);list.insertAdjacentHTML('beforeend','<h3 style="margin:14px 0 6px;font:700 15px Inter,sans-serif;color:var(--navy)">'+fl[1]+'</h3><a class="tbtn gold" target="_blank" rel="noopener" href="'+u+'">Open the PDF</a><a class="tbtn" download="'+fl[2]+'" href="'+u+'">Download</a>');});
   pw.value='';box.classList.add('open');
- }catch(ex){err.textContent=ex.message||'That password did not work.';}
+ }catch(ex){err.textContent=ex.message||'That password did not work.';clear();}
  go.disabled=false;go.textContent='Unlock';});
 })();
 </script>
