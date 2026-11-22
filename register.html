@@ -182,15 +182,17 @@ const CLIQUES=[["Jocks",158,172],["Band",259.5,172],["Ag / FFA",361,172],["Theat
 const BOX=8;
 const XS=[238,310.8,383.5,456.2,529];
 const RADIOS={
- grades:{label:"Current Grades",note:"Teachers, scholarships, and who trusts your facts",y:572,opts:[["F",0,XS[0]],["D",1,XS[1]],["C",2,XS[2]],["B",3,XS[3]],["A",4,XS[4]]]},
+ grades:{label:"Current Grades",note:"Teachers, scholarships, and who trusts your facts",y:572,opts:[["D",0,XS[0]],["C",1,XS[1]],["B",2,XS[2]],["A",3,XS[3]]]},
  fin:{label:"Family Finances",note:"Wheels, cash, free time, and who can afford to help",y:616,opts:[["Lower",0,XS[0]],["Middle",2,XS[2]],["Upper",4,XS[4]]]},
  pop:{label:"Popularity",note:"Who listens, who talks, and what spreads",y:660,opts:[["Invisible",0,XS[0]],["Overlooked",1,XS[1]],["Known",2,XS[2]],["Liked",3,XS[3]],["Popular",4,XS[4]]]}
 };
 const DOT=14,PTSBOX=[502,702,528,718],PHOTO=[496,30,564,98];
 const KEY="hhs-student-register-v1";
 const $=id=>document.getElementById(id);
-let st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};
-try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")st=Object.assign(st,s);}catch(e){}
+let st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null,gv:2};
+/* grades used to run F, D, C, B, A. D is now the lowest (0 points), so older saves shift down one step. */
+const migrateGrades=o=>{if(o.gv!==2){if(o.grades!==null&&o.grades!==undefined)o.grades=[0,0,1,2,3][o.grades]??null;o.gv=2;}return o;};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&typeof s==="object")st=Object.assign(st,migrateGrades(s));}catch(e){}
 let capReset=false;
 const pct=(v,t)=>(v/t*100)+"%";
 const place=(el,x,y,w,h)=>{el.style.left=pct(x,PW);el.style.top=pct(y,PH);el.style.width=pct(w,PW);el.style.height=pct(h,PH);};
@@ -325,9 +327,9 @@ $("saveBtn").addEventListener("click",()=>{
 $("openBtn").addEventListener("click",()=>$("openIn").click());
 $("openIn").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0];if(!f)return;
-  f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o!=="object"||!o.text)throw 0;st={text:o.text||{},clique:o.clique??null,grades:o.grades??null,fin:o.fin??null,pop:o.pop??null,photo:o.photo||null};const reset=fixCap();save(reset?"Opened "+f.name+", but its standings were over 6 points, so they were cleared.":"Opened "+f.name);refresh();}catch(err){$("status").textContent="That file is not a saved register.";}e.target.value="";});
+  f.text().then(t=>{try{const o=JSON.parse(t);if(!o||typeof o!=="object"||!o.text)throw 0;st=migrateGrades({text:o.text||{},clique:o.clique??null,grades:o.grades??null,fin:o.fin??null,pop:o.pop??null,photo:o.photo||null,gv:o.gv});const reset=fixCap();save(reset?"Opened "+f.name+", but its standings were over 6 points, so they were cleared.":"Opened "+f.name);refresh();}catch(err){$("status").textContent="That file is not a saved register.";}e.target.value="";});
 });
-$("clearBtn").addEventListener("click",()=>{if(confirm("Clear everything on this register and start over?")){st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null};save("Cleared");refresh();}});
+$("clearBtn").addEventListener("click",()=>{if(confirm("Clear everything on this register and start over?")){st={text:{},clique:null,grades:null,fin:null,pop:null,photo:null,gv:2};save("Cleared");refresh();}});
 const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"student";
 /* ---- PDF export (fills page 1 of the real PDF) ---- */
 $("pdfBtn").addEventListener("click",async()=>{
