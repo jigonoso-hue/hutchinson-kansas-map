@@ -630,7 +630,7 @@ document.getElementById("callist").innerHTML=L.filter(e=>e[1]!=="Thanksgiving br
 <script>
 /* Teachers login: each guide is stored encrypted (AES-GCM, key from PBKDF2) and only opens with the right password. */
 (function(){
-const FILES=[['teachers/guide.bin','The Incursions','Hutchinson_Incursions_Teachers_Only.pdf'],['teachers/clues.bin','The Engineer\'s Trail','Hutchinson_Engineers_Trail_Teachers_Only.pdf']];
+const FILES=[['teachers/guide.bin','The Incursions','Hutchinson_Incursions_Teachers_Only.pdf'],['teachers/clues.bin','The Engineer\'s Trail','Hutchinson_Engineers_Trail_Teachers_Only.pdf'],['teachers/bosses.bin','The Boss Fights','Hutchinson_Boss_Fights_Teachers_Only.pdf']];
 const m=document.getElementById('tModal'),f=document.getElementById('tForm'),pw=document.getElementById('tPw'),err=document.getElementById('tErr'),go=document.getElementById('tGo'),box=document.getElementById('tBox'),list=document.getElementById('tList');
 let urls=[];
 const clear=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[];list.innerHTML='';};
